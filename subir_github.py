@@ -43,7 +43,7 @@ def main():
     # Verifica branch atual
     logger.info("Verificando branch atual")
     result = subprocess.run("git branch --show-current", shell=True, text=True, capture_output=True)
-    branch = result.stdout.strip() or "master"  # Default para master se vazio
+    branch = result.stdout.strip() or "main"  # Default para master se vazio
     logger.info(f"Branch atual: {branch}")
 
     # Comandos Git
