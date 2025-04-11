@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Meus Vídeos</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+
+@keyframes pulse {
+    0% { opacity: 0.6; }
+    50% { opacity: 0.3; }
+    100% { opacity: 0.6; }
+}
+            * {
+                box-sizing: border-box;
+                margin: 0;
+                padding: 0;
+            }
+            
+            body { 
+                background: #1a1a1a; 
+                color: #ffffff; 
+                font-family: Arial, sans-serif; 
+                margin: 0; 
+                padding: 20px; 
+                min-height: 100vh;
+            }
+            
+            h1 { 
+                text-align: center; 
+                margin-bottom: 20px;
+                padding: 10px;
+            }
+            
+            .container {
+                max-width: 800px;
+                margin: 0 auto;
+                padding: 0 15px;
+            }
+            
+            .search-bar {
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    gap: 10px; 
+    margin: 30px auto; 
+    max-width: 600px;
+    width: 100%;
+    background: #2a2a2a;
+    border-radius: 12px;
+    padding: 10px 15px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+}.search-bar input {
+    padding: 12px 15px; 
+    font-size: 16px; 
+    flex: 1;
+    min-width: 0;
+    border-radius: 8px; 
+    border: none;
+    background: #363636;
+    color: #ffffff;
+}
+
+.search-bar button {
+    padding: 12px 20px; 
+    font-size: 16px; 
+    border: none; 
+    border-radius: 8px;
+    background: #1e90ff; 
+    color: white; 
+    cursor: pointer;
+    transition: all 0.3s;
+    white-space: nowrap;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-bar button:hover { 
+    background: #0078e7;
+    transform: translateY(-2px);
+}
+
+.search-bar .toggle-btn {
+    padding: 12px 18px;
+    font-size: 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, #ff7e5f, #feb47b);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.search-bar .toggle-btn:hover {
+    background: linear-gradient(135deg, #ff6e4c, #fea768);
+    transform: translateY(-2px);
+}
+            
+            #topBtn {
+                position: fixed;
+                bottom: 30px;
+                right: 30px;
+                z-index: 100;
+                background-color: #1e90ff;
+                color: white;
+                border: none;
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                font-size: 18px;
+                cursor: pointer;
+                display: none;
+                box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            #topBtn:hover { 
+                background-color: #1c7dd9; 
+            }
+            
+            .suggestions {
+                background: #2a2a2a; 
+                border-radius: 8px; 
+                max-width: 600px; 
+                margin: 0 auto;
+                position: relative; 
+                top: -10px; 
+                z-index: 10;
+                overflow: hidden;
+                width: 100%;
+            }
+            
+            .suggestions .item {
+                display: flex; 
+                align-items: center; 
+                padding: 10px;
+                border-bottom: 1px solid #444; 
+                cursor: pointer;
+            }
+            
+            .suggestions .item img {
+                width: 60px; 
+                height: 34px; 
+                object-fit: cover; 
+                margin-right: 10px; 
+                border-radius: 4px;
+            }
+            
+            .suggestions .item:hover { 
+                background: #444; 
+            }
+            
+            .suggestions .more-btn {
+                text-align: center; 
+                padding: 10px; 
+                cursor: pointer;
+                background: #3a3a3a; 
+                font-weight: bold;
+            }
+            
+            .suggestions .more-btn:hover { 
+                background: #4a4a4a; 
+            }
+            
+            #videos {
+                display: flex;
+                flex-direction: column;
+                gap: 30px;
+                margin: 0 auto;
+                max-width: 600px;
+            }
+            
+            .video-container { 
+                margin: 0 auto; 
+                width: 100%; 
+                min-height: 315px; 
+            }
+            
+            h2 { 
+                margin: 0 0 15px 0; 
+                font-size: 20px; 
+                line-height: 1.3;
+            }
+            
+            .description { 
+                font-size: 14px; 
+                background: #2a2a2a; 
+                padding: 15px; 
+                border-radius: 5px; 
+                display: none; 
+                margin-top: 10px;
+                line-height: 1.5;
+            }
+            
+            .description a { 
+                color: #1e90ff; 
+                text-decoration: none; 
+            }
+            
+            .description a:hover { 
+                text-decoration: underline; 
+            }
+            
+            .buttons-container {
+                margin-top: 15px;
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+            }
+            
+            .toggle-btn {
+                background: #4a4a4a; 
+                color: #fff; 
+                border: none;
+                padding: 8px 16px; 
+                cursor: pointer; 
+                border-radius: 5px;
+                text-decoration: none; 
+                display: inline-block;
+                font-size: 14px;
+            }
+            
+            .toggle-btn:hover { 
+                background: #5a5a5a; 
+            }
+            
+            .player-wrapper {
+                position: relative; 
+                width: 100%; 
+                aspect-ratio: 16/9;
+                background: #000;
+                border-radius: 8px;
+                overflow: hidden;
+            }
+            
+            .player-wrapper img {
+                width: 100%; 
+                height: 100%; 
+                object-fit: cover;
+            }
+
+            .cifra-list {
+    display: none;
+    font-size: 14px;
+    background: #2a2a2a;
+    padding: 15px;
+    border-radius: 5px;
+    margin-top: 0px;
+    line-height: 1.5;
+    width: 100%;
+}
+.cifra-list a {
+    display: block;
+    width: 100%;
+    margin: 5px 0;
+}
+            
+            .play-btn {
+                position: absolute; 
+                top: 50%; 
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: rgba(0,0,0,0.6); 
+                color: white; 
+                border: none;
+                font-size: 40px; 
+                width: 80px;
+                height: 80px;
+                border-radius: 50%;
+                cursor: pointer;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            
+            .play-btn:hover {
+                background: rgba(0,0,0,0.8);
+            }
+
+            .error {
+    background: #ff4444;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    margin: 20px 0;
+}
+.error button {
+    margin-top: 10px;
+    padding: 8px 16px;
+    background: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+    
+            @media (max-width: 700px) {
+                body { 
+                    padding: 15px 10px; 
+                }
+                
+                h1 { 
+                    font-size: 22px; 
+                    margin-bottom: 15px;
+                }
+                
+                .search-bar {
+        flex-wrap: wrap;
+        gap: 10px;
+        margin: 15px auto;
+        padding: 12px;
+    }
+    
+    .search-bar input {
+        width: 100%;
+        flex-basis: 100%;
+        font-size: 16px;
+        margin-bottom: 8px;
+    }
+    
+    .search-bar button {
+        flex: 1;
+        min-width: 45%;
+        font-size: 14px;
+        padding: 12px 10px;
+    }
+                
+    .search-bar .toggle-btn {
+        flex: 1;
+        font-size: 14px;
+        min-width: 45%;
+    }                
+
+                .suggestions {
+                    max-width: 100%;
+                }
+                
+                .suggestions .item img {
+                    width: 48px;
+                    height: 28px;
+                }
+                
+                .video-container {
+                    margin-bottom: 10px;
+                }
+                
+                .toggle-btn {
+    width: 100px;
+    padding: 6px 10px;
+    font-size: 12px;
+}
+.cifra-list a {
+    font-size: 12px;
+    padding: 6px 10px;
+}
+                
+                .description {
+                    font-size: 15px;
+                }
+                
+                #topBtn {
+                    bottom: 20px;
+                    right: 20px;
+                    font-size: 20px;
+                    padding: 0;
+                }
+                
+                h2 {
+                    font-size: 18px;
+                }
+                
+                .play-btn {
+                    width: 60px;
+                    height: 60px;
+                    font-size: 30px;
+                }
+            }
+        </style>
+    </head>
+<body>
+    <div class="container">
+        <h1>Lista de Vídeos</h1>
+
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Pesquisar música..." />
+            <button onclick="searchVideos()">🔍 Pesquisar</button>
+            <button onclick="resetSearch()" id="resetBtn" style="display:none;">✕ Limpar</button>
+            <button onclick="window.location.href='encaixe.html'" class="toggle-btn">Aulas Encaixe da Voz</button>
+        </div>
+        <div class="suggestions" id="suggestions"></div>
+
+        <div id="videos"></div>
+    </div>
+
+    <button onclick="scrollToTop()" id="topBtn" title="Voltar ao topo">↑</button>
+
+    <script>
+        
+        const videoList = [];
+        let observer;
+
+        function extractVideoId(url) {
+            const regExp = /(?:v=)([a-zA-Z0-9_-]{11})/;
+            const match = url.match(regExp);
+            return match ? match[1] : null;
+        }
+
+        async function getVideoInfo(videoId) {
+    try {
+        const response = await fetch(`http://localhost:3000/get_info?id=${videoId}`);
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        if (!data || (!data.title && !data.description)) {
+            throw new Error("Dados inválidos retornados pela API");
+        }
+        return {
+            title: data.title || "Sem título",
+            description: data.description || "Sem descrição"
+        };
+    } catch (error) {
+        console.error(`Erro ao obter informações do vídeo ${videoId}:`, error);
+        return { 
+            title: `Erro ao carregar (${videoId})`, 
+            description: "Não foi possível carregar as informações deste vídeo." 
+        };
+    }
+}
+
+
+
+function convertLinks(text) {
+    // Substitui \n por <br> primeiro
+    let formattedText = text.replace(/\n/g, '<br>');
+    // Não converte URLs já dentro de <a> e só pega URLs isoladas
+    return formattedText.replace(/(^|\s|<br>)(https?:\/\/[^\s<]+)(?=\s|$|<br>|<(?!a\s))/g, '$1<a href="$2" target="_blank">$2</a>');
+}
+
+
+
+
+
+function extractCifraLinks(text) {
+    const lines = text.split('\n');
+    const cifraLinks = [];
+    let lastTitle = null;
+
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i].trim();
+        const match = line.match(/https:\/\/drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/);
+        if (match) {
+            const fileId = match[1];
+            const downloadLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
+            cifraLinks.push({ title: lastTitle, link: downloadLink });
+            console.log(`Link gerado: ${downloadLink}`); // Log para depuração
+        } else if (line) {
+            lastTitle = line;
+        }
+    }
+
+    return cifraLinks.length > 1 
+        ? cifraLinks.map(c => ({ title: c.title || "Sem título", link: c.link }))
+        : cifraLinks.map(c => ({ title: null, link: c.link }));
+}
+
+
+
+
+function toggleDescription(button) {
+    const desc = button.closest(".video-container").querySelector(".description");
+    desc.style.display = desc.style.display === "block" ? "none" : "block";
+    button.textContent = desc.style.display === "block" ? "Esconder Descrição" : "Ver Descrição";
+}
+
+function toggleCifras(button) {
+    const cifraList = button.nextElementSibling;
+    cifraList.style.display = cifraList.style.display === "block" ? "none" : "block";
+    button.textContent = cifraList.style.display === "block" ? "Esconder Cifras" : "Ver Cifras";
+}
+
+        document.addEventListener("click", function(e) {
+            if (e.target.classList.contains("play-btn")) {
+                const wrapper = e.target.closest(".player-wrapper");
+                const videoId = wrapper.dataset.videoId;
+                const iframe = document.createElement("iframe");
+                iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&rel=0`;
+                iframe.frameBorder = "0";
+                iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+                iframe.allowFullscreen = true;
+                iframe.style.width = "100%";
+                iframe.style.height = "100%";
+                wrapper.innerHTML = "";
+                wrapper.appendChild(iframe);
+            }
+        });
+        function disableSearch() {
+    document.getElementById("search").disabled = true;
+}
+function enableSearch() {
+    document.getElementById("search").disabled = false;
+}
+
+
+
+async function loadVideos() {
+    const container = document.getElementById("videos");
+    container.innerHTML = "<p style='text-align: center; padding: 20px;'>Carregando vídeos...</p>";
+    
+    try {
+        const [videoResponse, ritmosResponse] = await Promise.all([
+            fetch('videos.json'),
+            fetch('ritmos.json')
+        ]);
+        const videos = await videoResponse.json();
+        const ritmos = await ritmosResponse.json();
+        container.innerHTML = "";
+        videoList.length = 0;
+
+        for (const video of videos) {
+            const videoId = video.id;
+            const title = video.title;
+            const description = video.description;
+            const ritmoKey = `${title}:${videoId}`;
+            const ritmo = ritmos[ritmoKey]?.ritmo || "";
+            
+            videoList.push({ videoId, title, description });
+            
+            const div = document.createElement("div");
+            div.className = "video-container";
+            div.dataset.videoId = videoId;
+            div.id = "vid_" + videoId;
+            
+            const cifraLinks = extractCifraLinks(description);
+            let cifraButton = '';
+            if (cifraLinks.length === 1) {
+                cifraButton = `<a href="${cifraLinks[0].link}" class="toggle-btn" target="_blank" rel="noopener" onclick="window.open('${cifraLinks[0].link}', '_blank'); console.log('Abrindo: ${cifraLinks[0].link}'); return false;">Baixar Cifra</a>`;
+            } else if (cifraLinks.length > 1) {
+                cifraButton = `
+                    <button class="toggle-btn" onclick="toggleCifras(this)">Ver Cifras</button>
+                    <div class="cifra-list">${cifraLinks.map(link => 
+                        `<a href="${link.link}" target="_blank" rel="noopener" onclick="window.open('${link.link}', '_blank'); console.log('Abrindo: ${link.link}'); return false;">${link.title || 'Cifra'}</a>`
+                    ).join('')}</div>`;
+            }
+            
+            div.innerHTML = `
+                <h2>${title}</h2>
+                ${ritmo ? `<p style="font-size: 16px; color: #bbb; margin-bottom: 10px;">Ritmo: ${ritmo}</p>` : ''}
+                <div class="player-wrapper" data-video-id="${videoId}">
+                    <img src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg" alt="${title}" />
+                    <button class="play-btn">▶</button>
+                </div>
+                <div class="buttons-container">
+                    <button class="toggle-btn" onclick="toggleDescription(this)">Ver Descrição</button>
+                    ${cifraButton}
+                </div>
+                <div class="description">${convertLinks(description.replace(/\n/g, '<br>'))}</div>
+            `;
+            
+            container.appendChild(div);
+        }
+
+        if (videoList.length === 0) {
+            container.innerHTML = `<p class="error">Nenhum vídeo carregado.</p>`;
+        }
+    } catch (error) {
+        console.error("Erro ao carregar vídeos:", error);
+        container.innerHTML = `
+            <div class="error">
+                <p>Erro ao carregar lista de vídeos</p>
+                <button onclick="loadVideos()">Tentar novamente</button>
+            </div>
+        `;
+    }
+}
+
+
+
+function searchVideos() {
+            const term = document.getElementById("search").value.toLowerCase();
+            const resetBtn = document.getElementById("resetBtn");
+            resetBtn.style.display = "inline-block";
+            document.getElementById("suggestions").innerHTML = "";
+
+            document.querySelectorAll(".video-container").forEach(div => {
+                const vid = div.dataset.videoId;
+                const data = videoList.find(v => v.videoId === vid);
+                if (!data || !data.title.toLowerCase().includes(term)) {
+                    div.style.display = "none";
+                } else {
+                    div.style.display = "block";
+                }
+            });
+        }
+
+        function resetSearch() {
+            document.getElementById("search").value = "";
+            document.getElementById("resetBtn").style.display = "none";
+            document.getElementById("suggestions").innerHTML = "";
+            document.querySelectorAll(".video-container").forEach(div => div.style.display = "block");
+        }
+
+        document.getElementById("search").addEventListener("input", function() {
+            const value = this.value.toLowerCase();
+            const suggestions = document.getElementById("suggestions");
+            suggestions.innerHTML = "";
+            if (!value) return;
+
+            const matches = videoList.filter(v => v.title.toLowerCase().includes(value));
+            const show = matches.slice(0, 5);
+            const remaining = matches.slice(5);
+
+            for (const match of show) {
+                const div = document.createElement("div");
+                div.className = "item";
+                div.innerHTML = `<img src="https://img.youtube.com/vi/${match.videoId}/default.jpg" alt="${match.title}" /><span>${match.title}</span>`;
+                div.onclick = () => {
+                    const el = document.getElementById("vid_" + match.videoId);
+                    el.scrollIntoView({ behavior: "smooth" });
+                    setTimeout(() => {
+                        const btn = el.querySelector(".play-btn");
+                        if (btn) btn.click();
+                    }, 400);
+                    suggestions.innerHTML = "";
+                    document.getElementById("search").value = match.title;
+                };
+                suggestions.appendChild(div);
+            }
+
+            if (remaining.length > 0) {
+                const moreBtn = document.createElement("div");
+                moreBtn.className = "more-btn";
+                moreBtn.textContent = "Mostrar mais";
+                moreBtn.onclick = () => {
+                    for (const match of remaining) {
+                        const div = document.createElement("div");
+                        div.className = "item";
+                        div.innerHTML = `<img src="https://img.youtube.com/vi/${match.videoId}/default.jpg" alt="${match.title}" /><span>${match.title}</span>`;
+                        div.onclick = () => {
+                            const el = document.getElementById("vid_" + match.videoId);
+                            el.scrollIntoView({ behavior: "smooth" });
+                            setTimeout(() => {
+                                const btn = el.querySelector(".play-btn");
+                                if (btn) btn.click();
+                            }, 400);
+                            suggestions.innerHTML = "";
+                            document.getElementById("search").value = match.title;
+                        };
+                        suggestions.appendChild(div);
+                    }
+                    moreBtn.remove();
+                };
+                suggestions.appendChild(moreBtn);
+            }
+        });
+
+        document.getElementById("search").addEventListener("keydown", function(e) {
+            if (e.key === "Enter") {
+                searchVideos();
+            }
+        });
+
+        // Inicializa a funcionalidade do botão de voltar ao topo
+        window.onscroll = function() {
+            document.getElementById("topBtn").style.display =
+                document.documentElement.scrollTop > 200 ? "block" : "none";
+        };
+
+        function scrollToTop() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        const videoCache = new Map();
+async function getVideoInfo(videoId) {
+    if (videoCache.has(videoId)) {
+        return videoCache.get(videoId);
+    }
+    try {
+        const response = await fetch(`http://localhost:3000/get_info?id=${videoId}`);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        const data = await response.json();
+        if (!data || (!data.title && !data.description)) {
+            throw new Error("Dados inválidos retornados pela API");
+        }
+        const result = {
+            title: data.title || "Sem título",
+            description: data.description || "Sem descrição"
+        };
+        videoCache.set(videoId, result);
+        return result;
+    } catch (error) {
+        console.error(`Erro ao obter vídeo ${videoId}:`, error);
+        return { title: `Erro (${videoId})`, description: "Falha ao carregar." };
+    }
+}
+
+        // Carrega os vídeos quando a página é carregada
+        loadVideos();
+    </script>
+</body>
+</html>
