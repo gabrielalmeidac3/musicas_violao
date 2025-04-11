@@ -40,11 +40,17 @@ def main():
         input("Pressione Enter para fechar...")
         return
 
+    # Verifica branch atual
+    logger.info("Verificando branch atual")
+    result = subprocess.run("git branch --show-current", shell=True, text=True, capture_output=True)
+    branch = result.stdout.strip() or "master"  # Default para master se vazio
+    logger.info(f"Branch atual: {branch}")
+
     # Comandos Git
     commands = [
         ("git add .", "Adicionando todos os arquivos"),
-        ('git commit -m "Upload inicial do site"', "Fazendo commit dos arquivos"),
-        ("git push -f origin main", "Forçando push para o GitHub")
+        (f'git commit -m "Upload inicial do site"', "Fazendo commit dos arquivos"),
+        (f"git push -f origin {branch}", "Forçando push para o GitHub")
     ]
 
     # Verifica se remoto já existe
