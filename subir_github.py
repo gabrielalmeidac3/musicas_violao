@@ -42,12 +42,22 @@ def main():
 
     # Comandos Git
     commands = [
-        ("git init", "Inicializando repositório Git"),
         ("git add .", "Adicionando todos os arquivos"),
         ('git commit -m "Upload inicial do site"', "Fazendo commit dos arquivos"),
-        ("git remote add origin https://github.com/gabrielalmeidac3/musicas_violao.git", "Configurando repositório remoto"),
         ("git push -f origin main", "Forçando push para o GitHub")
     ]
+
+    # Verifica se remoto já existe
+    logger.info("Verificando repositório remoto")
+    result = subprocess.run("git remote -v", shell=True, text=True, capture_output=True)
+    if "origin" not in result.stdout:
+        logger.info("Configurando repositório remoto")
+        if not run_command("git remote add origin https://github.com/gabrielalmeidac3/musicas_violao.git", logger):
+            logger.error("Falha ao configurar repositório remoto")
+            input("Pressione Enter para fechar...")
+            return
+    else:
+        logger.info("Repositório remoto 'origin' já configurado")
 
     for cmd, desc in commands:
         logger.info(f"Preparando: {desc}")
