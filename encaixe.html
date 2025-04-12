@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Aulas Encaixe da Voz</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+
+ 
+
+</head>
+<body>
+    <div id="app"></div>
+    <script src="common.js"></script>
+    <script>
+    async function loadTemplate() {
+        try {
+            const response = await fetch('index.html');
+            const text = await response.text();
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(text, 'text/html');
+            const container = doc.querySelector('.container');
+            container.querySelector('h1').textContent = 'Aulas de Violão - Encaixe da Voz';
+            container.querySelector('.toggle-btn').outerHTML = `<button onclick="window.location.href='index.html'" class="toggle-btn">Aulas Músicas</button>`;
+            document.getElementById('app').appendChild(container);
+            document.body.appendChild(doc.querySelector('#topBtn'));
+            loadRhythmButtons(true);
+            loadVideos(true);
+            addSearchEventListener(); // Adiciona o evento após carregar o template
+        } catch (error) {
+            console.error('Erro ao carregar template:', error);
+            document.getElementById('app').innerHTML = '<p>Erro ao carregar a página.</p>';
+        }
+    }
+    loadTemplate();
+    </script>
+</body>
+</html>

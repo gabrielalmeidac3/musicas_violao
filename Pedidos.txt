@@ -1,0 +1,11 @@
+Criar vários botões com os ritmos conforme aparece no json “ritmos.json” ao selecionar um dos botões, ele muda de cor e os vídeos são filtrados pelo ritmo em questão (e aparece uma mensagem “exibindo músicas no ritmo de “Ritmo” - esses botões vão ficar abaixo da barra de pesquisa um ao lado do outro (com bastante arrendondamento nas bordas)
+
+responda com poucas palavras
+
+a resposta final que quero é o pedaço de código para apenas o site index.html pra eu testar primeiro (depois só copio para o site encaixe html também)
+
+não me dê o código inteiro, apenas o pedaço, e me diga especificamente onde colocar no código index.html
+
+xxxxxxxxxxxxxxxxx
+
+

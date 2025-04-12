@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meus Vídeos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1 style="margin-bottom: 0;">Aulas de Violão - Músicas</h1>
+        <p style="text-align: center; color: gray;margin-bottom: 15px;">por Gabriel Almeida</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="https://www.youtube.com/@gabrielalmeidaviolao" target="_blank" class="youtube-btn">Ver canal do YouTube</a>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search" placeholder="Pesquisar música..." />
+            <button onclick="searchVideos()">🔍 Pesquisar</button>
+            <button onclick="resetSearch()" id="resetBtn" style="display:none;">✕ Limpar</button>
+            <button onclick="window.location.href='encaixe.html'" class="toggle-btn">Aulas Encaixe da Voz</button>
+        </div>
+        <div class="suggestions" id="suggestions"></div>
+        <div class="rhythm-buttons" id="rhythmButtons"></div>
+        <div id="videos"></div>
+    </div>
+    <button onclick="scrollToTop()" id="topBtn" title="Voltar ao topo">↑</button>
+
+    <script src="common.js"></script>
+    <script>
+        loadRhythmButtons();
+        loadVideos();
+        addSearchEventListener();
+    </script>
+</body>
+</html>
