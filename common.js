@@ -491,11 +491,16 @@ async function scrollToVideo() {
     await loadVideos();
     const hash = window.location.hash;
     if (hash.startsWith("#vid_")) {
-        const video = document.querySelector(hash);
-        if (video) {
-            scrollToVideoElement(video);
-            video.classList.add("highlight");
-        }
+        const attemptScroll = () => {
+            const video = document.querySelector(hash);
+            if (video) {
+                scrollToVideoElement(video);
+                video.classList.add("highlight");
+            } else {
+                setTimeout(attemptScroll, 100); // Tenta novamente até encontrar
+            }
+        };
+        attemptScroll();
     }
 }
 
