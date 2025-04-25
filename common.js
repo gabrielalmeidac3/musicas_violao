@@ -411,13 +411,8 @@ function addSearchEventListener() {
                     searchInput.value = ""; // Limpar campo de pesquisa
                     document.querySelectorAll(".video-container").forEach(div => div.style.display = "block");
                     const el = document.getElementById("vid_" + match.videoId);
-                    el.scrollIntoView({ behavior: "smooth" });
-                    setTimeout(() => {
-                        const btn = el.querySelector(".play-btn");
-                        if (btn) btn.click();
-                    }, 400);
+                    scrollToVideoElement(el, true);
                     suggestions.innerHTML = "";
-                    
                 };
                 suggestions.appendChild(div);
             }
@@ -432,11 +427,7 @@ function addSearchEventListener() {
                         div.innerHTML = `<img src="https://img.youtube.com/vi/${match.videoId}/default.jpg" alt="${match.title}" /><span>${match.title}</span>`;
                         div.onclick = () => {
                             const el = document.getElementById("vid_" + match.videoId);
-                            el.scrollIntoView({ behavior: "smooth" });
-                            setTimeout(() => {
-                                const btn = el.querySelector(".play-btn");
-                                if (btn) btn.click();
-                            }, 400);
+                            scrollToVideoElement(el, true);
                             suggestions.innerHTML = "";
                         };
                         suggestions.appendChild(div);
@@ -474,17 +465,40 @@ function scrollToEncaixe() {
     document.getElementById('encaixe-videos').scrollIntoView({ behavior: 'smooth' });
 }
 
+function scrollToVideoElement(el, playAfter = false) {
+    if (!el) return;
+    
+    // Aplicar margem superior
+    const yOffset = -30;
+    const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+    
+    // Rolagem suave
+    window.scrollTo({
+        top: y,
+        behavior: 'smooth'
+    });
+    
+    // Opcionalmente inicia o vídeo após a rolagem
+    if (playAfter) {
+        setTimeout(() => {
+            const btn = el.querySelector(".play-btn");
+            if (btn) btn.click();
+        }, 500);
+    }
+}
+
 async function scrollToVideo() {
     await loadVideos(); // Aguarda vídeos carregarem
     const hash = window.location.hash;
     if (hash.startsWith("#vid_")) {
-        const video = document.querySelector(hash);
-        if (video) {
-            video.scrollIntoView({ behavior: "smooth" });
-            video.classList.add("highlight"); // Opcional: destacar
-        }
+        setTimeout(() => {
+            const video = document.querySelector(hash);
+            scrollToVideoElement(video);
+            if (video) video.classList.add("highlight");
+        }, 500);
     }
 }
+
 window.addEventListener("load", scrollToVideo);
 
 async function checkUpdateStatus() {

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Meus Vídeos</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://www.youtube.com/iframe_api"></script>
+</head>
+
+<body>
+    <div class="container">
+        <div id="update-error" style="display: none; position: fixed; top: 10px; right: 10px; color: #443f0b; padding: 5px 10px; border-radius: 5px; font-size: 14px; z-index: 1000;">Erro</div>
+        <h1 style="margin-bottom: 0;">Aulas de Violão - Músicas</h1>
+        <p style="text-align: center; color: gray;margin-bottom: 15px;">por Gabriel Almeida</p>
+        <div style="text-align: center; margin-bottom: 20px;">
+            <a href="https://www.youtube.com/@gabrielalmeidaviolao" target="_blank" class="youtube-btn">Ver canal do YouTube</a>
+        </div>
+        <div class="search-bar">
+            <input type="search" id="search" placeholder="Pesquisar música..." />
+            <button onclick="searchVideos()">🔍 Pesquisar</button>
+            <button onclick="resetSearch()" id="resetBtn" style="display:none;">✕ Limpar</button>
+            <button onclick="scrollToEncaixe()">Aulas Encaixe da Voz</button>
+        </div>
+        <div class="suggestions" id="suggestions"></div>
+        <div class="rhythm-buttons" id="rhythmButtons"></div>
+        <div id="videos"></div>
+        <div id="encaixe-videos"></div>
+    </div>
+    
+    <button onclick="scrollToTop()" id="topBtn" title="Voltar ao topo">↑</button>
+
+    <script src="common.js"></script>
+    <script>
+        loadRhythmButtons();
+        loadVideos();
+        addSearchEventListener();
+        checkUpdateStatus();
+    </script>
+</body>
+</html>
