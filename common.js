@@ -488,14 +488,14 @@ function scrollToVideoElement(el, playAfter = false) {
 }
 
 async function scrollToVideo() {
-    await loadVideos(); // Aguarda vídeos carregarem
+    await loadVideos();
     const hash = window.location.hash;
     if (hash.startsWith("#vid_")) {
-        setTimeout(() => {
-            const video = document.querySelector(hash);
+        const video = document.querySelector(hash);
+        if (video) {
             scrollToVideoElement(video);
-            if (video) video.classList.add("highlight");
-        }, 500);
+            video.classList.add("highlight");
+        }
     }
 }
 
