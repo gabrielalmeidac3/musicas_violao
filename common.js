@@ -497,10 +497,10 @@ async function scrollToVideo() {
                 scrollToVideoElement(video);
                 video.classList.add("highlight");
             } else {
-                setTimeout(attemptScroll, 100); // Tenta novamente até encontrar
+                setTimeout(attemptScroll, 200); // Aumenta delay para links externos
             }
         };
-        attemptScroll();
+        setTimeout(attemptScroll, 500); // Delay inicial para carregamento completo
     }
 }
 
