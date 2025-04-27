@@ -1,0 +1,42 @@
+name: Update Videos Daily
+on:
+  schedule:
+    - cron: '0 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  update-videos:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          pip install yt-dlp pytz
+      - name: Criar cookies.txt
+        run: echo "${{ secrets.ACTIONS_COOKIE }}" > cookies.txt
+      - name: Verificar cookies.txt
+        run: ls -la && cat cookies.txt
+      - name: Run script to update videos
+        run: python carregar_dados_videos_unificado.py
+      - name: Commit and push changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          [ -f videos.json ] && git add videos.json || echo "videos.json não encontrado"
+          echo "videos.json adicionado: $(git status --porcelain videos.json)"
+          [ -f videos_encaixe.json ] && git add videos_encaixe.json || echo "videos_encaixe.json não encontrado"
+          echo "videos_encaixe.json adicionado: $(git status --porcelain videos_encaixe.json)"
+          [ -f ritmos.json ] && git add ritmos.json || echo "ritmos.json não encontrado"
+          echo "ritmos.json adicionado: $(git status --porcelain ritmos.json)"
+          [ -f ritmos_encaixe.json ] && git add ritmos_encaixe.json || echo "ritmos_encaixe.json não encontrado"
+          echo "ritmos_encaixe.json adicionado: $(git status --porcelain ritmos_encaixe.json)"
+          [ -f execution_log.json ] && git add execution_log.json || echo "execution_log.json não encontrado"
+          echo "execution_log.json adicionado: $(git status --porcelain execution_log.json)"
+          git commit -m "Atualizar vídeos e ritmos - $(date +'%Y-%m-%d %H:%M:%S')" || true
+          git push origin main
