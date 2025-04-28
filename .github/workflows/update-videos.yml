@@ -18,10 +18,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp pytz
-      - name: Criar cookies.txt
-        run: echo "${{ secrets.ACTIONS_COOKIE }}" > cookies.txt
-      - name: Verificar cookies.txt
-        run: ls -la && cat cookies.txt
       - name: Run script to update videos
         run: python carregar_dados_videos_unificado.py
       - name: Commit and push changes
