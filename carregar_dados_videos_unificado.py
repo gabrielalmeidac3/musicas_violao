@@ -137,7 +137,7 @@ def main():
         else:
             logger.warning("URL da playlist encaixe não encontrada, continuando...")
 
-        status = "concluído"
+        status = "concluído" if (videos_normal and len(videos_normal) == total_normal) and (videos_encaixe and len(videos_encaixe) == total_encaixe) else "incompleto"
     except Exception as e:
         logger.error(f"Erro no processo: {e}")
     finally:
