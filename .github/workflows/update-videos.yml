@@ -21,24 +21,18 @@ jobs:
         run: |
           pip install yt-dlp pytz
       
-      # Adicionado: Criar pasta private e arquivo cookies.txt com permissões adequadas
       - name: Create private directory and cookies file
         run: |
           mkdir -p private
           echo "${{ secrets.COOKIES }}" > private/cookies.txt
-          chmod 600 private/cookies.txt  # Ajuste de permissões para maior segurança
+          chmod 600 private/cookies.txt
           echo "Arquivo cookies.txt criado em private/"
-          
-          # Verificar se o arquivo foi criado corretamente (sem mostrar todo o conteúdo)
-          echo "Verificando se o arquivo existe:"
           ls -la private/
           echo "Total de linhas no arquivo cookies.txt:"
           wc -l private/cookies.txt
       
-      # Adicionado: Verificar formato do arquivo de cookies
       - name: Verify cookies format
         run: |
-          # Verificar se o arquivo de cookies parece estar correto
           echo "Verificando formato do arquivo de cookies..."
           if grep -q "youtube.com" private/cookies.txt; then
             echo "Arquivo de cookies parece conter domínios do YouTube."
@@ -52,9 +46,43 @@ jobs:
             echo "Certifique-se que seu secret COOKIES está neste formato."
           fi
       
+      - name: Mostrar conteúdo do cookies.txt para verificação (cuidado com dados sensíveis)
+        run: |
+          echo "Primeiras linhas do arquivo cookies.txt (para verificação):"
+          head -n 3 private/cookies.txt
+          echo "..."
+          echo "Últimas linhas do arquivo cookies.txt (para verificação):"
+          tail -n 3 private/cookies.txt
+          echo "Total de linhas no arquivo:"
+          wc -l private/cookies.txt
+      
+      - name: Executar script Python de exemplo
+        run: |
+          echo '
+          import os
+          
+          print("Tentando acessar o arquivo cookies.txt...")
+          
+          if os.path.exists("private/cookies.txt"):
+              print("Arquivo encontrado com sucesso!")
+              
+              with open("private/cookies.txt", "r") as f:
+                  lines = f.readlines()
+                  print(f"O arquivo tem {len(lines)} linhas")
+                  
+                  if len(lines) > 0:
+                      print("Primeiras 3 caracteres da primeira linha: " + lines[0][:3] + "...")
+                  
+                  print("Acesso bem-sucedido ao arquivo cookies.txt!")
+          else:
+              print("ERRO: O arquivo cookies.txt não foi encontrado!")
+          ' > test_cookies_access.py
+          
+          python test_cookies_access.py
+      
       - name: Run script to update videos
         env:
-          YT_DLP_VERBOSE: "True"  # Adicionar modo verbose para yt-dlp
+          YT_DLP_VERBOSE: "True"
         run: python carregar_dados_videos_unificado.py
       
       - name: Commit and push changes
