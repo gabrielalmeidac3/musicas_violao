@@ -1,6 +1,14 @@
+name: Generate Cookies File
+
+on:
+  push:
+    branches:
+      - main
+
 jobs:
   generate_cookies:
     runs-on: ubuntu-latest
+
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
@@ -14,11 +22,10 @@ jobs:
         run: pip install yt-dlp
 
       - name: Create private directory
-        run: mkdir -p private  # Cria a pasta private caso não exista
+        run: mkdir -p private  # Garante que a pasta 'private' exista
 
       - name: Save cookies to file
-        run: echo "${{ secrets.COOKIES }}" > private/cookies.txt
+        run: echo "${{ secrets.COOKIES }}" > private/cookies.txt  # Salva o segredo no arquivo cookies.txt
 
       - name: Verify cookies file
-        run: |
-          cat private/cookies.txt
+        run: cat private/cookies.txt  # Exibe o conteúdo do arquivo para confirmar se foi criado corretamente
