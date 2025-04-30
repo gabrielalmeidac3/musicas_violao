@@ -13,6 +13,9 @@ jobs:
       - name: Install yt-dlp
         run: pip install yt-dlp
 
+      - name: Create private directory
+        run: mkdir -p private  # Cria a pasta private caso não exista
+
       - name: Save cookies to file
         run: echo "${{ secrets.COOKIES }}" > private/cookies.txt
 
