@@ -18,8 +18,6 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp pytz
-      - name: Create cookies.txt from GitHub secret
-        run: echo "$COOKIES" > private/cookies.txt
       - name: Run script to update videos
         run: python carregar_dados_videos_unificado.py
       - name: Commit and push changes
