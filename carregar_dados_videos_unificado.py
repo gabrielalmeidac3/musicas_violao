@@ -44,13 +44,16 @@ def fetch_videos_data(playlist_url, file_name):
         'quiet': False,
         'progress_with_newline': True,
         'extract_flat': False,
-        
+        'cookiefile': 'private/cookies.txt',
         'no_warnings': True,
         'ignoreerrors': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
         'geo_bypass': True,
         'playlist_items': None
     }
+
+    print(f"[LOG] Usando cookies de: {ydl_opts.get('cookiefile')}")
+    print(f"[LOG] Arquivo existe? {'Sim' if os.path.exists(ydl_opts.get('cookiefile')) else 'Não'}")
 
     #se quiser pegar de um item x a item y dentro da playlist, use 'playlist_items': '164-' if not is_encaixe else None
 
