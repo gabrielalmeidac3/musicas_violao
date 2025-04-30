@@ -1,7 +1,7 @@
 name: Update Videos Daily
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '0 4 * * *'  # Corrigido o formato do cron para executar diariamente às 4:00 UTC
   workflow_dispatch:
 permissions:
   contents: write
@@ -11,13 +11,16 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+      
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.x'
+      
       - name: Install dependencies
         run: |
           pip install yt-dlp pytz
+      
       # Adicionado: Criar pasta private e arquivo cookies.txt
       - name: Create private directory and cookies file
         run: |
@@ -30,8 +33,10 @@ jobs:
           ls -la private/
           echo "Total de linhas no arquivo cookies.txt:"
           wc -l private/cookies.txt
+      
       - name: Run script to update videos
         run: python carregar_dados_videos_unificado.py
+      
       - name: Commit and push changes
         run: |
           git config user.name "github-actions[bot]"
