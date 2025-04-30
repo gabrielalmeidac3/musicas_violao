@@ -38,8 +38,12 @@ def get_existing_ritmos(file_name):
         logger.error(f"Erro ao carregar {file_name}: {e}")
         return {}
 
+
 def fetch_videos_data(playlist_url, file_name):
     is_encaixe = 'Encaixe' in file_name
+    print("DEBUG: Arquivo de cookies existe?", os.path.exists('private/cookies.txt'))
+    with open('private/cookies.txt', 'r', encoding='utf-8') as f:
+        print("DEBUG: Primeira linha dos cookies:", f.readline().strip())
     ydl_opts = {
         'quiet': False,
         'progress_with_newline': True,
