@@ -42,14 +42,30 @@ def get_existing_ritmos(file_name):
 def fetch_videos_data(playlist_url, file_name):
     is_encaixe = 'Encaixe' in file_name
     print("DEBUG: Arquivo de cookies existe?", os.path.exists('private/cookies.txt'))
-    with open('private/cookies.txt', 'r', encoding='utf-8') as f:
-        print("DEBUG: Primeira linha dos cookies:", f.readline().strip())
+    
+    # Verificar permissões do arquivo
+    import stat
+    if os.path.exists('private/cookies.txt'):
+        file_stats = os.stat('private/cookies.txt')
+        print(f"DEBUG: Permissões do arquivo de cookies: {oct(file_stats.st_mode)}")
+        
+        # Verificar conteúdo do início do arquivo
+        with open('private/cookies.txt', 'r', encoding='utf-8', errors='replace') as f:
+            first_line = f.readline().strip()
+            print("DEBUG: Primeira linha dos cookies:", first_line)
+            # Verificar se o arquivo parece ser um arquivo de cookies netscape/mozilla
+            if "# Netscape HTTP Cookie File" in first_line or ".youtube.com" in first_line:
+                print("DEBUG: Arquivo de cookies parece estar no formato correto")
+            else:
+                print("AVISO: Arquivo de cookies pode não estar no formato correto para yt-dlp")
+    
     ydl_opts = {
         'quiet': False,
+        'verbose': True,  # Adicionar modo verbose para mais informações de debug
         'progress_with_newline': True,
         'extract_flat': False,
         'cookiefile': 'private/cookies.txt',
-        'no_warnings': True,
+        'no_warnings': False,  # Mostrar avisos para ajudar no debug
         'ignoreerrors': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Safari/537.36',
         'geo_bypass': True,
