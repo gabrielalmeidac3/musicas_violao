@@ -44,7 +44,7 @@ def fetch_videos_data(playlist_url, file_name):
         'quiet': False,
         'progress_with_newline': True,
         'extract_flat': False,
-        'cookiefile': 'cookies.txt',
+        'cookiefile': 'private/cookies.txt',
         'no_warnings': True,
         'ignoreerrors': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Safari/537.36',
