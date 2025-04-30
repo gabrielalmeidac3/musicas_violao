@@ -1,7 +1,7 @@
 name: Update Videos Daily
 on:
   schedule:
-    - cron: '0 4 * * *'  # Corrigido o formato do cron para executar diariamente às 4:00 UTC
+    - cron: '0 4 * * *'
   workflow_dispatch:
 permissions:
   contents: write
@@ -21,11 +21,12 @@ jobs:
         run: |
           pip install yt-dlp pytz
       
-      # Adicionado: Criar pasta private e arquivo cookies.txt
+      # Adicionado: Criar pasta private e arquivo cookies.txt com permissões adequadas
       - name: Create private directory and cookies file
         run: |
           mkdir -p private
           echo "${{ secrets.COOKIES }}" > private/cookies.txt
+          chmod 600 private/cookies.txt  # Ajuste de permissões para maior segurança
           echo "Arquivo cookies.txt criado em private/"
           
           # Verificar se o arquivo foi criado corretamente (sem mostrar todo o conteúdo)
@@ -34,7 +35,26 @@ jobs:
           echo "Total de linhas no arquivo cookies.txt:"
           wc -l private/cookies.txt
       
+      # Adicionado: Verificar formato do arquivo de cookies
+      - name: Verify cookies format
+        run: |
+          # Verificar se o arquivo de cookies parece estar correto
+          echo "Verificando formato do arquivo de cookies..."
+          if grep -q "youtube.com" private/cookies.txt; then
+            echo "Arquivo de cookies parece conter domínios do YouTube."
+          else
+            echo "AVISO: Arquivo de cookies pode não estar no formato correto para o YouTube."
+            echo "O arquivo de cookies deve estar no formato Netscape/Mozilla."
+            echo "Exemplo das primeiras linhas (sem valores sensíveis):"
+            echo "# Netscape HTTP Cookie File"
+            echo "# http://curl.haxx.se/rfc/cookie_spec.html"
+            echo "# This is a generated file! Do not edit."
+            echo "Certifique-se que seu secret COOKIES está neste formato."
+          fi
+      
       - name: Run script to update videos
+        env:
+          YT_DLP_VERBOSE: "True"  # Adicionar modo verbose para yt-dlp
         run: python carregar_dados_videos_unificado.py
       
       - name: Commit and push changes
