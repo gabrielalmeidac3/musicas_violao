@@ -18,6 +18,18 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp pytz
+      # Adicionado: Criar pasta private e arquivo cookies.txt
+      - name: Create private directory and cookies file
+        run: |
+          mkdir -p private
+          echo "${{ secrets.COOKIES }}" > private/cookies.txt
+          echo "Arquivo cookies.txt criado em private/"
+          
+          # Verificar se o arquivo foi criado corretamente (sem mostrar todo o conteúdo)
+          echo "Verificando se o arquivo existe:"
+          ls -la private/
+          echo "Total de linhas no arquivo cookies.txt:"
+          wc -l private/cookies.txt
       - name: Run script to update videos
         run: python carregar_dados_videos_unificado.py
       - name: Commit and push changes
