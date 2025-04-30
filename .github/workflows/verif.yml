@@ -1,31 +1,68 @@
-name: Generate Cookies File
+name: Test Cookies Setup
 
 on:
-  push:
-    branches:
-      - main
+  workflow_dispatch:  # Permite executar o workflow manualmente pela interface do GitHub
 
 jobs:
-  generate_cookies:
+  test-cookies:
     runs-on: ubuntu-latest
-
+    
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v2
-
-      - name: Set up Python
-        uses: actions/setup-python@v2
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      
+      - name: Setup Python
+        uses: actions/setup-python@v4
         with:
           python-version: '3.x'
-
-      - name: Install yt-dlp
-        run: pip install yt-dlp
-
+      
       - name: Create private directory
-        run: mkdir -p private  # Garante que a pasta 'private' exista
-
-      - name: Save cookies to file
-        run: echo "${{ secrets.COOKIES }}" > private/cookies.txt  # Salva o segredo no arquivo cookies.txt
-
-      - name: Verify cookies file
-        run: cat private/cookies.txt  # Exibe o conteúdo do arquivo para confirmar se foi criado corretamente
+        run: mkdir -p private
+      
+      - name: Create cookies.txt file from secret
+        run: |
+          echo "${{ secrets.COOKIES }}" > private/cookies.txt
+          
+          # Verifica se o arquivo foi criado corretamente
+          echo "Arquivo cookies.txt criado em private/"
+          echo "Verificando se o arquivo existe:"
+          ls -la private/
+      
+      - name: Mostrar conteúdo do cookies.txt para verificação (cuidado com dados sensíveis)
+        run: |
+          echo "Primeiras linhas do arquivo cookies.txt (para verificação):"
+          head -n 3 private/cookies.txt
+          echo "..."
+          echo "Últimas linhas do arquivo cookies.txt (para verificação):"
+          tail -n 3 private/cookies.txt
+          
+          # Para verificar o número total de linhas
+          echo "Total de linhas no arquivo:"
+          wc -l private/cookies.txt
+      
+      - name: Executar script Python de exemplo
+        run: |
+          # Criando um script Python de teste simples
+          echo '
+          import os
+          
+          print("Tentando acessar o arquivo cookies.txt...")
+          
+          if os.path.exists("private/cookies.txt"):
+              print("Arquivo encontrado com sucesso!")
+              
+              # Lê algumas linhas para demonstração
+              with open("private/cookies.txt", "r") as f:
+                  lines = f.readlines()
+                  print(f"O arquivo tem {len(lines)} linhas")
+                  
+                  if len(lines) > 0:
+                      print("Primeiras 3 caracteres da primeira linha: " + lines[0][:3] + "...")
+                  
+                  print("Acesso bem-sucedido ao arquivo cookies.txt!")
+          else:
+              print("ERRO: O arquivo cookies.txt não foi encontrado!")
+          ' > test_cookies_access.py
+          
+          # Executar o script de teste
+          python test_cookies_access.py
