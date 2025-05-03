@@ -61,7 +61,14 @@ def fetch_videos_data(playlist_url, file_name):
             else:
                 print("AVISO: Arquivo de cookies pode não estar no formato correto para yt-dlp")
     
-
+class ErrorCatchingLogger:
+    def debug(self, msg): 
+        if "Sign in to confirm you're not a bot" in msg or "YouTube account cookies are no longer valid" in msg:
+            print(f"Erro crítico detectado: {msg}")
+            sys.exit(1)
+    def warning(self, msg): self.debug(msg)
+    def error(self, msg): self.debug(msg)
+    def info(self, msg): pass
     
     ydl_opts = {
         'quiet': False,
@@ -74,6 +81,7 @@ def fetch_videos_data(playlist_url, file_name):
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Safari/537.36',
         'geo_bypass': True,
         'playlist_items': None
+        'logger': ErrorCatchingLogger(),
     }
 
     #se quiser pegar de um item x a item y dentro da playlist, use 'playlist_items': '164-' if not is_encaixe else None
