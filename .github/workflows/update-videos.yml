@@ -1,7 +1,7 @@
 name: Update Videos Daily
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: '53 13 * * *'
   workflow_dispatch:
 permissions:
   contents: write
