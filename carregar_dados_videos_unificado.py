@@ -61,14 +61,23 @@ def fetch_videos_data(playlist_url, file_name):
             else:
                 print("AVISO: Arquivo de cookies pode não estar no formato correto para yt-dlp")
     
-class ErrorCatchingLogger:
-    def debug(self, msg): 
-        if "Sign in to confirm you're not a bot" in msg or "YouTube account cookies are no longer valid" in msg:
-            print(f"Erro crítico detectado: {msg}")
-            sys.exit(1)
-    def warning(self, msg): self.debug(msg)
-    def error(self, msg): self.debug(msg)
-    def info(self, msg): pass
+    class ErrorCatchingLogger:
+        def debug(self, msg):
+            print(msg)  # Exibe mensagens normalmente
+            if "Sign in to confirm you're not a bot" in msg or "YouTube account cookies are no longer valid" in msg:
+                print(f"Erro crítico detectado: {msg}")
+                sys.exit(1)
+        
+        def warning(self, msg):
+            print(f"AVISO: {msg}")
+            self.debug(msg)
+        
+        def error(self, msg):
+            print(f"ERRO: {msg}")
+            self.debug(msg)
+        
+        def info(self, msg):
+            print(msg)
     
     ydl_opts = {
         'quiet': False,
@@ -207,4 +216,3 @@ def main():
 if __name__ == "__main__":
     main()
 
-input("Pressione Enter para sair...")
