@@ -1,0 +1,15 @@
+name: Executar via Webhook
+
+on:
+  repository_dispatch:
+    types: [external-trigger]
+
+jobs:
+  rodar-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout código
+        uses: actions/checkout@v3
+
+      - name: Rodar script
+        run: echo "Workflow disparado por webhook externo!"
