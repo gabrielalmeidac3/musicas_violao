@@ -1,7 +1,7 @@
 name: Update Videos Daily
 on:
   repository_dispatch:
-  types: [external-trigger]
+    types: [external-trigger]
   workflow_dispatch:
 permissions:
   contents: write
