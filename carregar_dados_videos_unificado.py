@@ -4,6 +4,8 @@ import logging
 from yt_dlp import YoutubeDL
 from datetime import datetime, timezone
 import pytz
+import sys
+import re
 
 logging.basicConfig(
     level=logging.INFO,
@@ -59,6 +61,24 @@ def fetch_videos_data(playlist_url, file_name):
             else:
                 print("AVISO: Arquivo de cookies pode não estar no formato correto para yt-dlp")
     
+    class ErrorCatchingLogger:
+        def debug(self, msg):
+            print(msg)  # Exibe mensagens normalmente
+            if "Sign in to confirm you're not a bot" in msg or "YouTube account cookies are no longer valid" in msg:
+                print(f"Erro crítico detectado: {msg}")
+                sys.exit(1)
+        
+        def warning(self, msg):
+            print(f"AVISO: {msg}")
+            self.debug(msg)
+        
+        def error(self, msg):
+            print(f"ERRO: {msg}")
+            self.debug(msg)
+        
+        def info(self, msg):
+            print(msg)
+    
     ydl_opts = {
         'quiet': False,
         'verbose': True,  # Adicionar modo verbose para mais informações de debug
@@ -69,7 +89,8 @@ def fetch_videos_data(playlist_url, file_name):
         'ignoreerrors': True,
         'user_agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.6312.86 Safari/537.36',
         'geo_bypass': True,
-        'playlist_items': None
+        'playlist_items': None,
+        'logger': ErrorCatchingLogger(),
     }
 
     #se quiser pegar de um item x a item y dentro da playlist, use 'playlist_items': '164-' if not is_encaixe else None
@@ -85,6 +106,12 @@ def fetch_videos_data(playlist_url, file_name):
         with YoutubeDL(ydl_opts) as ydl:
             logger.info("Extraindo informações da playlist")
             playlist = ydl.extract_info(playlist_url, download=False)
+            # Verifique erros na saída
+            output_str = str(playlist)
+            for pattern in ["The provided YouTube account cookies are no longer valid", "Sign in to confirm you're not a bot"]:
+                if pattern in output_str:
+                    print(f"Erro detectado: {pattern}")
+                    sys.exit(1)  # Saída com código de erro
             logger.info(f"Total vídeos disponíveis: {playlist.get('playlist_count', 0)}")
             videos = playlist.get('entries', [])
             logger.info(f"Total vídeos extraídos: {len(videos)}")
@@ -188,3 +215,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+
+input("Pressione Enter para sair...")
