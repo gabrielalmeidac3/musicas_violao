@@ -1,13 +1,13 @@
 name: Update Videos Daily
 on:
-  schedule:
-    - cron: '56 13 * * *'
+  repository_dispatch:
+  types: [external-trigger]
   workflow_dispatch:
 permissions:
   contents: write
 jobs:
   update-videos:
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
