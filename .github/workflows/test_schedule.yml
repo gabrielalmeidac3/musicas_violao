@@ -1,0 +1,47 @@
+name: Test Schedule 22:50 Manaus
+on:
+  schedule:
+    - cron: '56 2 * * *'  # 22:50 Manaus (UTC-4)
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  test-schedule:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Run test script
+        run: |
+          echo '
+          from datetime import datetime
+          import pytz
+          
+          manaus_tz = pytz.timezone("America/Manaus")
+          now = datetime.now(manaus_tz)
+          print(f"Executado em: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}")
+          with open("test_log.txt", "a") as f:
+              f.write(f"Executado em: {now.strftime('%Y-%m-%d %H:%M:%S %Z')}\n")
+          ' > test_schedule.py
+          
+          python test_schedule.py
+
+      - name: Upload log as artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-log
+          path: test_log.txt
+
+      - name: Commit and push log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add test_log.txt
+          git commit -m "Adicionar log de teste - $(date +'%Y-%m-%d %H:%M:%S')" || true
+          git push origin main
