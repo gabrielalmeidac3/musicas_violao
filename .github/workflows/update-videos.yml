@@ -20,16 +20,19 @@ jobs:
       - name: Install dependencies
         run: |
           pip install yt-dlp pytz
-      
-      - name: Create private directory and cookies file
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Verificar existência do cookies.txt
         run: |
-          mkdir -p private
-          echo "${{ secrets.COOKIES }}" > private/cookies.txt
-          chmod 600 private/cookies.txt
-          echo "Arquivo cookies.txt criado em private/"
-          ls -la private/
-          echo "Total de linhas no arquivo cookies.txt:"
-          wc -l private/cookies.txt
+          if [ -f private/cookies.txt ]; then
+            echo "Arquivo private/cookies.txt encontrado com sucesso."
+          else
+            echo "ERRO: Arquivo private/cookies.txt não encontrado!"
+            exit 1
+          fi
+
       
       - name: Verify cookies format
         run: |
