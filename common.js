@@ -59,7 +59,7 @@ function toggleDescription(button) {
     const desc = button.closest(".video-container").querySelector(".description");
     desc.style.display = desc.style.display === "block" ? "none" : "block";
     button.classList.toggle("active", desc.style.display === "block");
-    window.location.hash = ""; // Limpa hash
+    history.replaceState(null, '', window.location.pathname + window.location.search);
 }
 // Função toggleCifras
 function toggleCifras(button) {
@@ -69,7 +69,7 @@ function toggleCifras(button) {
         cifraList.style.display = cifraList.style.display === "block" ? "none" : "block";
         button.classList.toggle("active", cifraList.style.display === "block");
     }
-    window.location.hash = "";
+    history.replaceState(null, '', window.location.pathname + window.location.search);
 }
 
 document.addEventListener("click", function(e) {
@@ -307,7 +307,7 @@ async function loadVideos() {
                     <button class="play-btn">▶</button>
                 </div>
                 <div class="buttons-container">
-                    <button class="toggle-btn" onclick="toggleDescription(this)"><span class="toggle-indicator"></span> Descrição</button>
+                    <button type="button" class="toggle-btn" onclick="toggleDescription(this)"><span class="toggle-indicator"></span> Descrição</button>
                     ${cifraButton}
                     <button class="toggle-btn copy-link-btn" onclick="copyVideoLink('${videoId}')">Copiar Link da aula</button>
                 </div>
@@ -315,7 +315,7 @@ async function loadVideos() {
                 ${cifraList}
             `;
             div.querySelector(".play-btn").addEventListener("click", () => {
-                window.location.hash = "";
+                history.replaceState(null, '', window.location.pathname + window.location.search);
             });
            
             container.appendChild(div);
@@ -356,7 +356,7 @@ async function loadVideos() {
                     <button class="play-btn">▶</button>
                 </div>
                 <div class="buttons-container">
-                    <button class="toggle-btn" onclick="toggleDescription(this)"><span class="toggle-indicator"></span>Descrição</button>
+                    <button type="button" class="toggle-btn" onclick="toggleDescription(this)"><span class="toggle-indicator"></span>Descrição</button>
                     ${cifraButton}
                     <button class="toggle-btn copy-link-btn" onclick="copyVideoLink('${videoId}')">Copiar Link da aula</button>
                 </div>
@@ -364,7 +364,8 @@ async function loadVideos() {
                 ${cifraList}
             `;
             div.querySelector(".play-btn").addEventListener("click", () => {
-                window.location.hash = "";
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+
             });
            
             encaixeContainer.appendChild(div);
@@ -446,7 +447,8 @@ function addSearchEventListener() {
 function copyVideoLink(videoId) {
     const url = `${window.location.origin}${window.location.pathname}#vid_${videoId}`;
     navigator.clipboard.writeText(url).then(() => {
-        window.location.hash = ""; // Limpa hash
+        history.replaceState(null, '', window.location.pathname + window.location.search);
+
     }).catch(err => {
         console.error("Erro ao copiar:", err);
     });
@@ -496,6 +498,8 @@ async function scrollToVideo() {
             if (video) {
                 scrollToVideoElement(video);
                 video.classList.add("highlight");
+                history.replaceState(null, '', window.location.pathname + window.location.search);
+
             } else {
                 setTimeout(attemptScroll, 200); // Aumenta delay para links externos
             }
