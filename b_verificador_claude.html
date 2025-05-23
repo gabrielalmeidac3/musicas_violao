@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Site B - Verificador</title>
+</head>
+<body>
+  <h1>🔍 Site B - Verificando login do Site A...</h1>
+  <div id="resultado">⏳ Aguardando resposta...</div>
+
+  <iframe id="iframeA" src="https://viocomg.github.io/cursofechadoviolao/site_a_login.html" style="display:none;"></iframe>
+
+  <script>
+    console.log("[Site B] 🚀 Iniciando verificação...");
+
+    const iframe = document.getElementById("iframeA");
+    const resultado = document.getElementById("resultado");
+    let respostaRecebida = false;
+    let siteAReady = false;
+
+    // Escuta respostas do Site A
+    window.addEventListener("message", (event) => {
+      console.log("[Site B] 📩 Mensagem recebida de:", event.origin, event.data);
+
+      // Confere se vem do domínio esperado
+      const origemEsperada = iframe.src.split("/").slice(0, 3).join("/");
+      if (event.origin !== origemEsperada) {
+        console.warn("[Site B] ⚠️ Origem inesperada da mensagem:", event.origin);
+        return;
+      }
+
+      if (event.data.type === "siteAReady") {
+        console.log("[Site B] ✅ Site A está pronto!");
+        siteAReady = true;
+        enviarVerificacao();
+      } else if (event.data.type === "loginStatus") {
+        respostaRecebida = true;
+        if (event.data.loggedIn) {
+          console.log("[Site B] ✅ Usuário está logado no Site A! UID:", event.data.uid);
+          resultado.innerText = "✅ Logado no Site A!";
+          resultado.style.color = "green";
+        } else {
+          console.log("[Site B] ❌ Usuário NÃO está logado no Site A.");
+          resultado.innerText = "❌ Não logado no Site A.";
+          resultado.style.color = "red";
+        }
+      }
+    });
+
+    function enviarVerificacao() {
+      if (!siteAReady) {
+        console.log("[Site B] ⏳ Aguardando Site A ficar pronto...");
+        return;
+      }
+
+      console.log("[Site B] 📤 Enviando verificação para Site A...");
+      const message = { type: "checkLogin" };
+      const targetOrigin = iframe.src.split("/").slice(0, 3).join("/");
+      iframe.contentWindow.postMessage(message, targetOrigin);
+      console.log("[Site B] 📤 Mensagem enviada:", message, "para", targetOrigin);
+
+      // Define timeout para verificar se a resposta vem
+      setTimeout(() => {
+        if (!respostaRecebida) {
+          console.warn("[Site B] ⏰ Tempo limite atingido. Nenhuma resposta do Site A.");
+          resultado.innerText = "⚠️ Sem resposta do Site A.";
+          resultado.style.color = "orange";
+        }
+      }, 8000); // 8 segundos
+    }
+
+    // Quando o iframe carregar
+    iframe.onload = () => {
+      console.log("[Site B] ✅ Iframe carregado. Aguardando Site A ficar pronto...");
+      
+      // Fallback: se não receber siteAReady em 3 segundos, tenta mesmo assim
+      setTimeout(() => {
+        if (!siteAReady) {
+          console.log("[Site B] ⚠️ Timeout aguardando siteAReady, tentando mesmo assim...");
+          siteAReady = true;
+          enviarVerificacao();
+        }
+      }, 3000);
+    };
+  </script>
+</body>
+</html>
