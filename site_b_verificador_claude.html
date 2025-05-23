@@ -10,14 +10,10 @@
   <div style="margin-top: 20px;">
     <button id="verificarAgain">🔄 Verificar Novamente</button>
     <button id="reloadIframe">🔄 Recarregar Site A</button>
+    <button id="forceSync">🔬 Forçar Sincronização Deep</button>
   </div>
 
   <iframe id="iframeA" src="https://viocomg.github.io/cursofechadoviolao/site_a_login_claude.html" style="width: 100%; height: 400px; border: 1px solid #ccc; margin-top: 20px;"></iframe>
-  <!-- 
-  IMPORTANTE: Certifique-se de que o src="" acima aponta para o arquivo Site A CORRETO!
-  Deve ser o mesmo arquivo que você está testando diretamente.
-  Se o arquivo se chama "site_a_login_fixed.html", mude o src acima.
-  -->
   
   <div id="logs" style="margin-top: 20px; padding: 10px; background: #f0f0f0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
 
@@ -39,7 +35,8 @@
     let respostaRecebida = false;
     let siteAReady = false;
     let tentativasEnvio = 0;
-    const maxTentativas = 3;
+    let ultimoStatusRecebido = null;
+    const maxTentativas = 5; // Aumentado para dar mais chances
 
     addLog(`[Site B] 🔗 URL do iframe: ${iframe.src}`);
     addLog(`[Site B] 🌐 Origem atual: ${window.location.origin}`);
@@ -51,7 +48,7 @@
         return url.origin;
       } catch (error) {
         addLog(`[Site B] ❌ Erro ao processar URL do iframe: ${error.message}`);
-        return window.location.origin; // fallback para mesma origem
+        return window.location.origin;
       }
     }
 
@@ -64,12 +61,6 @@
       const origemEsperada = getIframeOrigin();
       addLog(`[Site B] 🎯 Origem esperada: ${origemEsperada}`);
       
-      // Aceita mensagens da mesma origem ou do iframe
-      if (event.origin !== origemEsperada && event.origin !== window.location.origin) {
-        addLog(`[Site B] ⚠️ Origem não confiável: ${event.origin} (esperado: ${origemEsperada})`);
-        // Mas não retorna, vamos processar mesmo assim para debug
-      }
-
       if (!event.data || typeof event.data !== 'object') {
         addLog("[Site B] ❌ Dados da mensagem inválidos");
         return;
@@ -78,45 +69,73 @@
       if (event.data.type === "siteAReady") {
         addLog("[Site B] ✅ Site A está pronto para comunicação!");
         addLog(`[Site B] 👤 Usuário atual no Site A: ${event.data.currentUser ? JSON.stringify(event.data.currentUser) : 'nenhum'}`);
+        addLog(`[Site B] 📱 Contexto: ${event.data.context || 'não informado'}`);
         
         siteAReady = true;
         
-        // Aguarda um pouco e envia verificação
+        // Se já tem usuário logado, mostra status imediatamente
+        if (event.data.currentUser) {
+          mostrarStatusLogado(event.data.currentUser, event.data.timestamp, event.data.context);
+        }
+        
+        // Aguarda um pouco mais para sincronização completa e envia verificação
         setTimeout(() => {
+          addLog("[Site B] 🔄 Iniciando verificação após siteAReady...");
           enviarVerificacao();
-        }, 500);
+        }, 1500); // Aumentado para 1.5 segundos
         
       } else if (event.data.type === "loginStatus") {
         addLog("[Site B] 📊 Status de login recebido");
         respostaRecebida = true;
+        ultimoStatusRecebido = event.data;
         
         if (event.data.loggedIn) {
           addLog(`[Site B] ✅ Usuário ESTÁ logado no Site A! UID: ${event.data.uid}`);
           addLog(`[Site B] 🔍 É anônimo: ${event.data.isAnonymous}`);
           addLog(`[Site B] 📱 Contexto: ${event.data.context || 'não informado'}`);
+          addLog(`[Site B] 🔬 Método de sync: ${event.data.syncMethod || 'padrão'}`);
           
-          resultado.innerHTML = `
-            <div style="color: green;">
-              ✅ Logado no Site A!<br>
-              <small>UID: ${event.data.uid}<br>
-              Anônimo: ${event.data.isAnonymous}<br>
-              Contexto: ${event.data.context || 'não informado'}<br>
-              Timestamp: ${event.data.timestamp}</small>
-            </div>
-          `;
+          mostrarStatusLogado({
+            uid: event.data.uid,
+            isAnonymous: event.data.isAnonymous
+          }, event.data.timestamp, event.data.context, event.data.syncMethod);
         } else {
           addLog("[Site B] ❌ Usuário NÃO está logado no Site A");
-          resultado.innerHTML = `
-            <div style="color: red;">
-              ❌ Não logado no Site A<br>
-              <small>Timestamp: ${event.data.timestamp}</small>
-            </div>
-          `;
+          mostrarStatusDeslogado(event.data.timestamp, event.data.context);
         }
       } else {
         addLog(`[Site B] ❓ Tipo de mensagem desconhecido: ${event.data.type}`);
       }
     });
+
+    function mostrarStatusLogado(userInfo, timestamp, context, syncMethod) {
+      resultado.innerHTML = `
+        <div style="color: green; border: 2px solid green; padding: 10px; border-radius: 5px;">
+          ✅ <strong>LOGADO no Site A!</strong><br>
+          <small>
+            UID: ${userInfo.uid}<br>
+            Anônimo: ${userInfo.isAnonymous}<br>
+            Contexto: ${context || 'não informado'}<br>
+            Sync: ${syncMethod || 'padrão'}<br>
+            Timestamp: ${timestamp}<br>
+            Last Auth: ${userInfo.authTime || 'não informado'}
+          </small>
+        </div>
+      `;
+    }
+
+    function mostrarStatusDeslogado(timestamp, context) {
+      resultado.innerHTML = `
+        <div style="color: red; border: 2px solid red; padding: 10px; border-radius: 5px;">
+          ❌ <strong>NÃO LOGADO no Site A</strong><br>
+          <small>
+            Contexto: ${context || 'não informado'}<br>
+            Timestamp: ${timestamp}<br>
+            <em>Tente fazer login em uma aba separada do Site A primeiro</em>
+          </small>
+        </div>
+      `;
+    }
 
     function enviarVerificacao() {
       if (!siteAReady) {
@@ -126,6 +145,7 @@
 
       if (tentativasEnvio >= maxTentativas) {
         addLog(`[Site B] ⚠️ Máximo de tentativas (${maxTentativas}) atingido`);
+        mostrarStatusTimeout();
         return;
       }
 
@@ -135,7 +155,8 @@
       const message = { 
         type: "checkLogin",
         timestamp: new Date().toISOString(),
-        tentativa: tentativasEnvio
+        tentativa: tentativasEnvio,
+        forceDeepSync: tentativasEnvio > 2 // Força sync profundo após 2 tentativas
       };
       
       const targetOrigin = getIframeOrigin();
@@ -152,7 +173,10 @@
         
         respostaRecebida = false;
         
-        // Timeout para esta tentativa específica
+        // Timeout progressivo - mais tempo para tentativas posteriores
+        const timeoutDelay = Math.min(5000 + (tentativasEnvio * 2000), 12000);
+        addLog(`[Site B] ⏰ Timeout configurado para ${timeoutDelay/1000}s`);
+        
         setTimeout(() => {
           if (!respostaRecebida) {
             addLog(`[Site B] ⏰ Timeout na tentativa ${tentativasEnvio}`);
@@ -164,18 +188,52 @@
               }, 3000);
             } else {
               addLog("[Site B] ❌ Todas as tentativas falharam");
-              resultado.innerHTML = `
-                <div style="color: orange;">
-                  ⚠️ Sem resposta do Site A após ${maxTentativas} tentativas<br>
-                  <small>Tente recarregar o iframe ou verificar se há login em outra aba</small>
-                </div>
-              `;
+              mostrarStatusTimeout();
             }
           }
-        }, 8000); // Aumentado para 8 segundos por causa da sincronização
+        }, timeoutDelay);
         
       } catch (error) {
         addLog(`[Site B] ❌ Erro ao enviar mensagem: ${error.message}`);
+      }
+    }
+
+    function mostrarStatusTimeout() {
+      resultado.innerHTML = `
+        <div style="color: orange; border: 2px solid orange; padding: 10px; border-radius: 5px;">
+          ⚠️ <strong>SEM RESPOSTA do Site A</strong><br>
+          <small>
+            Tentativas: ${tentativasEnvio}/${maxTentativas}<br>
+            Possíveis causas:<br>
+            • Site A ainda carregando<br>
+            • Problemas de sincronização do Firebase<br>
+            • Login foi feito em contexto diferente<br>
+            <br>
+            <em>Tente: Recarregar iframe, Verificar novamente, ou Fazer login diretamente no iframe</em>
+          </small>
+        </div>
+      `;
+    }
+
+    function forcarSincronizacaoDeep() {
+      addLog("[Site B] 🔬 Forçando sincronização deep no Site A...");
+      
+      const message = { 
+        type: "forceDeepSync",
+        timestamp: new Date().toISOString()
+      };
+      
+      try {
+        iframe.contentWindow.postMessage(message, getIframeOrigin());
+        addLog("[Site B] ✅ Comando de sincronização deep enviado");
+        
+        // Aguarda um pouco e então verifica
+        setTimeout(() => {
+          tentativasEnvio = 0; // Reset tentativas
+          enviarVerificacao();
+        }, 2000);
+      } catch (error) {
+        addLog(`[Site B] ❌ Erro ao enviar comando deep sync: ${error.message}`);
       }
     }
 
@@ -188,15 +246,19 @@
       siteAReady = false;
       respostaRecebida = false;
       tentativasEnvio = 0;
+      ultimoStatusRecebido = null;
       
-      // Fallback: se não receber siteAReady em 5 segundos, força tentativa
+      // Atualiza status
+      resultado.innerHTML = "⏳ Aguardando Site A carregar...";
+      
+      // Fallback: se não receber siteAReady em 8 segundos, força tentativa
       setTimeout(() => {
         if (!siteAReady) {
           addLog("[Site B] ⏰ Timeout aguardando siteAReady, forçando tentativa...");
           siteAReady = true;
           enviarVerificacao();
         }
-      }, 5000);
+      }, 8000); // Aumentado para 8 segundos
     };
 
     // Event listeners dos botões
@@ -209,12 +271,150 @@
 
     document.getElementById("reloadIframe").addEventListener("click", () => {
       addLog("[Site B] 🔄 Recarregando iframe do Site A");
+      resultado.innerHTML = "⏳ Recarregando Site A...";
       iframe.src = iframe.src;
     });
+
+    document.getElementById("forceSync").addEventListener("click", () => {
+      addLog("[Site B] 🔬 Forçando sincronização deep solicitada pelo usuário");
+      forcarSincronizacaoDeep();
+    });
+
+    // NOVA FUNCIONALIDADE: Verificação periódica automática
+    let verificacaoPeriodicaAtiva = false;
+    
+    function iniciarVerificacaoPeriorica() {
+      if (verificacaoPeriodicaAtiva) return;
+      
+      verificacaoPeriodicaAtiva = true;
+      addLog("[Site B] ⏰ Iniciando verificação periódica automática...");
+      
+      const intervalo = setInterval(() => {
+        if (!siteAReady) {
+          addLog("[Site B] ⏰ Verificação periódica: Site A não está pronto");
+          return;
+        }
+        
+        // Só faz verificação periódica se não há status recente
+        const agora = new Date();
+        const ultimaVerificacao = ultimoStatusRecebido ? new Date(ultimoStatusRecebido.timestamp) : null;
+        
+        if (!ultimaVerificacao || (agora - ultimaVerificacao) > 30000) { // 30 segundos
+          addLog("[Site B] ⏰ Verificação periódica: executando check automático");
+          tentativasEnvio = 0;
+          enviarVerificacao();
+        }
+      }, 15000); // A cada 15 segundos
+      
+      // Para a verificação periódica após 5 minutos
+      setTimeout(() => {
+        clearInterval(intervalo);
+        verificacaoPeriodicaAtiva = false;
+        addLog("[Site B] ⏰ Verificação periódica automática finalizada");
+      }, 300000); // 5 minutos
+    }
+
+    // Inicia verificação periódica após um tempo
+    setTimeout(() => {
+      iniciarVerificacaoPeriorica();
+    }, 10000); // Após 10 segundos da carga da página
+
+    // NOVA FUNCIONALIDADE: Detectar mudanças na aba do Site A
+    function monitorarMudancasAbaSiteA() {
+      addLog("[Site B] 👁️ Iniciando monitoramento de mudanças na aba do Site A...");
+      
+      // Tenta abrir uma referência para o Site A em nova aba (se não existir)
+      // Isso ajuda a detectar quando há login em outra aba
+      window.addEventListener('focus', () => {
+        addLog("[Site B] 👁️ Janela focada - verificando possíveis mudanças de login");
+        setTimeout(() => {
+          if (siteAReady) {
+            tentativasEnvio = 0;
+            enviarVerificacao();
+          }
+        }, 1000);
+      });
+      
+      // Detectar mudanças de storage (caso o Firebase use localStorage para sync)
+      window.addEventListener('storage', (e) => {
+        if (e.key && e.key.includes('firebase')) {
+          addLog(`[Site B] 💾 Mudança detectada no storage Firebase: ${e.key}`);
+          setTimeout(() => {
+            if (siteAReady) {
+              addLog("[Site B] 🔄 Verificando login após mudança de storage...");
+              tentativasEnvio = 0;
+              enviarVerificacao();
+            }
+          }, 2000);
+        }
+      });
+    }
+
+    // Inicia monitoramento
+    monitorarMudancasAbaSiteA();
+
+    // NOVA FUNCIONALIDADE: Status visual aprimorado
+    function criarIndicadorStatus() {
+      const indicador = document.createElement('div');
+      indicador.id = 'statusIndicator';
+      indicador.style.cssText = `
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        font-weight: bold;
+        background: #f0f0f0;
+        border: 2px solid #ccc;
+        min-width: 150px;
+        text-align: center;
+      `;
+      indicador.innerHTML = '🔄 Carregando...';
+      document.body.appendChild(indicador);
+      
+      return indicador;
+    }
+
+    const statusIndicador = criarIndicadorStatus();
+
+    // Atualizar indicador baseado no estado
+    function atualizarIndicadorStatus(estado, detalhes = '') {
+      const estilos = {
+        carregando: { bg: '#fff3cd', border: '#ffeaa7', text: '🔄 Carregando...' },
+        pronto: { bg: '#d4edda', border: '#c3e6cb', text: '✅ Site A Pronto' },
+        logado: { bg: '#d1ecf1', border: '#bee5eb', text: '🔐 Usuário Logado' },
+        deslogado: { bg: '#f8d7da', border: '#f5c6cb', text: '❌ Não Logado' },
+        erro: { bg: '#f8d7da', border: '#f5c6cb', text: '⚠️ Erro/Timeout' }
+      };
+      
+      const estilo = estilos[estado] || estilos.carregando;
+      statusIndicador.style.background = estilo.bg;
+      statusIndicador.style.borderColor = estilo.border;
+      statusIndicador.innerHTML = estilo.text + (detalhes ? `<br><small>${detalhes}</small>` : '');
+    }
+
+    // Interceptar mudanças de resultado para atualizar indicador
+    const resultadoOriginal = resultado.innerHTML;
+    const observer = new MutationObserver(() => {
+      const conteudo = resultado.innerHTML;
+      if (conteudo.includes('LOGADO no Site A')) {
+        atualizarIndicadorStatus('logado');
+      } else if (conteudo.includes('NÃO LOGADO')) {
+        atualizarIndicadorStatus('deslogado');
+      } else if (conteudo.includes('SEM RESPOSTA')) {
+        atualizarIndicadorStatus('erro');
+      } else if (conteudo.includes('Aguardando')) {
+        atualizarIndicadorStatus('carregando');
+      }
+    });
+    
+    observer.observe(resultado, { childList: true, subtree: true });
 
     // Log quando a página termina de carregar
     window.addEventListener('load', () => {
       addLog("[Site B] 📄 Página Site B totalmente carregada");
+      atualizarIndicadorStatus('carregando');
     });
 
     // Log de erros gerais
@@ -222,8 +422,22 @@
       addLog(`[Site B] 💥 Erro JavaScript: ${event.message} em ${event.filename}:${event.lineno}`);
     });
 
+    // NOVA FUNCIONALIDADE: Botão para abrir Site A em nova aba
+    const abrirSiteABtn = document.createElement('button');
+    abrirSiteABtn.textContent = '🔗 Abrir Site A em Nova Aba';
+    abrirSiteABtn.style.marginLeft = '10px';
+    abrirSiteABtn.addEventListener('click', () => {
+      const urlSiteA = iframe.src;
+      addLog(`[Site B] 🔗 Abrindo Site A em nova aba: ${urlSiteA}`);
+      window.open(urlSiteA, '_blank');
+    });
+    
+    document.querySelector('div[style*="margin-top: 20px"]').appendChild(abrirSiteABtn);
+
     // Log inicial
     addLog("[Site B] ✅ Sistema de logs iniciado");
-  </script>
-</body>
-</html>
+    addLog("[Site B] 🔧 Funcionalidades extras ativadas:");
+    addLog("[Site B]   • Verificação periódica automática");
+    addLog("[Site B]   • Monitoramento de mudanças de aba");
+    addLog("[Site B]   • Indicador visual de status");
+    addLog("[Site B]   • Sincronização deep sob demanda");
