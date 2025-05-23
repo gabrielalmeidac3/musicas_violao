@@ -6,81 +6,217 @@
 <body>
   <h1>🔍 Site B - Verificando login do Site A...</h1>
   <div id="resultado">⏳ Aguardando resposta...</div>
+  
+  <div style="margin-top: 20px;">
+    <button id="verificarAgain">🔄 Verificar Novamente</button>
+    <button id="reloadIframe">🔄 Recarregar Site A</button>
+  </div>
 
-  <iframe id="iframeA" src="https://viocomg.github.io/cursofechadoviolao/site_a_login.html" style="display:none;"></iframe>
+  <iframe id="iframeA" src="site_a_login_fixed.html" style="width: 100%; height: 400px; border: 1px solid #ccc; margin-top: 20px;"></iframe>
+  
+  <div id="logs" style="margin-top: 20px; padding: 10px; background: #f0f0f0; font-family: monospace; font-size: 12px; max-height: 300px; overflow-y: auto;"></div>
 
   <script>
-    console.log("[Site B] 🚀 Iniciando verificação...");
+    const logDiv = document.getElementById('logs');
+    
+    function addLog(message) {
+      const timestamp = new Date().toLocaleTimeString();
+      const logMessage = `[${timestamp}] ${message}`;
+      console.log(logMessage);
+      logDiv.innerHTML += logMessage + '<br>';
+      logDiv.scrollTop = logDiv.scrollHeight;
+    }
+
+    addLog("[Site B] 🚀 Iniciando Site B...");
 
     const iframe = document.getElementById("iframeA");
     const resultado = document.getElementById("resultado");
     let respostaRecebida = false;
     let siteAReady = false;
+    let tentativasEnvio = 0;
+    const maxTentativas = 3;
 
-    // Escuta respostas do Site A
+    addLog(`[Site B] 🔗 URL do iframe: ${iframe.src}`);
+    addLog(`[Site B] 🌐 Origem atual: ${window.location.origin}`);
+
+    // Função para obter a origem esperada do iframe
+    function getIframeOrigin() {
+      try {
+        const url = new URL(iframe.src, window.location.href);
+        return url.origin;
+      } catch (error) {
+        addLog(`[Site B] ❌ Erro ao processar URL do iframe: ${error.message}`);
+        return window.location.origin; // fallback para mesma origem
+      }
+    }
+
+    // Listener de mensagens
     window.addEventListener("message", (event) => {
-      console.log("[Site B] 📩 Mensagem recebida de:", event.origin, event.data);
+      addLog(`[Site B] 📨 Mensagem recebida de: ${event.origin}`);
+      addLog(`[Site B] 📄 Dados da mensagem: ${JSON.stringify(event.data)}`);
 
-      // Confere se vem do domínio esperado
-      const origemEsperada = iframe.src.split("/").slice(0, 3).join("/");
-      if (event.origin !== origemEsperada) {
-        console.warn("[Site B] ⚠️ Origem inesperada da mensagem:", event.origin);
+      // Validação de origem mais flexível
+      const origemEsperada = getIframeOrigin();
+      addLog(`[Site B] 🎯 Origem esperada: ${origemEsperada}`);
+      
+      // Aceita mensagens da mesma origem ou do iframe
+      if (event.origin !== origemEsperada && event.origin !== window.location.origin) {
+        addLog(`[Site B] ⚠️ Origem não confiável: ${event.origin} (esperado: ${origemEsperada})`);
+        // Mas não retorna, vamos processar mesmo assim para debug
+      }
+
+      if (!event.data || typeof event.data !== 'object') {
+        addLog("[Site B] ❌ Dados da mensagem inválidos");
         return;
       }
 
       if (event.data.type === "siteAReady") {
-        console.log("[Site B] ✅ Site A está pronto!");
+        addLog("[Site B] ✅ Site A está pronto para comunicação!");
+        addLog(`[Site B] 👤 Usuário atual no Site A: ${event.data.currentUser ? JSON.stringify(event.data.currentUser) : 'nenhum'}`);
+        
         siteAReady = true;
-        enviarVerificacao();
+        
+        // Aguarda um pouco e envia verificação
+        setTimeout(() => {
+          enviarVerificacao();
+        }, 500);
+        
       } else if (event.data.type === "loginStatus") {
+        addLog("[Site B] 📊 Status de login recebido");
         respostaRecebida = true;
+        
         if (event.data.loggedIn) {
-          console.log("[Site B] ✅ Usuário está logado no Site A! UID:", event.data.uid);
-          resultado.innerText = "✅ Logado no Site A!";
-          resultado.style.color = "green";
+          addLog(`[Site B] ✅ Usuário ESTÁ logado no Site A! UID: ${event.data.uid}`);
+          addLog(`[Site B] 🔍 É anônimo: ${event.data.isAnonymous}`);
+          
+          resultado.innerHTML = `
+            <div style="color: green;">
+              ✅ Logado no Site A!<br>
+              <small>UID: ${event.data.uid}<br>
+              Anônimo: ${event.data.isAnonymous}<br>
+              Timestamp: ${event.data.timestamp}</small>
+            </div>
+          `;
         } else {
-          console.log("[Site B] ❌ Usuário NÃO está logado no Site A.");
-          resultado.innerText = "❌ Não logado no Site A.";
-          resultado.style.color = "red";
+          addLog("[Site B] ❌ Usuário NÃO está logado no Site A");
+          resultado.innerHTML = `
+            <div style="color: red;">
+              ❌ Não logado no Site A<br>
+              <small>Timestamp: ${event.data.timestamp}</small>
+            </div>
+          `;
         }
+      } else {
+        addLog(`[Site B] ❓ Tipo de mensagem desconhecido: ${event.data.type}`);
       }
     });
 
     function enviarVerificacao() {
       if (!siteAReady) {
-        console.log("[Site B] ⏳ Aguardando Site A ficar pronto...");
+        addLog("[Site B] ⏳ Site A ainda não está pronto");
         return;
       }
 
-      console.log("[Site B] 📤 Enviando verificação para Site A...");
-      const message = { type: "checkLogin" };
-      const targetOrigin = iframe.src.split("/").slice(0, 3).join("/");
-      iframe.contentWindow.postMessage(message, targetOrigin);
-      console.log("[Site B] 📤 Mensagem enviada:", message, "para", targetOrigin);
+      if (tentativasEnvio >= maxTentativas) {
+        addLog(`[Site B] ⚠️ Máximo de tentativas (${maxTentativas}) atingido`);
+        return;
+      }
 
-      // Define timeout para verificar se a resposta vem
-      setTimeout(() => {
-        if (!respostaRecebida) {
-          console.warn("[Site B] ⏰ Tempo limite atingido. Nenhuma resposta do Site A.");
-          resultado.innerText = "⚠️ Sem resposta do Site A.";
-          resultado.style.color = "orange";
+      tentativasEnvio++;
+      addLog(`[Site B] 📤 Enviando verificação para Site A (tentativa ${tentativasEnvio}/${maxTentativas})`);
+      
+      const message = { 
+        type: "checkLogin",
+        timestamp: new Date().toISOString(),
+        tentativa: tentativasEnvio
+      };
+      
+      const targetOrigin = getIframeOrigin();
+      addLog(`[Site B] 🎯 Origem de destino: ${targetOrigin}`);
+      
+      try {
+        if (!iframe.contentWindow) {
+          addLog("[Site B] ❌ ContentWindow do iframe não disponível");
+          return;
         }
-      }, 8000); // 8 segundos
+        
+        iframe.contentWindow.postMessage(message, targetOrigin);
+        addLog(`[Site B] ✅ Mensagem enviada com sucesso: ${JSON.stringify(message)}`);
+        
+        respostaRecebida = false;
+        
+        // Timeout para esta tentativa específica
+        setTimeout(() => {
+          if (!respostaRecebida) {
+            addLog(`[Site B] ⏰ Timeout na tentativa ${tentativasEnvio}`);
+            
+            if (tentativasEnvio < maxTentativas) {
+              addLog("[Site B] 🔄 Tentando novamente em 2 segundos...");
+              setTimeout(() => {
+                enviarVerificacao();
+              }, 2000);
+            } else {
+              addLog("[Site B] ❌ Todas as tentativas falharam");
+              resultado.innerHTML = `
+                <div style="color: orange;">
+                  ⚠️ Sem resposta do Site A após ${maxTentativas} tentativas<br>
+                  <small>Verifique se o Site A carregou corretamente</small>
+                </div>
+              `;
+            }
+          }
+        }, 5000);
+        
+      } catch (error) {
+        addLog(`[Site B] ❌ Erro ao enviar mensagem: ${error.message}`);
+      }
     }
 
     // Quando o iframe carregar
     iframe.onload = () => {
-      console.log("[Site B] ✅ Iframe carregado. Aguardando Site A ficar pronto...");
+      addLog("[Site B] 📱 Iframe carregado");
+      addLog(`[Site B] 🔗 URL final do iframe: ${iframe.contentWindow?.location?.href || 'não acessível'}`);
       
-      // Fallback: se não receber siteAReady em 3 segundos, tenta mesmo assim
+      // Reset das variáveis
+      siteAReady = false;
+      respostaRecebida = false;
+      tentativasEnvio = 0;
+      
+      // Fallback: se não receber siteAReady em 5 segundos, força tentativa
       setTimeout(() => {
         if (!siteAReady) {
-          console.log("[Site B] ⚠️ Timeout aguardando siteAReady, tentando mesmo assim...");
+          addLog("[Site B] ⏰ Timeout aguardando siteAReady, forçando tentativa...");
           siteAReady = true;
           enviarVerificacao();
         }
-      }, 3000);
+      }, 5000);
     };
+
+    // Event listeners dos botões
+    document.getElementById("verificarAgain").addEventListener("click", () => {
+      addLog("[Site B] 🔄 Verificação manual solicitada");
+      tentativasEnvio = 0;
+      resultado.innerHTML = "⏳ Verificando novamente...";
+      enviarVerificacao();
+    });
+
+    document.getElementById("reloadIframe").addEventListener("click", () => {
+      addLog("[Site B] 🔄 Recarregando iframe do Site A");
+      iframe.src = iframe.src;
+    });
+
+    // Log quando a página termina de carregar
+    window.addEventListener('load', () => {
+      addLog("[Site B] 📄 Página Site B totalmente carregada");
+    });
+
+    // Log de erros gerais
+    window.addEventListener('error', (event) => {
+      addLog(`[Site B] 💥 Erro JavaScript: ${event.message} em ${event.filename}:${event.lineno}`);
+    });
+
+    // Log inicial
+    addLog("[Site B] ✅ Sistema de logs iniciado");
   </script>
 </body>
 </html>
