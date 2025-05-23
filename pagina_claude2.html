@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <title>Site Protegido - Violão</title>
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+    }
+
+    #loading { 
+      display: block; 
+      text-align: center; 
+      margin-top: 50px; 
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    
+    #content, #error { 
+      display: none; 
+    }
+    
+    #content.active { 
+      display: block; 
+    }
+    
+    #error { 
+      color: red; 
+      text-align: center; 
+      margin-top: 50px;
+      font-family: Arial, sans-serif;
+    }
+
+    /* iframe fixo que mostra o conteúdo principal */
+    #iframeConteudo {
+      position: fixed;
+      inset: 0;
+      border: none;
+      width: 100%;
+      height: 100%;
+      display: none;
+    }
+
+    #authFrame { 
+      display: none; 
+    }
+  </style>
+</head>
+
+<body>
+  <div id="loading">Verificando autenticação...</div>
+  <div id="content">
+    <!-- iframe fixo do conteúdo principal -->
+    <iframe id="iframeConteudo" src="index.html"></iframe>
+  </div>
+  <p id="error"></p>
+  <iframe id="authFrame" src="https://viocomg.github.io/cursofechadoviolao/geral_claude2.html"></iframe>
+
+  <script>
+    // Verifica o estado de autenticação via postMessage
+    function checkAuthState() {
+      return new Promise((resolve, reject) => {
+        const iframe = document.getElementById('authFrame');
+        const targetOrigin = 'https://viocomg.github.io';
+        let timeout;
+
+        // Define o handler para mensagens
+        const handler = function(event) {
+          if (event.origin !== targetOrigin) {
+            console.log("Origem inválida no Site B:", event.origin);
+            return;
+          }
+          
+          if (event.data.type === 'siteAReady') {
+            console.log("Site B recebeu confirmação: Site A está pronto");
+            // Envia o pedido de autenticação
+            try {
+              iframe.contentWindow.postMessage({ type: 'checkAuth' }, targetOrigin);
+              console.log("Site B enviou pedido de autenticação");
+            } catch (error) {
+              console.error("Erro ao enviar postMessage:", error);
+              handleError("Erro ao comunicar com Site A");
+            }
+          } else if (event.data.type === 'authStatus') {
+            console.log("Site B recebeu resposta do Site A:", JSON.stringify(event.data, null, 2));
+            clearTimeout(timeout);
+            window.removeEventListener('message', handler);
+            document.getElementById('loading').style.display = 'none';
+            
+            if (event.data.isLoggedIn) {
+              console.log("Usuário está logado, mostrando conteúdo");
+              document.getElementById('content').classList.add('active');
+              document.getElementById('iframeConteudo').style.display = 'block';
+              document.body.style.background = '#000';
+              resolve(true);
+            } else {
+              console.log("Nenhum usuário logado, redirecionando");
+              handleError("Nenhum usuário logado", false);
+            }
+          }
+        };
+
+        // Adiciona o listener
+        window.addEventListener('message', handler, false);
+
+        // Timeout para caso o iframe não responda
+        timeout = setTimeout(() => {
+          console.log("Timeout: Nenhuma resposta do Site A, redirecionando");
+          handleError("Erro: Nenhuma resposta do Site A");
+        }, 15000);
+
+        // Função para lidar com erros
+        function handleError(message, removeListener = true) {
+          clearTimeout(timeout);
+          if (removeListener) {
+            window.removeEventListener('message', handler);
+          }
+          document.getElementById('loading').style.display = 'none';
+          document.getElementById('error').textContent = message;
+          document.getElementById('error').style.display = 'block';
+          setTimeout(() => {
+            window.location.href = 'https://viocomg.github.io/cursofechadoviolao/geral_claude2.html';
+          }, 2000);
+        }
+
+        // Verifica se o iframe carregou
+        iframe.addEventListener('load', () => {
+          console.log("Iframe carregado, aguardando siteAReady");
+        });
+      });
+    }
+
+    // Inicia a verificação
+    checkAuthState();
+  </script>
+</body>
+</html>

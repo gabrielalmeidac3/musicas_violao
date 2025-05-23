@@ -508,3 +508,7 @@ h2 {
     background: #089326 !important; /* Azul */
     color: #fff !important;
 }
+
+html {
+    scrollbar-color: #696969 #111;
+  }
