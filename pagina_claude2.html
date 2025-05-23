@@ -80,11 +80,11 @@
             console.log("Site B recebeu confirmação: Site A está pronto");
             // Envia o pedido de autenticação
             try {
-              iframe.contentWindow.postMessage({ type: 'checkAuth' }, targetOrigin);
+              iframe.contentWindow.postMessage({ type: 'checkAuth' }, 'https://viocomg.github.io');
               console.log("Site B enviou pedido de autenticação");
             } catch (error) {
               console.error("Erro ao enviar postMessage:", error);
-              handleError("Erro ao comunicar com Site A");
+              handleError("Falha na comunicação com Site A");
             }
           } else if (event.data.type === 'authStatus') {
             console.log("Site B recebeu resposta do Site A:", JSON.stringify(event.data, null, 2));
