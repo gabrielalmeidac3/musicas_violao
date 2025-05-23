@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Site B - Verificador</title>
+</head>
+<body>
+  <h1>🔍 Site B - Verificando login do Site A...</h1>
+  <div id="resultado">Aguardando resposta...</div>
+
+  <iframe id="iframeA" src="https://viocomg.github.io/cursofechadoviolao/site_a_login.html" style="display:none;"></iframe>
+
+  <script>
+    console.log("[Site B] Iniciando...");
+
+    const iframe = document.getElementById("iframeA");
+
+    window.addEventListener("message", (event) => {
+      console.log("[Site B] 📩 Mensagem recebida de:", event.origin, event.data);
+      if (event.data.type === "loginStatus") {
+        if (event.data.loggedIn) {
+          console.log("[Site B] ✅ Usuário está logado no Site A! UID:", event.data.uid);
+          document.getElementById("resultado").innerText = "✅ Logado no Site A!";
+        } else {
+          console.log("[Site B] ❌ Usuário NÃO está logado no Site A.");
+          document.getElementById("resultado").innerText = "❌ Não logado no Site A.";
+        }
+      }
+    });
+
+    // Aguarda o carregamento do iframe e envia a solicitação
+    iframe.onload = () => {
+      console.log("[Site B] ✅ Iframe carregado, enviando solicitação...");
+      iframe.contentWindow.postMessage({ type: "checkLogin" }, "*");
+    };
+  </script>
+</body>
+</html>
