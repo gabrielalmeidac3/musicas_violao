@@ -16,12 +16,14 @@
     const resultado = document.getElementById("resultado");
     let respostaRecebida = false;
 
+    // Define origem esperada para validar mensagens
+    const origemEsperada = "https://viocomg.github.io";
+
     // Escuta respostas do Site A
     window.addEventListener("message", (event) => {
       console.log("[Site B] 📩 Mensagem recebida de:", event.origin, event.data);
 
-      // Confere se vem do domínio esperado
-      const origemEsperada = iframe.src.split("/").slice(0, 3).join("/");
+      // Confere se a mensagem veio da origem esperada
       if (event.origin !== origemEsperada) {
         console.warn("[Site B] ⚠️ Origem inesperada da mensagem:", event.origin);
         return;
@@ -39,21 +41,20 @@
       }
     });
 
-    // Quando o iframe carregar, envia a mensagem
+    // Quando o iframe carregar, envia a mensagem para checar login
     iframe.onload = () => {
       console.log("[Site B] ✅ Iframe carregado. Enviando verificação para Site A...");
       const message = { type: "checkLogin" };
-      const targetOrigin = iframe.src.split("/").slice(0, 3).join("/");
-      iframe.contentWindow.postMessage(message, targetOrigin);
-      console.log("[Site B] 📤 Mensagem enviada:", message, "para", targetOrigin);
+      iframe.contentWindow.postMessage(message, origemEsperada);
+      console.log("[Site B] 📤 Mensagem enviada:", message, "para", origemEsperada);
 
-      // Define timeout para verificar se a resposta vem
+      // Timeout de 5 segundos para aguardar resposta
       setTimeout(() => {
         if (!respostaRecebida) {
           console.warn("[Site B] ⏰ Tempo limite atingido. Nenhuma resposta do Site A.");
           resultado.innerText = "⚠️ Sem resposta do Site A.";
         }
-      }, 5000); // 5 segundos
+      }, 5000);
     };
   </script>
 </body>
