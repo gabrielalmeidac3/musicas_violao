@@ -5,32 +5,55 @@
 </head>
 <body>
   <h1>🔍 Site B - Verificando login do Site A...</h1>
-  <div id="resultado">Aguardando resposta...</div>
+  <div id="resultado">⏳ Aguardando resposta...</div>
 
   <iframe id="iframeA" src="https://viocomg.github.io/cursofechadoviolao/site_a_login.html" style="display:none;"></iframe>
 
   <script>
-    console.log("[Site B] Iniciando...");
+    console.log("[Site B] 🚀 Iniciando verificação...");
 
     const iframe = document.getElementById("iframeA");
+    const resultado = document.getElementById("resultado");
+    let respostaRecebida = false;
 
+    // Escuta respostas do Site A
     window.addEventListener("message", (event) => {
       console.log("[Site B] 📩 Mensagem recebida de:", event.origin, event.data);
+
+      // Confere se vem do domínio esperado
+      const origemEsperada = iframe.src.split("/").slice(0, 3).join("/");
+      if (event.origin !== origemEsperada) {
+        console.warn("[Site B] ⚠️ Origem inesperada da mensagem:", event.origin);
+        return;
+      }
+
       if (event.data.type === "loginStatus") {
+        respostaRecebida = true;
         if (event.data.loggedIn) {
           console.log("[Site B] ✅ Usuário está logado no Site A! UID:", event.data.uid);
-          document.getElementById("resultado").innerText = "✅ Logado no Site A!";
+          resultado.innerText = "✅ Logado no Site A!";
         } else {
           console.log("[Site B] ❌ Usuário NÃO está logado no Site A.");
-          document.getElementById("resultado").innerText = "❌ Não logado no Site A.";
+          resultado.innerText = "❌ Não logado no Site A.";
         }
       }
     });
 
-    // Aguarda o carregamento do iframe e envia a solicitação
+    // Quando o iframe carregar, envia a mensagem
     iframe.onload = () => {
-      console.log("[Site B] ✅ Iframe carregado, enviando solicitação...");
-      iframe.contentWindow.postMessage({ type: "checkLogin" }, "*");
+      console.log("[Site B] ✅ Iframe carregado. Enviando verificação para Site A...");
+      const message = { type: "checkLogin" };
+      const targetOrigin = iframe.src.split("/").slice(0, 3).join("/");
+      iframe.contentWindow.postMessage(message, targetOrigin);
+      console.log("[Site B] 📤 Mensagem enviada:", message, "para", targetOrigin);
+
+      // Define timeout para verificar se a resposta vem
+      setTimeout(() => {
+        if (!respostaRecebida) {
+          console.warn("[Site B] ⏰ Tempo limite atingido. Nenhuma resposta do Site A.");
+          resultado.innerText = "⚠️ Sem resposta do Site A.";
+        }
+      }, 5000); // 5 segundos
     };
   </script>
 </body>
