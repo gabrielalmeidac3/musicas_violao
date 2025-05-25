@@ -1,0 +1,6 @@
+fechado_curso.html - está aberto
+fechado_index.htm - é o curso fechado
+fechado_geral_protegido_site.html - verifica se está logado ou não. Se estiver, exibe o conteúdo de fechado_geral2.html
+fechado_geral_ protedgido.html - é a página de login
+fechado_geral_2.html - é o conteúdo a ser exibido (o site principal)
+fechado_produtor.html - é onde eu gerencio os alunos
