@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Curso de Violão</title>
+  <link rel="stylesheet" href="fechado_styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Curso de Violão do Zero Ao Repertório</h1>
+    <h2>Por Gabriel Almeida</h2>
+    <form id="loginForm">
+      <label for="telefone">Número de Telefone:</label>
+      <input type="text" id="telefone" placeholder="Digite seu telefone" required>
+      <label for="senha">Senha:</label>
+      <input type="password" id="senha" placeholder="Digite sua senha (4 dígitos)" required>
+      <button type="submit">Entrar</button>
+      <p id="erro" style="color: red; display: none;">Acesso negado</p>
+    </form>
+  </div>
+  <!-- Bibliotecas do Firebase (versões compatíveis) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="geral_protegido.js"></script>
+</body>
+</html>

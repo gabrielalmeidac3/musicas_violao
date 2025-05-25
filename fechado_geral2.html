@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Curso de Violão</title>
+    <link rel="stylesheet" href="fechado_styles.css">
+    
+</head>
+
+<style>
+
+    img {
+        max-width: 100%; /* Para garantir que a imagem não ultrapasse a tela */
+        height: auto;
+    }
+</style>
+
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="img.webp" alt="Descrição da imagem" />
+            <p>Página Geral</p>
+        </div>
+        <div class="logout-button" onclick="logout()">Sair</div>
+        <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'geral_protegido.html';
+            }).catch((error) => {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao sair. Tente novamente.');
+            });
+        }
+        </script>
+        <div class="toggle-section">
+            <button class="toggle-header" style="background-color: #319234;" onclick="openModal('modal1')">Como funcionam as videochamadas</button>
+            <button class="toggle-header" style="background-color: #197de1;" onclick="openModal('modal2')">Como entrar na videochamada</button>
+            <button class="toggle-header" style="background-color: #b52121;" onclick="openModal('modal3')">Como funciona nosso grupo do WhatsApp</button>
+            <button class="toggle-header" style="background-color: #a8931d;" onclick="window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/'">Site Aulas Músicas</button>
+            <button class="toggle-header" style="background-color: #b42a6f;" onclick="window.location.href='fechado_index.html'">Curso Completo do Zero ao Repertório</button>
+            <button class="toggle-header" style="background-color: #46306d;" onclick="window.location.href='https://youtube.com/playlist?list=PLQFrIFIh3VvJlQEkcsDMzPn50rOdQYh89&si=gnL5iG7nADlvIUX9'">Gravações das videochamadas</button>
+        </div>
+    </div>
+
+    <!-- Modal 1 -->
+    <div id="modal1" class="modal">
+        <div class="modal-content" style="text-align: left;">
+            <p>As videochamadas são realizadas uma vez por semana.<br>Segunda-feira 20h (8 horas da noite).<br><br>
+            Nelas você vai poder falar diretamente comigo.<br><br>
+            Eu vou saber como você está no violão.<br><br>
+            E vou te passar qual o teu objetivo pra semana.<br>
+            <p style="font-size: 18px; font-weight: bold; color:#d15a5a">Caso você não participar da videochamada, diga o motivo e faça uma dessas coisas na segunda-feira mesmo:</p>
+            1 - Escolha o seu objetivo pra semana e mande no grupo<br>
+            2 - Me fale sua dúvida ou dificuldade que passo o que você deve fazer</p>
+            <button class="modal-close" onclick="closeModal('modal1')">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Modal 2 -->
+    <div id="modal2" class="modal">
+        <div class="modal-content">
+            <iframe width="100%" height="315" src="https://www.youtube.com/embed/-pktnbKCK_g" frameborder="0" allowfullscreen></iframe>
+            <button class="modal-close" onclick="closeModal('modal2')">Voltar</button>
+        </div>
+    </div>
+
+    <!-- Modal 3 -->
+    <div id="modal3" class="modal">
+        <div class="modal-content"style="text-align: left;">
+            <p style="font-size: 25px; font-weight: bold;">Toda terça e quinta você pode mandar seu vídeo ou seu áudio tocando pra eu analisar.<br></p>
+            <p>Obs: Máximo de 2 envios por aluno por dia.<br><br>
+            Às vezes eu não consigo responder todos no mesmo dia (na terça ou na quinta), mas no próximo dia eu respondo.<br><br>
+            Pode mandar dúvidas também na terça ou quinta (caso não mande material pra análise)<br><br>
+            Nos outros dias você pode mandar vídeos e áudios também pra compartilhar com os colegas.<br><br>
+            Mas os dias em que eu vou analisar mesmo é só terça e quinta.<br><br>
+            ⚠️ Aviso: Os materiais a serem analisados devem ser mandados apenas na terça e na quinta (pra manter a organização do grupo).</p>
+            <button class="modal-close" onclick="closeModal('modal3')">Voltar</button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

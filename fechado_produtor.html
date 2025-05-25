@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Painel do Produtor</title>
+  <link rel="stylesheet" href="fechado_styles.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Painel do Produtor</h1>
+    <form id="loginProdutorForm" style="display: none;">
+      <label for="usuario">Usuário:</label>
+      <input type="text" id="usuario" placeholder="Digite seu usuário" required>
+      <label for="senhaProdutor">Senha:</label>
+      <input type="password" id="senhaProdutor" placeholder="Digite sua senha" required>
+      <button type="submit">Entrar</button>
+    </form>
+    <div id="painel">
+      <h2>Cadastrar Aluno</h2>
+      <form id="cadastroForm">
+        <label for="nome">Nome:</label>
+        <input type="text" id="nome" placeholder="Nome do aluno" required>
+        <label for="telefoneCadastro">Telefone:</label>
+        <input type="text" id="telefoneCadastro" placeholder="Telefone do aluno" required>
+        <label for="senhaCadastro">Senha (opcional):</label>
+        <input type="password" id="senhaCadastro" placeholder="Senha do aluno (padrão aleatória)">
+        <button type="submit">Cadastrar</button>
+      </form>
+      <h2>Alunos Cadastrados</h2>
+      <ul id="listaAlunos"></ul>
+    </div>
+  </div>
+
+  <!-- Bibliotecas do Firebase (versões compatíveis) -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+  <script src="produtor.js"></script>
+</body>
+</html>
