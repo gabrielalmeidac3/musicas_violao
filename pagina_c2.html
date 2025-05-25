@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Teste Visual - Site C</title>
+  <link rel="stylesheet" href="styles.css">
+  <body style="visibility: hidden;">
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script>
+    let auth;
+  
+    async function initFirebase() {
+      try {
+        const response = await fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev');
+        const firebaseConfig = await response.json();
+  
+        firebase.initializeApp(firebaseConfig);
+        await firebase.auth().setPersistence(firebase.auth.Auth.Persistence.LOCAL);
+        console.log("🔐 Persistência LOCAL definida");
+        auth = firebase.auth();
+        
+        console.log("Firebase pronto no Site C");
+      } catch (error) {
+        console.error("Erro ao iniciar Firebase:", error);
+      }
+    }
+  
+    
+    initFirebase().then(() => {
+      auth.onAuthStateChanged((user) => {
+        if (user) {
+          console.log("✅ Usuário logado:", user);
+          document.body.style.visibility = "visible";
+        } else {
+          console.log("❌ Usuário não logado. Redirecionando...");
+          window.location.href = "fechado_geral_protegido_site.html";
+        }
+      });
+    });
+
+
+    function logout() {
+    if (!auth) {
+      console.error("Firebase auth ainda não carregado");
+      return;
+    }
+
+    auth.signOut().then(() => {
+      console.log("🔒 Logout feito com sucesso");
+      window.location.href = 'geral_protegido_site.html'; // página pública
+    }).catch((error) => {
+      console.error("❌ Erro ao sair:", error);
+      alert("Erro ao sair. Tente novamente.");
+    });
+  }
+
+
+  </script>
+  
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background-color: #111;
+    }
+
+    iframe {
+      position: fixed;
+      inset: 0;
+      border: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    .logout-button {
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    background-color: #803232;
+    color: #ccc;
+    padding: 3px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    z-index: 1000;
+    }
+
+    .logout-button:hover {
+        background-color: #994040;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="logout-button" onclick="logout()">Sair</div>
+  <iframe src="index.html"></iframe>
+</body>
+</html>
