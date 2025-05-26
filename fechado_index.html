@@ -53,6 +53,11 @@
                                 const newContent = doc.body;
                                 document.body.innerHTML = `<div class="logout-button" onclick="logout()">Sair</div>` + newContent.innerHTML;
 
+                                // Atualiza o link "Voltar para a Página Geral"
+                                const voltarBtn = document.querySelector('a[href="https://viocomg.github.io/cursofechadoviolao/geral"]');
+                                if (voltarBtn) {
+                                voltarBtn.href = "https://gabrielalmeidac3.github.io/musicas_violao/fechado_geral_protegido_site";
+                                }
 
                                 // Executa todos os scripts do curso.html (inline e externos)
                                 const scripts = doc.querySelectorAll('script');
