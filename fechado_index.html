@@ -16,94 +16,90 @@
     <div id="content"></div>
     
     <script>
-    let auth;
-    let db;
-
-        fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
-          .then(response => response.json())
-          .then(firebaseConfig => {
-            // Inicializa o Firebase com a configuração recebida do Worker
-            
-
-            firebase.initializeApp(firebaseConfig);
-
+        // Declarar auth e db globalmente
+        let auth = null;
+        let db = null;
+    
+        // Inicializar Firebase apenas se ainda não foi inicializado
+        if (!firebase.apps.length) {
+            fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
+                .then(response => response.json())
+                .then(firebaseConfig => {
+                    firebase.initializeApp(firebaseConfig);
+                    auth = firebase.auth();
+                    db = firebase.firestore();
+                    console.log('Firebase inicializado com configuração segura!');
+                    loadContent();
+                })
+                .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
+        } else {
             auth = firebase.auth();
             db = firebase.firestore();
-
-
-            // Agora você pode usar 'auth' e 'db' normalmente
-            console.log('Firebase inicializado com configuração segura!');
-
+            console.log('Firebase já inicializado.');
+            loadContent();
+        }
+    
+        function loadContent() {
             auth.onAuthStateChanged((user) => {
-            if (user) {
-                const telefone = user.email.split('@')[0];
-                db.collection('alunos').where('telefone', '==', telefone).get()
-                    .then((snapshot) => {
-                        if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
-                            fetch('fechado_curso.html')
-                            .then(response => response.text())
-                            .then(data => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(data, 'text/html');
-
-                                // Substitui o <head> (opcional, se você quiser usar o head do curso.html)
-                                document.head.innerHTML = doc.head.innerHTML;
-
-                                // Substitui apenas o conteúdo principal (evita conflitos com Firebase, etc.)
-                                const newContent = doc.body;
-                                document.body.innerHTML = `<div class="logout-button" onclick="logout()">Sair</div>` + newContent.innerHTML;
-
-                                // Atualiza o link "Voltar para a Página Geral"
-                                const voltarBtn = document.querySelector('a[href="https://viocomg.github.io/cursofechadoviolao/geral"]');
-                                if (voltarBtn) {
-                                voltarBtn.href = "https://gabrielalmeidac3.github.io/musicas_violao/fechado_geral_protegido_site";
-                                }
-
-                                // Executa todos os scripts do curso.html (inline e externos)
-                                const scripts = doc.querySelectorAll('script');
-                                scripts.forEach(oldScript => {
-                                const newScript = document.createElement('script');
-
-                                if (oldScript.src) {
-                                    // Script externo
-                                    newScript.src = oldScript.src;
-                                    newScript.async = false;
-                                } else {
-                                    // Script inline
-                                    newScript.textContent = oldScript.textContent;
-                                }
-
-                                document.body.appendChild(newScript);
-                                });
-                            })
-                            .catch(error => console.error('Erro ao carregar fechado_curso.html:', error));
-
-
-                        } else {
-                            alert('Acesso negado.');
-                            auth.signOut();
-                            window.location.href = 'fechado_geral_protegido_site.html';
-                        }
-                    })
-                    .catch(error => console.error('Erro ao verificar aluno:', error));
-            } else {
-                window.location.href = 'fechado_geral_protegido_site.html';
-            }
-        });
-
-          })
-          .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
-
-
+                if (user) {
+                    const telefone = user.email.split('@')[0];
+                    db.collection('alunos').where('telefone', '==', telefone).get()
+                        .then((snapshot) => {
+                            if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
+                                fetch('fechado_curso.html')
+                                    .then(response => response.text())
+                                    .then(data => {
+                                        const parser = new DOMParser();
+                                        const doc = parser.parseFromString(data, 'text/html');
+    
+                                        // Substitui o <head> (opcional, mantido para consistência)
+                                        document.head.innerHTML = doc.head.innerHTML;
+    
+                                        // Substitui o conteúdo principal
+                                        document.body.innerHTML = `<div class="logout-button" onclick="logout()">Sair</div>` + doc.body.innerHTML;
+    
+                                        
+    
+                                        // Executa scripts de fechado_curso.html, evitando redeclarações
+                                        const scripts = doc.querySelectorAll('script');
+                                        scripts.forEach(oldScript => {
+                                            if (oldScript.src && !oldScript.src.includes('firebase')) {
+                                                const newScript = document.createElement('script');
+                                                newScript.src = oldScript.src;
+                                                newScript.async = false;
+                                                document.body.appendChild(newScript);
+                                            } else if (!oldScript.src) {
+                                                // Evita executar scripts inline que possam redeclarar auth ou Firebase
+                                                if (!oldScript.textContent.includes('firebase.initializeApp') && !oldScript.textContent.includes('auth =')) {
+                                                    const newScript = document.createElement('script');
+                                                    newScript.textContent = oldScript.textContent;
+                                                    document.body.appendChild(newScript);
+                                                }
+                                            }
+                                        });
+                                    })
+                                    .catch(error => console.error('Erro ao carregar fechado_curso.html:', error));
+                            } else {
+                                alert('Acesso negado.');
+                                auth.signOut();
+                                window.location.href = 'fechado_geral_protegido_site.html';
+                            }
+                        })
+                        .catch(error => console.error('Erro ao verificar aluno:', error));
+                } else {
+                    window.location.href = 'fechado_geral_protegido_site.html';
+                }
+            });
+        }
+    
         function logout() {
             auth.signOut().then(() => {
-                window.location.href = 'fechado_geral_protegido_site.html';
+                window.location.href = 'fechado_geral/protegido_site.html';
             }).catch((error) => {
                 console.error('Erro ao fazer logout:', error);
                 alert('Erro ao sair. Tente novamente.');
             });
         }
-    
     </script>
 </body>
 </html>
