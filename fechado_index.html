@@ -12,8 +12,9 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
 <body>
+    <div class="logout-button" onclick="logout()">Sair</div>
     <div id="content"></div>
-   
+    
     <script>
     let auth;
     let db;
@@ -50,7 +51,8 @@
 
                                 // Substitui apenas o conteúdo principal (evita conflitos com Firebase, etc.)
                                 const newContent = doc.body;
-                                document.body.innerHTML = newContent.innerHTML;
+                                document.body.innerHTML = `<div class="logout-button" onclick="logout()">Sair</div>` + newContent.innerHTML;
+
 
                                 // Executa todos os scripts do curso.html (inline e externos)
                                 const scripts = doc.querySelectorAll('script');
@@ -89,7 +91,12 @@
 
 
         function logout() {
-            auth.signOut().then(() => window.location.href = 'fechado_geral_protegido_site.html');
+            auth.signOut().then(() => {
+                window.location.href = 'fechado_geral_protegido_site.html';
+            }).catch((error) => {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao sair. Tente novamente.');
+            });
         }
     
     </script>
