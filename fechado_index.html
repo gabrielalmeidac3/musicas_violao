@@ -11,10 +11,14 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 </head>
+
+
+
 <body>
-    <div class="logout-button" onclick="logout()">Sair</div>
+    <div id="loading">Carregando Curso <br>Do Zero ao Repertório</div>
     <div id="content"></div>
-    
+    <div class="logout-button" onclick="logout()">Sair</div>
+
     <script>
         // Declarar auth e db globalmente
         let auth = null;
@@ -51,25 +55,24 @@
                                     .then(data => {
                                         const parser = new DOMParser();
                                         const doc = parser.parseFromString(data, 'text/html');
-    
-                                        // Substitui o <head> (opcional, mantido para consistência)
-                                        document.head.innerHTML = doc.head.innerHTML;
-    
-                                        // Substitui o conteúdo principal
-                                        document.body.innerHTML = `<div class="logout-button" onclick="logout()">Sair</div>` + doc.body.innerHTML;
-    
                                         
+                                        // Insere o conteúdo em #content
+                                        document.getElementById('content').innerHTML = doc.body.innerHTML;
     
-                                        // Executa scripts de fechado_curso.html, evitando redeclarações
+                                        // Carrega scripts de fechado_curso.html
                                         const scripts = doc.querySelectorAll('script');
+                                        const scriptPromises = [];
                                         scripts.forEach(oldScript => {
                                             if (oldScript.src && !oldScript.src.includes('firebase')) {
                                                 const newScript = document.createElement('script');
                                                 newScript.src = oldScript.src;
                                                 newScript.async = false;
-                                                document.body.appendChild(newScript);
+                                                scriptPromises.push(new Promise((resolve, reject) => {
+                                                    newScript.onload = resolve;
+                                                    newScript.onerror = reject;
+                                                    document.body.appendChild(newScript);
+                                                }));
                                             } else if (!oldScript.src) {
-                                                // Evita executar scripts inline que possam redeclarar auth ou Firebase
                                                 if (!oldScript.textContent.includes('firebase.initializeApp') && !oldScript.textContent.includes('auth =')) {
                                                     const newScript = document.createElement('script');
                                                     newScript.textContent = oldScript.textContent;
@@ -77,6 +80,17 @@
                                                 }
                                             }
                                         });
+    
+                                        // Aplica o override após carregar todos os scripts
+                                        Promise.all(scriptPromises).then(() => {
+                                            const button = document.querySelector('button[onclick="voltarPaginaGeral()"]');
+                                            if (button) {
+                                                window.voltarPaginaGeral = function() {
+                                                    window.location.href = 'fechado_geral_protegido_site.html';
+                                                };
+                                                document.getElementById('loading').style.display = 'none';
+                                            }
+                                        }).catch(error => console.error('Erro ao carregar scripts:', error));
                                     })
                                     .catch(error => console.error('Erro ao carregar fechado_curso.html:', error));
                             } else {
@@ -94,12 +108,28 @@
     
         function logout() {
             auth.signOut().then(() => {
-                window.location.href = 'fechado_geral/protegido_site.html';
+                window.location.href = 'fechado_geral_protegido_site.html';
             }).catch((error) => {
                 console.error('Erro ao fazer logout:', error);
                 alert('Erro ao sair. Tente novamente.');
             });
         }
     </script>
+    <style>
+     
+        #loading {
+            text-align: center;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            font-family: Arial, sans-serif;
+            color: #999999;
+        }
+    </style>
+
+    
 </body>
+
 </html>
