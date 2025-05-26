@@ -13,7 +13,7 @@
         <h1 style="margin-bottom: 0;">Aulas de Violão - Músicas</h1>
         <p style="text-align: center; color: gray;margin-bottom: 15px;">por Gabriel Almeida</p>
         <div style="text-align: center; margin-bottom: 20px;">
-            <a href="https://www.youtube.com/@gabrielalmeidaviolao" class="youtube-btn" style="
+            <button onclick="abrirYoutube()" style="
                 display: inline-block;
                 padding: 8px 16px;
                 font-size: 9px;
@@ -23,23 +23,55 @@
                 text-decoration: none;
                 text-align: center;
                 transition: background 0.3s;
+                border: none;
+                cursor: pointer;
             ">
                 Ver canal do YouTube
-            </a>
-            <a href="https://viocomg.github.io/cursofechadoviolao/geral" class="geral-btn" style="
-                display: inline-block;
-                padding: 8px 16px;
-                font-size: 9px;
-                color: white;
-                background: #2594a3; /* Cor azul */
-                border-radius: 12px;
-                text-decoration: none;
-                text-align: center;
-                transition: background 0.3s;
+            </button>
+
+            <script>
+            function abrirYoutube() {
+                // Detecta se está dentro de um iframe
+                const dentroDeIframe = window.self !== window.top;
+
+                if (dentroDeIframe) {
+                parent.postMessage('abrir_youtube', '*');
+                } else {
+                window.location.href = 'https://www.youtube.com/@gabrielalmeidaviolao';
+                }
+            }
+            </script>
+
+            <button onclick="voltarPaginaGeral()" style="
+            display: inline-block;
+            padding: 8px 16px;
+            font-size: 9px;
+            color: white;
+            background: #2594a3;
+            border-radius: 12px;
+            text-decoration: none;
+            text-align: center;
+            transition: background 0.3s;
+            border: none;
+            cursor: pointer;
             ">
-                Voltar para a Página Geral
-            </a>
+            Voltar para a Página Geral
+            </button>
+
+            <script>
+            function voltarPaginaGeral() {
+            const dentroDeIframe = window.self !== window.top;
+
+            if (dentroDeIframe) {
+            parent.postMessage('voltar_pagina_geral', '*');
+            } else {
+            window.location.href = 'https://gabrielalmeidac3.github.io/musicas_violao/fechado_geral2';
+            }
+            }
+            </script>
+
         </div>
+        
         
         
         
@@ -66,12 +98,6 @@
         addSearchEventListener();
         checkUpdateStatus();
     </script>
-    <script>
-        // Detecta se está dentro de iframe
-        if (window.self !== window.top) {
-        // Se estiver dentro do iframe, altera o link
-        document.getElementById('btn-voltar').href = 'https://gabrielalmeidac3.github.io/musicas_violao/fechado_geral_protegido_site';
-        }
-    </script>  
+    
 </body>
 </html>

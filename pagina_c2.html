@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Teste Visual - Site C</title>
   <link rel="stylesheet" href="styles.css">
+  
   <body style="visibility: hidden;">
 
   <!-- Firebase SDKs -->
@@ -98,6 +99,20 @@
 <body>
   <div class="logout-button" onclick="logout()">Sair</div>
   <iframe src="index.html"></iframe>
+  <script>
+    window.addEventListener('message', (event) => {
+      if (event.data === 'abrir_youtube') {
+        console.log("🔁 Redirecionando para o YouTube...");
+        window.location.href = 'https://www.youtube.com/@gabrielalmeidaviolao';
+      }
+  
+      if (event.data === 'voltar_pagina_geral') {
+        console.log("🔁 Redirecionando para a Página Geral...");
+        window.location.href = 'https://gabrielalmeidac3.github.io/musicas_violao/fechado_geral2';
+      }
+    });
+  </script>
+  
   
 </body>
 
