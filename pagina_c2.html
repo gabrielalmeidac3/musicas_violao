@@ -34,7 +34,7 @@
     initFirebase().then(() => {
       auth.onAuthStateChanged((user) => {
         if (user) {
-          console.log("✅ Usuário logado:", user);
+          
           document.body.style.visibility = "visible";
         } else {
           console.log("❌ Usuário não logado. Redirecionando...");
