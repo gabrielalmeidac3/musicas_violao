@@ -16,6 +16,15 @@
     let auth;
     let db;
   
+    function logout() {
+        auth.signOut().then(() => {
+            window.location.href = 'fechado_geral_protegido.html';
+        }).catch((error) => {
+            console.error('Erro ao fazer logout:', error);
+            alert('Erro ao sair. Tente novamente.');
+        });
+    }
+
     fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
       .then(response => response.json())
       .then(firebaseConfig => {
@@ -44,14 +53,7 @@
       })
       .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
 
-      function logout() {
-        auth.signOut().then(() => {
-            window.location.href = 'fechado_geral_protegido.html';
-        }).catch((error) => {
-            console.error('Erro ao fazer logout:', error);
-            alert('Erro ao sair. Tente novamente.');
-        });
-    }
+      
   </script>
 <div id="content">
 <div class="logout-button" onclick="logout()">Sair</div>
