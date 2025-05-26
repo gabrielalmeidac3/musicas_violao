@@ -512,3 +512,22 @@ h2 {
 html {
     scrollbar-color: #696969 #111;
   }
+
+  .back-to-top {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    background-color: #1e90ff;
+    color: white;
+    padding: 10px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    z-index: 1000;
+    display: none; /* <- Isso aqui faz ele iniciar escondido */
+  }
+  
+  .back-to-top:hover {
+    background-color: #4682b4;
+  }
+  
