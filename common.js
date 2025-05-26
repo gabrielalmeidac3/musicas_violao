@@ -235,14 +235,32 @@ async function loadRhythmButtons() {
     window.ritmos = await ritmosResponse.json();
     const ritmosEncaixe = await (await fetch('ritmos_encaixe.json')).json();
     Object.assign(window.ritmos, ritmosEncaixe);
-    const rhythms = ["Todos os ritmos", ...new Set(Object.values(window.ritmos).map(r => r.ritmo).filter(r => r))];
+
+    // Contar vídeos por ritmo
+    const rhythmCounts = {};
+    Object.entries(window.ritmos).forEach(([key, { ritmo }]) => {
+        if (ritmo) {
+            rhythmCounts[ritmo] = (rhythmCounts[ritmo] || 0) + 1;
+        }
+    });
+
+    // Total de vídeos
+    const totalVideos = Object.values(window.ritmos).filter(r => r.ritmo).length;
+
+    // Ordenar ritmos por quantidade de vídeos (decrescente) e alfabeticamente para empates
+    const rhythms = [["Todos os ritmos", totalVideos], ...Object.entries(rhythmCounts).sort((a, b) => {
+        const countA = a[1];
+        const countB = b[1];
+        return countB - countA || a[0].localeCompare(b[0]);
+    })];
+
     const container = document.getElementById("rhythmButtons");
 
-    rhythms.forEach(rhythm => {
+    rhythms.forEach(([rhythm, count]) => {
         const btn = document.createElement("button");
         btn.className = "rhythm-btn";
         btn.dataset.rhythm = rhythm;
-        btn.textContent = rhythm;
+        btn.innerHTML = `${rhythm} <span style="font-size: 0.8em;">(${count})</span>`;
         btn.onclick = () => filterByRhythm(rhythm);
         container.appendChild(btn);
     });
