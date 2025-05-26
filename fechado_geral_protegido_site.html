@@ -13,7 +13,17 @@
 </head>
 <body>
     <div id="content"></div>
-   
+    <div class="logout-button" onclick="logout()">Sair</div>
+    <script>
+        function logout() {
+            auth.signOut().then(() => {
+                window.location.href = 'fechado_geral_protegido.html';
+            }).catch((error) => {
+                console.error('Erro ao fazer logout:', error);
+                alert('Erro ao sair. Tente novamente.');
+            });
+        }
+        </script>
     <script>
     let auth;
     let db;
@@ -50,7 +60,8 @@
 
                                 // Substitui apenas o conteúdo principal (evita conflitos com Firebase, etc.)
                                 const newContent = doc.body;
-                                document.body.innerHTML = newContent.innerHTML;
+                                document.getElementById('content').innerHTML = newContent.innerHTML;
+
 
                                 // Executa todos os scripts do geral2.html (inline e externos)
                                 const scripts = doc.querySelectorAll('script');
