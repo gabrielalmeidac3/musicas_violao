@@ -6,10 +6,31 @@
   <title>Login - Curso de Violão</title>
   <link rel="stylesheet" href="fechado_styles.css">
 </head>
+<style>
+
+
+
+.imagem-container {
+  text-align: center; /* centraliza o conteúdo inline dentro da div */
+  margin-bottom: 20px; /* espaço entre imagem e título */
+}
+
+.imagem-container img {
+  width: 100%; /* faz a imagem ter a largura máxima da div container */
+  height: auto; /* mantém proporção da imagem */
+
+  margin: 0 auto; /* centraliza a imagem no container, útil quando imagem é menor que o container */
+}
+
+
+</style>
 <body>
   <div class="container">
-    <h1>Curso de Violão do Zero Ao Repertório</h1>
-    <h2>Por Gabriel Almeida</h2>
+    <div class="imagem-container">
+      <img src="fechado_img.webp" alt="Descrição da imagem" />
+    </div>
+    
+    <h3 style="color: rgb(196, 196, 196);;">Seja bem vindo! Entre:</h3>
     <form id="loginForm">
       <label for="telefone">Número de Telefone:</label>
       <input type="text" id="telefone" placeholder="Digite seu telefone" required>
