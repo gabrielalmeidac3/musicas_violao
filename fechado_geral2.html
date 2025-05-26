@@ -22,17 +22,8 @@
             <img src="fechado_img.webp" alt="Descrição da imagem" />
             <p>Página Geral</p>
         </div>
-        <div class="logout-button" onclick="logout()">Sair</div>
-        <script>
-        function logout() {
-            auth.signOut().then(() => {
-                window.location.href = 'fechado_geral_protegido.html';
-            }).catch((error) => {
-                console.error('Erro ao fazer logout:', error);
-                alert('Erro ao sair. Tente novamente.');
-            });
-        }
-        </script>
+        
+        
         <div class="toggle-section">
             <button class="toggle-header" style="background-color: #319234;" onclick="openModal('modal1')">Como funcionam as videochamadas</button>
             <button class="toggle-header" style="background-color: #197de1;" onclick="openModal('modal2')">Como entrar na videochamada</button>
