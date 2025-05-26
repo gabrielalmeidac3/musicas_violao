@@ -6,8 +6,53 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Curso de Violão do Zero ao Repertório</title>
 <link href="fechado_styles.css" rel="stylesheet"/>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
 </head>
 <body style="visibility: hidden;">
+  <script>
+    let auth;
+    let db;
+  
+    fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
+      .then(response => response.json())
+      .then(firebaseConfig => {
+        firebase.initializeApp(firebaseConfig);
+        auth = firebase.auth();
+        db = firebase.firestore();
+  
+        auth.onAuthStateChanged((user) => {
+          if (user) {
+            const telefone = user.email.split('@')[0];
+            db.collection('alunos').where('telefone', '==', telefone).get()
+              .then((snapshot) => {
+                if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
+                  document.body.style.visibility = 'visible';
+                } else {
+                  alert('Acesso negado.');
+                  auth.signOut();
+                  window.location.href = 'fechado_geral_protegido.html';
+                }
+              })
+              .catch(error => console.error('Erro ao verificar aluno:', error));
+          } else {
+            window.location.href = 'fechado_geral_protegido.html';
+          }
+        });
+      })
+      .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
+
+      function logout() {
+        auth.signOut().then(() => {
+            window.location.href = 'fechado_geral_protegido.html';
+        }).catch((error) => {
+            console.error('Erro ao fazer logout:', error);
+            alert('Erro ao sair. Tente novamente.');
+        });
+    }
+  </script>
 <div id="content">
 <div class="logout-button" onclick="logout()">Sair</div>
 <div class="header">
@@ -613,14 +658,7 @@
     document.body.style.visibility = 'visible';
     document.querySelector('.toggle-header').textContent = 'Procurar aulas';
     
-    function logout() {
-        auth.signOut().then(() => {
-            window.location.href = 'fechado_geral_protegido.html';
-        }).catch((error) => {
-            console.error('Erro ao fazer logout:', error);
-            alert('Erro ao sair. Tente novamente.');
-        });
-    }
+    
     
     function toggleSection(element) {
         const content = element.nextElementSibling;
@@ -653,5 +691,7 @@
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }</script>
 </div>
+
+
 </body>
 </html>
