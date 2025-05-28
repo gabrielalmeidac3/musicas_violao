@@ -61,6 +61,11 @@
                                 // Substitui apenas o conteúdo principal (evita conflitos com Firebase, etc.)
                                 const newContent = doc.body;
                                 document.getElementById('content').innerHTML = newContent.innerHTML;
+                                // Modifica o link do botão "Site Aulas Músicas"
+                                const botaoMusicas = document.querySelector('button[onclick*="gabrielalmeidac3.github.io/musicas_violao"]');
+                                if (botaoMusicas) {
+                                    botaoMusicas.setAttribute('onclick', "window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/pagina_c2'");
+                                }
 
 
                                 // Executa todos os scripts do geral2.html (inline e externos)
@@ -104,5 +109,6 @@
         }
     
     </script>
+    
 </body>
 </html>
