@@ -10,105 +10,202 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <style>
+        #loading {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 18px;
+            color: #666;
+            z-index: 1000;
+        }
+        .fade-in {
+            opacity: 0;
+            transition: opacity 0.3s ease-in;
+        }
+        .fade-in.loaded {
+            opacity: 1;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+        }
+    </style>
 </head>
 <body>
-    <div id="content"></div>
-    <div class="logout-button" onclick="logout()">Sair</div>
+    <div id="loading">Carregando...</div>
+    <div id="content" class="fade-in"></div>
+    <div class="logout-button" onclick="logout()" style="display: none;">Sair</div>
+    
     <script>
+        let auth;
+        let db;
+        let contentLoaded = false;
+
+        // Cache para evitar múltiplas requisições
+        let cachedHtmlContent = null;
+
         function logout() {
-            auth.signOut().then(() => {
-                window.location.href = 'fechado_geral_protegido.html';
-            }).catch((error) => {
-                console.error('Erro ao fazer logout:', error);
-                alert('Erro ao sair. Tente novamente.');
+            if (auth) {
+                auth.signOut().then(() => {
+                    window.location.href = 'fechado_geral_protegido.html';
+                }).catch((error) => {
+                    console.error('Erro ao fazer logout:', error);
+                    alert('Erro ao sair. Tente novamente.');
+                });
+            }
+        }
+
+        function loadMainContent() {
+            if (cachedHtmlContent) {
+                // Usa conteúdo em cache
+                renderContent(cachedHtmlContent);
+                return;
+            }
+
+            // Carrega conteúdo apenas uma vez
+            fetch('fechado_geral2.html')
+            .then(response => {
+                if (!response.ok) throw new Error('Erro ao carregar página');
+                return response.text();
+            })
+            .then(data => {
+                cachedHtmlContent = data;
+                renderContent(data);
+            })
+            .catch(error => {
+                console.error('Erro ao carregar fechado_geral2.html:', error);
+                document.getElementById('content').innerHTML = '<p>Erro ao carregar conteúdo. Tente recarregar a página.</p>';
+                hideLoading();
             });
         }
-        </script>
-    <script>
-    let auth;
-    let db;
 
-        fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
-          .then(response => response.json())
-          .then(firebaseConfig => {
-            // Inicializa o Firebase com a configuração recebida do Worker
+        function renderContent(data) {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(data, 'text/html');
+
+            // Substitui o conteúdo principal
+            const newContent = doc.body;
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = newContent.innerHTML;
+
+            // Modifica o link do botão "Site Aulas Músicas" para a versão protegida
+            const botaoMusicas = contentDiv.querySelector('button[onclick*="gabrielalmeidac3.github.io/musicas_violao"]');
+            if (botaoMusicas) {
+                botaoMusicas.setAttribute('onclick', "window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/pagina_c2'");
+            }
+
+            // Carrega apenas scripts necessários do conteúdo
+            const scripts = doc.querySelectorAll('script[src]');
+            let scriptsToLoad = scripts.length;
             
+            if (scriptsToLoad === 0) {
+                finishLoading();
+            } else {
+                scripts.forEach(oldScript => {
+                    const newScript = document.createElement('script');
+                    newScript.src = oldScript.src;
+                    newScript.async = false;
+                    newScript.onload = () => {
+                        scriptsToLoad--;
+                        if (scriptsToLoad === 0) {
+                            finishLoading();
+                        }
+                    };
+                    newScript.onerror = () => {
+                        scriptsToLoad--;
+                        if (scriptsToLoad === 0) {
+                            finishLoading();
+                        }
+                    };
+                    document.head.appendChild(newScript);
+                });
+            }
 
+            // Executa scripts inline imediatamente
+            const inlineScripts = doc.querySelectorAll('script:not([src])');
+            inlineScripts.forEach(oldScript => {
+                const newScript = document.createElement('script');
+                newScript.textContent = oldScript.textContent;
+                document.body.appendChild(newScript);
+            });
+        }
+
+        function finishLoading() {
+            hideLoading();
+            document.getElementById('content').classList.add('loaded');
+            document.querySelector('.logout-button').style.display = 'block';
+            contentLoaded = true;
+        }
+
+        function hideLoading() {
+            const loading = document.getElementById('loading');
+            if (loading) {
+                loading.style.display = 'none';
+            }
+        }
+
+        // Inicialização otimizada do Firebase
+        fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
+        .then(response => {
+            if (!response.ok) throw new Error('Erro ao carregar configuração');
+            return response.json();
+        })
+        .then(firebaseConfig => {
             firebase.initializeApp(firebaseConfig);
-
             auth = firebase.auth();
             db = firebase.firestore();
 
-
-            // Agora você pode usar 'auth' e 'db' normalmente
-            console.log('Firebase inicializado com configuração segura!');
-
+            // Listener de autenticação otimizado
             auth.onAuthStateChanged((user) => {
-            if (user) {
-                const telefone = user.email.split('@')[0];
-                db.collection('alunos').where('telefone', '==', telefone).get()
-                    .then((snapshot) => {
-                        if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
-                            fetch('fechado_geral2.html')
-                            .then(response => response.text())
-                            .then(data => {
-                                const parser = new DOMParser();
-                                const doc = parser.parseFromString(data, 'text/html');
-
-                                // Substitui o <head> (opcional, se você quiser usar o head do geral2.html)
-                                document.head.innerHTML = doc.head.innerHTML;
-
-                                // Substitui apenas o conteúdo principal (evita conflitos com Firebase, etc.)
-                                const newContent = doc.body;
-                                document.getElementById('content').innerHTML = newContent.innerHTML;
-                                // Modifica o link do botão "Site Aulas Músicas"
-                                const botaoMusicas = document.querySelector('button[onclick*="gabrielalmeidac3.github.io/musicas_violao"]');
-                                if (botaoMusicas) {
-                                    botaoMusicas.setAttribute('onclick', "window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/pagina_c2'");
-                                }
-
-
-                                // Executa todos os scripts do geral2.html (inline e externos)
-                                const scripts = doc.querySelectorAll('script');
-                                scripts.forEach(oldScript => {
-                                const newScript = document.createElement('script');
-
-                                if (oldScript.src) {
-                                    // Script externo
-                                    newScript.src = oldScript.src;
-                                    newScript.async = false;
-                                } else {
-                                    // Script inline
-                                    newScript.textContent = oldScript.textContent;
-                                }
-
-                                document.body.appendChild(newScript);
-                                });
-                            })
-                            .catch(error => console.error('Erro ao carregar fechado_geral2.html:', error));
-
-
-                        } else {
-                            alert('Acesso negado.');
-                            auth.signOut();
-                            window.location.href = 'fechado_geral_protegido.html';
-                        }
-                    })
-                    .catch(error => console.error('Erro ao verificar aluno:', error));
-            } else {
-                window.location.href = 'fechado_geral_protegido.html';
-            }
+                if (user) {
+                    const telefone = user.email.split('@')[0];
+                    
+                    // Query otimizada com limit
+                    db.collection('alunos')
+                      .where('telefone', '==', telefone)
+                      .limit(1)
+                      .get()
+                      .then((snapshot) => {
+                          if (!snapshot.empty) {
+                              const userData = snapshot.docs[0].data();
+                              if (userData.acesso === 'Liberado') {
+                                  loadMainContent();
+                              } else {
+                                  alert('Acesso negado.');
+                                  auth.signOut();
+                                  window.location.href = 'fechado_geral_protegido.html';
+                              }
+                          } else {
+                              alert('Usuário não encontrado.');
+                              auth.signOut();
+                              window.location.href = 'fechado_geral_protegido.html';
+                          }
+                      })
+                      .catch(error => {
+                          console.error('Erro ao verificar aluno:', error);
+                          alert('Erro ao verificar acesso. Tente novamente.');
+                          hideLoading();
+                      });
+                } else {
+                    window.location.href = 'fechado_geral_protegido.html';
+                }
+            });
+        })
+        .catch(error => {
+            console.error('Erro ao carregar configuração do Firebase:', error);
+            alert('Erro ao inicializar. Recarregue a página.');
+            hideLoading();
         });
 
-          })
-          .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
-
-
-        function logout() {
-            auth.signOut().then(() => window.location.href = 'fechado_geral_protegido.html');
-        }
-    
+        // Timeout de segurança para evitar loading infinito
+        setTimeout(() => {
+            if (!contentLoaded) {
+                hideLoading();
+                document.getElementById('content').innerHTML = '<p>Timeout ao carregar. <button onclick="location.reload()">Recarregar</button></p>';
+            }
+        }, 15000);
     </script>
-    
 </body>
 </html>
