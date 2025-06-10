@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎥 Gravador de Videochamadas</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2.2em;
+            background: linear-gradient(45deg, #ff6b6b, #4ecdc4);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        button {
+            background: #333;
+            border: 2px solid #555;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            min-width: 140px;
+        }
+
+        button:hover:not(:disabled) {
+            background: #444;
+            border-color: #666;
+            transform: translateY(-2px);
+        }
+
+        button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        button:disabled {
+            background: #222;
+            border-color: #333;
+            color: #666;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        button.recording {
+            background: #ff4444;
+            border-color: #ff6666;
+            animation: pulse 2s infinite;
+        }
+
+        button.paused {
+            background: #ff8800;
+            border-color: #ffaa00;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        .status-panel {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .status {
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            min-height: 1.5em;
+        }
+
+        .status.recording {
+            color: #ff4444;
+        }
+
+        .status.paused {
+            color: #ff8800;
+        }
+
+        .status.error {
+            color: #ff5555;
+        }
+
+        .status.success {
+            color: #44ff44;
+        }
+
+        .timer {
+            font-size: 2em;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            color: #4ecdc4;
+        }
+
+        .audio-config {
+            margin-bottom: 30px;
+        }
+
+        .audio-config h3 {
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+
+        .config-panel {
+            background: #333;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .config-panel.visible {
+            display: block;
+        }
+
+        .device-group {
+            margin-bottom: 20px;
+        }
+
+        .device-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #ddd;
+        }
+
+        select {
+            width: 100%;
+            padding: 10px;
+            background: #222;
+            border: 2px solid #555;
+            color: white;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #4ecdc4;
+        }
+
+        .audio-visualizer {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .viz-container {
+            flex: 1;
+            background: #222;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .viz-title {
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: #ddd;
+        }
+
+        .viz-bars {
+            display: flex;
+            justify-content: center;
+            align-items: end;
+            height: 60px;
+            gap: 2px;
+        }
+
+        .viz-bar {
+            width: 4px;
+            background: linear-gradient(to top, #4ecdc4, #ff6b6b);
+            border-radius: 2px;
+            transition: height 0.1s ease;
+        }
+
+        .instructions {
+            background: #333;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #4ecdc4;
+        }
+
+        .instructions h3 {
+            margin-bottom: 15px;
+            color: #4ecdc4;
+        }
+
+        .instructions ul {
+            padding-left: 20px;
+        }
+
+        .instructions li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+
+        .compatibility-warning {
+            background: #ff5555;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media (max-width: 640px) {
+            .container {
+                padding: 20px;
+                margin: 10px;
+            }
+
+            .controls {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            button {
+                width: 100%;
+                max-width: 200px;
+            }
+
+            .audio-visualizer {
+                flex-direction: column;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .timer {
+                font-size: 1.5em;
+            }
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Gravador de Videochamadas</h1>
+        
+        <div id="compatibilityWarning" class="compatibility-warning" style="display: none;">
+            ⚠️ Seu navegador não suporta todas as funcionalidades necessárias para gravação.
+        </div>
+
+        <div class="controls">
+            <button id="startBtn" aria-label="Iniciar gravação de videochamada">
+                ▶️ Iniciar Gravação
+            </button>
+            <button id="pauseBtn" disabled aria-label="Pausar gravação">
+                ⏸️ Pausar
+            </button>
+            <button id="stopBtn" disabled aria-label="Parar gravação">
+                ⏹️ Parar
+            </button>
+            <button id="configBtn" aria-label="Abrir configurações de áudio" aria-expanded="false">
+                🔊 Configurações de Áudio
+            </button>
+        </div>
+
+        <div class="status-panel">
+            <div id="status" class="status" aria-live="polite" aria-atomic="true">
+                Pronto para gravar
+            </div>
+            <div id="timer" class="timer" aria-live="polite" aria-label="Tempo de gravação">
+                00:00:00
+            </div>
+        </div>
+
+        <div class="audio-config">
+            <div id="configPanel" class="config-panel" role="region" aria-labelledby="configBtn">
+                <div class="device-group">
+                    <label for="microphoneSelect">Microfone:</label>
+                    <select id="microphoneSelect" aria-label="Selecionar microfone">
+                        <option value="">Carregando...</option>
+                    </select>
+                </div>
+                
+                <div class="device-group">
+                    <label for="audioOutputSelect">Saída de Áudio:</label>
+                    <select id="audioOutputSelect" aria-label="Selecionar saída de áudio">
+                        <option value="tab">Áudio da Guia (Padrão)</option>
+                    </select>
+                </div>
+
+                <div class="audio-visualizer">
+                    <div class="viz-container">
+                        <div class="viz-title">Microfone</div>
+                        <div id="micViz" class="viz-bars" aria-label="Visualização do áudio do microfone"></div>
+                    </div>
+                    <div class="viz-container">
+                        <div class="viz-title">Áudio da Guia</div>
+                        <div id="tabViz" class="viz-bars" aria-label="Visualização do áudio da guia"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Instruções:</h3>
+            <ul>
+                <li>Clique em "Iniciar Gravação" e selecione a aba ou tela desejada</li>
+                <li>Permite captura de áudio do sistema + microfone simultaneamente</li>
+                <li>Use Pausar/Retomar durante a gravação sem perder dados</li>
+                <li>Arquivo salvo automaticamente como WebM de alta qualidade</li>
+                <li>Nome do arquivo: "dd-mmm-yy-HHMM.webm" (ex: 09-jun-25-1430.webm)</li>
+                <li>Fechar a aba salva automaticamente a gravação</li>
+                <li>Configure dispositivos de áudio nas "Configurações de Áudio"</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        class VideoCallRecorder {
+            constructor() {
+                this.mediaRecorder = null;
+                this.recordedChunks = [];
+                this.displayStream = null;
+                this.micStream = null;
+                this.combinedStream = null;
+                this.audioContext = null;
+                this.micAnalyser = null;
+                this.tabAnalyser = null;
+                this.animationId = null;
+                this.timerInterval = null;
+                this.startTime = null;
+                this.pausedTime = 0;
+                this.isRecording = false;
+                this.isPaused = false;
+                this.isConfigVisible = false;
+
+                this.initializeElements();
+                this.setupEventListeners();
+                this.checkCompatibility();
+                this.loadDevices();
+                this.setupVisualization();
+            }
+
+            initializeElements() {
+                this.startBtn = document.getElementById('startBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.configBtn = document.getElementById('configBtn');
+                this.status = document.getElementById('status');
+                this.timer = document.getElementById('timer');
+                this.configPanel = document.getElementById('configPanel');
+                this.microphoneSelect = document.getElementById('microphoneSelect');
+                this.audioOutputSelect = document.getElementById('audioOutputSelect');
+                this.micViz = document.getElementById('micViz');
+                this.tabViz = document.getElementById('tabViz');
+                this.compatibilityWarning = document.getElementById('compatibilityWarning');
+            }
+
+            setupEventListeners() {
+                this.startBtn.addEventListener('click', () => this.startRecording());
+                this.pauseBtn.addEventListener('click', () => this.togglePause());
+                this.stopBtn.addEventListener('click', () => this.stopRecording());
+                this.configBtn.addEventListener('click', () => this.toggleConfig());
+                
+                this.microphoneSelect.addEventListener('change', () => this.updateMicrophone());
+                this.audioOutputSelect.addEventListener('change', () => this.updateAudioOutput());
+
+                // Detectar mudanças de dispositivos
+                navigator.mediaDevices.addEventListener('devicechange', () => this.loadDevices());
+
+                // Salvar automaticamente ao fechar a aba
+                window.addEventListener('beforeunload', (e) => {
+                    if (this.isRecording) {
+                        this.stopRecording();
+                        e.preventDefault();
+                        e.returnValue = '';
+                    }
+                });
+
+                // Suporte a teclado
+                document.addEventListener('keydown', (e) => {
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'SELECT') {
+                        switch(e.key) {
+                            case ' ':
+                                e.preventDefault();
+                                if (this.isRecording) {
+                                    this.togglePause();
+                                } else {
+                                    this.startRecording();
+                                }
+                                break;
+                            case 'Escape':
+                                if (this.isRecording) {
+                                    this.stopRecording();
+                                }
+                                break;
+                        }
+                    }
+                });
+            }
+
+            checkCompatibility() {
+                const hasMediaRecorder = 'MediaRecorder' in window;
+                const hasGetDisplayMedia = navigator.mediaDevices && navigator.mediaDevices.getDisplayMedia;
+                const hasGetUserMedia = navigator.mediaDevices && navigator.mediaDevices.getUserMedia;
+
+                if (!hasMediaRecorder || !hasGetDisplayMedia || !hasGetUserMedia) {
+                    this.compatibilityWarning.style.display = 'block';
+                    this.startBtn.disabled = true;
+                    this.updateStatus('Navegador incompatível', 'error');
+                    return false;
+                }
+
+                return true;
+            }
+
+            async loadDevices() {
+                try {
+                    const devices = await navigator.mediaDevices.enumerateDevices();
+                    
+                    // Limpar opções existentes
+                    this.microphoneSelect.innerHTML = '';
+                    
+                    const audioInputs = devices.filter(device => device.kind === 'audioinput');
+                    
+                    if (audioInputs.length === 0) {
+                        this.microphoneSelect.innerHTML = '<option value="">Nenhum microfone encontrado</option>';
+                        return;
+                    }
+
+                    audioInputs.forEach((device, index) => {
+                        const option = document.createElement('option');
+                        option.value = device.deviceId;
+                        option.textContent = device.label || `Microfone ${index + 1}`;
+                        this.microphoneSelect.appendChild(option);
+                    });
+
+                    // Selecionar primeiro dispositivo se nenhum estiver selecionado
+                    if (!this.microphoneSelect.value) {
+                        this.microphoneSelect.value = audioInputs[0].deviceId;
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao carregar dispositivos:', error);
+                    this.microphoneSelect.innerHTML = '<option value="">Erro ao carregar dispositivos</option>';
+                }
+            }
+
+            setupVisualization() {
+                // Criar barras de visualização
+                for (let i = 0; i < 20; i++) {
+                    const micBar = document.createElement('div');
+                    micBar.className = 'viz-bar';
+                    micBar.style.height = '2px';
+                    this.micViz.appendChild(micBar);
+
+                    const tabBar = document.createElement('div');
+                    tabBar.className = 'viz-bar';
+                    tabBar.style.height = '2px';
+                    this.tabViz.appendChild(tabBar);
+                }
+            }
+
+            toggleConfig() {
+                this.isConfigVisible = !this.isConfigVisible;
+                this.configPanel.classList.toggle('visible', this.isConfigVisible);
+                this.configBtn.setAttribute('aria-expanded', this.isConfigVisible.toString());
+            }
+
+            async startRecording() {
+                try {
+                    this.updateStatus('Solicitando permissões...', 'recording');
+                    
+                    // Solicitar captura de tela
+                    this.displayStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: 'screen' },
+                        audio: true
+                    });
+
+                    // Solicitar microfone
+                    const micConstraints = {
+                        audio: this.microphoneSelect.value ? 
+                            { deviceId: { exact: this.microphoneSelect.value } } : 
+                            true
+                    };
+                    
+                    this.micStream = await navigator.mediaDevices.getUserMedia(micConstraints);
+
+                    // Combinar streams
+                    await this.combineStreams();
+                    
+                    // Configurar MediaRecorder
+                    const options = {
+                        mimeType: 'video/webm;codecs=vp8,opus',
+                        videoBitsPerSecond: 2500000,
+                        audioBitsPerSecond: 128000
+                    };
+
+                    this.mediaRecorder = new MediaRecorder(this.combinedStream, options);
+                    this.recordedChunks = [];
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            this.recordedChunks.push(event.data);
+                        }
+                    };
+
+                    this.mediaRecorder.onstop = () => {
+                        this.saveRecording();
+                    };
+
+                    this.mediaRecorder.onerror = (event) => {
+                        console.error('Erro no MediaRecorder:', event.error);
+                        this.updateStatus('Erro na gravação', 'error');
+                    };
+
+                    // Iniciar gravação
+                    this.mediaRecorder.start(1000); // Chunks de 1 segundo
+                    
+                    this.isRecording = true;
+                    this.isPaused = false;
+                    this.startTime = Date.now();
+                    this.pausedTime = 0;
+                    
+                    this.updateUI();
+                    this.startTimer();
+                    this.startVisualization();
+                    
+                    this.updateStatus('GRAVANDO', 'recording');
+
+                    // Detectar quando o usuário para de compartilhar
+                    this.displayStream.getVideoTracks()[0].addEventListener('ended', () => {
+                        if (this.isRecording) {
+                            this.stopRecording();
+                        }
+                    });
+
+                } catch (error) {
+                    console.error('Erro ao iniciar gravação:', error);
+                    this.handleRecordingError(error);
+                }
+            }
+
+            async combineStreams() {
+                this.audioContext = new AudioContext();
+                const destination = this.audioContext.createMediaStreamDestination();
+
+                // Áudio do microfone
+                if (this.micStream.getAudioTracks().length > 0) {
+                    const micSource = this.audioContext.createMediaStreamSource(this.micStream);
+                    this.micAnalyser = this.audioContext.createAnalyser();
+                    this.micAnalyser.fftSize = 256;
+                    micSource.connect(this.micAnalyser);
+                    micSource.connect(destination);
+                }
+
+                // Áudio da tela/guia
+                if (this.displayStream.getAudioTracks().length > 0) {
+                    const displaySource = this.audioContext.createMediaStreamSource(this.displayStream);
+                    this.tabAnalyser = this.audioContext.createAnalyser();
+                    this.tabAnalyser.fftSize = 256;
+                    displaySource.connect(this.tabAnalyser);
+                    displaySource.connect(destination);
+                } else {
+                    console.warn('Áudio da guia não disponível');
+                }
+
+                // Combinar vídeo da tela com áudio combinado
+                const videoTrack = this.displayStream.getVideoTracks()[0];
+                const audioTrack = destination.stream.getAudioTracks()[0];
+                
+                this.combinedStream = new MediaStream([videoTrack, audioTrack]);
+            }
+
+            togglePause() {
+                if (!this.isRecording) return;
+
+                if (this.isPaused) {
+                    // Retomar
+                    this.mediaRecorder.resume();
+                    this.isPaused = false;
+                    this.startTime = Date.now() - this.pausedTime;
+                    this.updateStatus('GRAVANDO', 'recording');
+                    this.pauseBtn.textContent = '⏸️ Pausar';
+                    this.pauseBtn.setAttribute('aria-label', 'Pausar gravação');
+                } else {
+                    // Pausar
+                    this.mediaRecorder.pause();
+                    this.isPaused = true;
+                    this.pausedTime = Date.now() - this.startTime;
+                    this.updateStatus('PAUSADO', 'paused');
+                    this.pauseBtn.textContent = '▶️ Retomar';
+                    this.pauseBtn.setAttribute('aria-label', 'Retomar gravação');
+                }
+
+                this.updateUI();
+            }
+
+            stopRecording() {
+                if (!this.isRecording) return;
+
+                this.isRecording = false;
+                this.isPaused = false;
+
+                if (this.mediaRecorder && this.mediaRecorder.state !== 'inactive') {
+                    this.mediaRecorder.stop();
+                }
+
+                this.cleanup();
+                this.updateUI();
+                this.updateStatus('Processando...', 'success');
+            }
+
+            cleanup() {
+                // Parar timer
+                if (this.timerInterval) {
+                    clearInterval(this.timerInterval);
+                    this.timerInterval = null;
+                }
+
+                // Parar visualização
+                if (this.animationId) {
+                    cancelAnimationFrame(this.animationId);
+                    this.animationId = null;
+                }
+
+                // Fechar streams
+                if (this.displayStream) {
+                    this.displayStream.getTracks().forEach(track => track.stop());
+                    this.displayStream = null;
+                }
+
+                if (this.micStream) {
+                    this.micStream.getTracks().forEach(track => track.stop());
+                    this.micStream = null;
+                }
+
+                if (this.combinedStream) {
+                    this.combinedStream.getTracks().forEach(track => track.stop());
+                    this.combinedStream = null;
+                }
+
+                // Fechar AudioContext
+                if (this.audioContext) {
+                    this.audioContext.close();
+                    this.audioContext = null;
+                }
+
+                this.micAnalyser = null;
+                this.tabAnalyser = null;
+            }
+
+            saveRecording() {
+                if (this.recordedChunks.length === 0) {
+                    this.updateStatus('Erro: Gravação vazia', 'error');
+                    return;
+                }
+
+                const blob = new Blob(this.recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                
+                const now = new Date();
+                const filename = this.generateFilename(now);
+                
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                
+                // Limpar URL
+                setTimeout(() => URL.revokeObjectURL(url), 1000);
+                
+                this.updateStatus(`Salvo: ${filename}`, 'success');
+                this.recordedChunks = [];
+            }
+
+            generateFilename(date) {
+                const months = ['jan', 'fev', 'mar', 'abr', 'mai', 'jun',
+                              'jul', 'ago', 'set', 'out', 'nov', 'dez'];
+                
+                const day = date.getDate().toString().padStart(2, '0');
+                const month = months[date.getMonth()];
+                const year = date.getFullYear().toString().slice(-2);
+                const hour = date.getHours().toString().padStart(2, '0');
+                const minute = date.getMinutes().toString().padStart(2, '0');
+                
+                return `${day}-${month}-${year}-${hour}${minute}.webm`;
+            }
+
+            updateUI() {
+                this.startBtn.disabled = this.isRecording;
+                this.pauseBtn.disabled = !this.isRecording;
+                this.stopBtn.disabled = !this.isRecording;
+
+                // Atualizar classes dos botões
+                this.startBtn.classList.toggle('recording', this.isRecording && !this.isPaused);
+                this.pauseBtn.classList.toggle('paused', this.isPaused);
+
+                // Atualizar ARIA
+                this.startBtn.setAttribute('aria-disabled', this.isRecording.toString());
+                this.pauseBtn.setAttribute('aria-disabled', (!this.isRecording).toString());
+                this.stopBtn.setAttribute('aria-disabled', (!this.isRecording).toString());
+            }
+
+            updateStatus(message, type = '') {
+                this.status.textContent = message;
+                this.status.className = `status ${type}`;
+            }
+
+            startTimer() {
+                this.timerInterval = setInterval(() => {
+                    const elapsed = this.isPaused ? 
+                        this.pausedTime : 
+                        Date.now() - this.startTime;
+                    
+                    const seconds = Math.floor(elapsed / 1000);
+                    const hours = Math.floor(seconds / 3600);
+                    const minutes = Math.floor((seconds % 3600) / 60);
+                    const secs = seconds % 60;
+                    
+                    const timeString = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+                    this.timer.textContent = timeString;
+                }, 1000);
+            }
+
+            startVisualization() {
+                const updateViz = () => {
+                    if (!this.isRecording) return;
+
+                    // Visualização do microfone
+                    if (this.micAnalyser) {
+                        const micData = new Uint8Array(this.micAnalyser.frequencyBinCount);
+                        this.micAnalyser.getByteFrequencyData(micData);
+                        this.updateVisualizationBars(this.micViz, micData);
+                    }
+
+                    // Visualização do áudio da guia
+                    if (this.tabAnalyser) {
+                        const tabData = new Uint8Array(this.tabAnalyser.frequencyBinCount);
+                        this.tabAnalyser.getByteFrequencyData(tabData);
+                        this.updateVisualizationBars(this.tabViz, tabData);
+                    }
+
+                    this.animationId = requestAnimationFrame(updateViz);
+                };
+
+                updateViz();
+            }
+
+            updateVisualizationBars(container, data) {
+                const bars = container.children;
+                const step = Math.floor(data.length / bars.length);
+                
+                for (let i = 0; i < bars.length; i++) {
+                    const value = data[i * step] || 0;
+                    const height = Math.max(2, (value / 255) * 60);
+                    bars[i].style.height = `${height}px`;
+                }
+            }
+
+            async updateMicrophone() {
+                if (!this.isRecording) return;
+
+                try {
+                    // Pausar gravação temporariamente
+                    const wasPaused = this.isPaused;
+                    if (!wasPaused) {
+                        this.togglePause();
+                    }
+
+                    // Parar stream atual do microfone
+                    if (this.micStream) {
+                        this.micStream.getTracks().forEach(track => track.stop());
+                    }
+
+                    // Criar novo stream
+                    const constraints = {
+                        audio: this.microphoneSelect.value ? 
+                            { deviceId: { exact: this.microphoneSelect.value } } : 
+                            true
+                    };
+                    
+                    this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    
+                    // Reconectar áudio
+                    await this.combineStreams();
+                    
+                    // Retomar se não estava pausado
+                    if (!wasPaused) {
+                        this.togglePause();
+                    }
+
+                } catch (error) {
+                    console.error('Erro ao trocar microfone:', error);
+                    this.updateStatus('Erro ao trocar microfone', 'error');
+                }
+            }
+
+            async updateAudioOutput() {
+                // Esta funcionalidade seria para trocar a saída de áudio
+                // Por limitações da API, mantemos apenas áudio da guia
+                console.log('Saída de áudio alterada:', this.audioOutputSelect.value);
+            }
+
+            handleRecordingError(error) {
+                let message = 'Erro ao iniciar gravação';
+                
+                if (error.name === 'NotAllowedError') {
+                    message = 'Permissão negada para captura de tela/áudio';
+                } else if (error.name === 'NotFoundError') {
+                    message = 'Dispositivo de áudio não encontrado';
+                } else if (error.name === 'NotSupportedError') {
+                    message = 'Gravação não suportada neste navegador';
+                }
+                
+                this.updateStatus(message, 'error');
+                this.cleanup();
+                this.updateUI();
+            }
+        }
+
+        // Inicializar aplicação quando DOM estiver pronto
+        document.addEventListener('DOMContentLoaded', () => {
+            new VideoCallRecorder();
+        });
+    </script>
+</body>
+</html>
