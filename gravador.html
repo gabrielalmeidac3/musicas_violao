@@ -211,6 +211,18 @@
             transition: height 0.1s ease;
         }
 
+        .mic-on {
+            background: #333;
+            border-color: #4ecdc4;
+        }
+        .mic-off {
+            background: #444;
+            border-color: #ff5555;
+        }
+        .mic-off-visualizer {
+            background: #8b0000 !important; /* Vermelho escuro */
+        }
+
         .instructions {
             background: #333;
             padding: 20px;
@@ -305,6 +317,7 @@
             <button id="configBtn" aria-label="Abrir configurações de áudio" aria-expanded="false">
                 🔊 Configurações de Áudio
             </button>
+            <button id="micToggleBtn" aria-label="Desativar microfone" class="mic-on">🎤 Microfone Ativado</button>
         </div>
 
         <div class="status-panel">
@@ -326,9 +339,9 @@
                 </div>
                 
                 <div class="device-group">
-                    <label for="audioOutputSelect">Saída de Áudio:</label>
                     <select id="audioOutputSelect" aria-label="Selecionar saída de áudio">
-                        <option value="tab">Áudio da Guia (Padrão)</option>
+                        <option value="tab" selected>Áudio da Guia (Padrão)</option>
+                        <option value="system">Áudio do Sistema (Experimental)</option>
                     </select>
                 </div>
 
@@ -362,6 +375,7 @@
     <script>
         class VideoCallRecorder {
             constructor() {
+                
                 this.mediaRecorder = null;
                 this.recordedChunks = [];
                 this.displayStream = null;
@@ -377,11 +391,15 @@
                 this.isRecording = false;
                 this.isPaused = false;
                 this.isConfigVisible = false;
+                this.isMicEnabled = true;
 
                 this.initializeElements();
                 this.setupEventListeners();
                 this.checkCompatibility();
+                this.requestInitialPermissions(); // ADICIONAR ESTA LINHA
+
                 this.loadDevices();
+                this.startMicrophoneMonitoring();
                 this.setupVisualization();
             }
 
@@ -398,6 +416,11 @@
                 this.micViz = document.getElementById('micViz');
                 this.tabViz = document.getElementById('tabViz');
                 this.compatibilityWarning = document.getElementById('compatibilityWarning');
+
+                // Verificar se audioOutputSelect existe
+                if (!this.audioOutputSelect) {
+                    console.error('Erro: elemento audioOutputSelect não encontrado!');
+                }
             }
 
             setupEventListeners() {
@@ -405,9 +428,15 @@
                 this.pauseBtn.addEventListener('click', () => this.togglePause());
                 this.stopBtn.addEventListener('click', () => this.stopRecording());
                 this.configBtn.addEventListener('click', () => this.toggleConfig());
-                
+                this.micToggleBtn = document.getElementById('micToggleBtn');
+                this.micToggleBtn.addEventListener('click', () => this.toggleMicrophone());
                 this.microphoneSelect.addEventListener('change', () => this.updateMicrophone());
-                this.audioOutputSelect.addEventListener('change', () => this.updateAudioOutput());
+                if (this.audioOutputSelect) {
+                    this.audioOutputSelect.addEventListener('change', () => this.updateAudioSource());
+                } else {
+                    console.warn('audioOutputSelect não encontrado, evento não adicionado');
+                }
+
 
                 // Detectar mudanças de dispositivos
                 navigator.mediaDevices.addEventListener('devicechange', () => this.loadDevices());
@@ -415,9 +444,8 @@
                 // Salvar automaticamente ao fechar a aba
                 window.addEventListener('beforeunload', (e) => {
                     if (this.isRecording) {
-                        this.stopRecording();
                         e.preventDefault();
-                        e.returnValue = '';
+                        e.returnValue = 'Gravação em andamento. Deseja realmente fechar?';
                     }
                 });
 
@@ -441,7 +469,21 @@
                         }
                     }
                 });
+            
+            
+                
             }
+
+            async requestInitialPermissions() {
+            try {
+                // Solicitar permissão temporária apenas para listar dispositivos
+                const tempStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                // Parar imediatamente - só precisamos da permissão
+                tempStream.getTracks().forEach(track => track.stop());
+            } catch (error) {
+                console.log('Permissão de microfone não concedida inicialmente');
+            }
+        }
 
             checkCompatibility() {
                 const hasMediaRecorder = 'MediaRecorder' in window;
@@ -467,26 +509,83 @@
                     
                     const audioInputs = devices.filter(device => device.kind === 'audioinput');
                     
+                    // Preencher microfones
                     if (audioInputs.length === 0) {
                         this.microphoneSelect.innerHTML = '<option value="">Nenhum microfone encontrado</option>';
-                        return;
+                    } else {
+                        audioInputs.forEach((device, index) => {
+                            const option = document.createElement('option');
+                            option.value = device.deviceId;
+                            option.textContent = device.label || `Microfone ${index + 1}`;
+                            this.microphoneSelect.appendChild(option);
+                        });
+                        if (!this.microphoneSelect.value) {
+                            this.microphoneSelect.value = audioInputs[0].deviceId;
+                        }
                     }
 
-                    audioInputs.forEach((device, index) => {
-                        const option = document.createElement('option');
-                        option.value = device.deviceId;
-                        option.textContent = device.label || `Microfone ${index + 1}`;
-                        this.microphoneSelect.appendChild(option);
-                    });
-
-                    // Selecionar primeiro dispositivo se nenhum estiver selecionado
-                    if (!this.microphoneSelect.value) {
-                        this.microphoneSelect.value = audioInputs[0].deviceId;
-                    }
+                    // Atualizar opções de áudio
+                    this.audioOutputSelect.innerHTML = `
+                        <option value="tab">Áudio da Guia</option>
+                        <option value="system">Áudio do Sistema (Loopback)</option>
+                    `;
 
                 } catch (error) {
                     console.error('Erro ao carregar dispositivos:', error);
                     this.microphoneSelect.innerHTML = '<option value="">Erro ao carregar dispositivos</option>';
+                    this.audioOutputSelect.innerHTML = '<option value="tab">Áudio da Guia</option>';
+                }
+            }
+
+            async requestSystemAudio() {
+                try {
+                    // Solicitar captura de desktop com áudio do sistema
+                    const systemStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: false,
+                        audio: {
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: false,
+                            sampleRate: 48000,
+                            suppressLocalAudioPlayback: false
+                        }
+                    });
+                    
+                    return systemStream;
+                } catch (error) {
+                    console.error('Erro ao capturar áudio do sistema:', error);
+                    throw error;
+                }
+            }
+
+            async startMicrophoneMonitoring() {
+                if (!this.isMicEnabled) return;
+
+                try {
+                    if (!this.micStream) {
+                        const constraints = {
+                            audio: this.microphoneSelect.value ? 
+                                { deviceId: { exact: this.microphoneSelect.value } } : 
+                                true
+                        };
+                        this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
+                    }
+
+                    if (!this.audioContext) {
+                        this.audioContext = new AudioContext();
+                    }
+
+                    if (!this.micAnalyser) {
+                        const micSource = this.audioContext.createMediaStreamSource(this.micStream);
+                        this.micAnalyser = this.audioContext.createAnalyser();
+                        this.micAnalyser.fftSize = 256;
+                        this.micAnalyser.smoothingTimeConstant = 0.3;
+                        micSource.connect(this.micAnalyser);
+                    }
+
+                    this.startMicVisualization();
+                } catch (error) {
+                    console.error('Erro ao iniciar monitoramento do microfone:', error);
                 }
             }
 
@@ -505,21 +604,91 @@
                 }
             }
 
+            toggleMicrophone() {
+                this.isMicEnabled = !this.isMicEnabled;
+                const micVizContainer = this.micViz.parentElement;
+                this.micToggleBtn.classList.toggle('mic-on', this.isMicEnabled);
+                this.micToggleBtn.classList.toggle('mic-off', !this.isMicEnabled);
+                this.micToggleBtn.setAttribute('aria-label', this.isMicEnabled ? 'Desativar microfone' : 'Ativar microfone');
+                this.micToggleBtn.textContent = this.isMicEnabled ? '🎤 Microfone Ativado' : '🎤 Microfone Desativado';
+                micVizContainer.classList.toggle('mic-off-visualizer', !this.isMicEnabled);
+
+                if (!this.isMicEnabled) {
+                    if (this.micStream) {
+                        this.micStream.getAudioTracks().forEach(track => track.enabled = false);
+                    }
+                } else {
+                    if (this.micStream) {
+                        this.micStream.getAudioTracks().forEach(track => track.enabled = true);
+                    } else {
+                        this.startMicrophoneMonitoring();
+                    }
+                }
+            }
+
             toggleConfig() {
                 this.isConfigVisible = !this.isConfigVisible;
                 this.configPanel.classList.toggle('visible', this.isConfigVisible);
                 this.configBtn.setAttribute('aria-expanded', this.isConfigVisible.toString());
             }
+            
+            showAudioWarning() {
+            const warningDiv = document.createElement('div');
+            warningDiv.style.cssText = `
+                position: fixed; top: 20px; right: 20px; 
+                background: #ff5555; color: white; padding: 15px; 
+                border-radius: 8px; z-index: 1000; max-width: 300px;
+                font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            `;
+            warningDiv.innerHTML = `
+                ⚠️ IMPORTANTE:<br>
+                Certifique-se de marcar<br>
+                "Compartilhar áudio da guia"<br>
+                na janela de seleção!
+            `;
+            document.body.appendChild(warningDiv);
+            
+            setTimeout(() => {
+                if (warningDiv.parentNode) {
+                    warningDiv.parentNode.removeChild(warningDiv);
+                }
+            }, 2000);
+        }
 
             async startRecording() {
                 try {
                     this.updateStatus('Solicitando permissões...', 'recording');
                     
-                    // Solicitar captura de tela
+                    // Adicione esta linha antes de solicitar captura de tela
+                    this.showAudioWarning();
+
+                    // Solicitar captura de tela com configurações mais específicas
                     this.displayStream = await navigator.mediaDevices.getDisplayMedia({
-                        video: { mediaSource: 'screen' },
-                        audio: true
+                        video: { 
+                            mediaSource: 'screen',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        },
+                        audio: {
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: false,
+                            sampleRate: 48000
+                        }
                     });
+
+                    // Exibir mensagem se dispositivo de saída foi selecionado
+                    if (this.audioOutputSelect && this.audioOutputSelect.value && this.audioOutputSelect.value !== 'tab' && this.audioOutputSelect.value !== 'system') {
+                        console.log('Dispositivo de saída selecionado:', this.audioOutputSelect.value);
+                        this.updateStatus('Aviso: Áudio do sistema será capturado experimentalmente', 'success');
+                    }
+
+                    // Verificar se o áudio da guia foi capturado
+                    const hasTabAudio = this.displayStream.getAudioTracks().length > 0;
+                    if (!hasTabAudio) {
+                        console.warn('⚠️ Áudio da guia não foi capturado. Certifique-se de marcar "Compartilhar áudio da guia" na janela de seleção.');
+                        this.updateStatus('Atenção: Áudio da guia não detectado', 'error');
+                    }
 
                     // Solicitar microfone
                     const micConstraints = {
@@ -533,6 +702,8 @@
                     // Combinar streams
                     await this.combineStreams();
                     
+                    this.startTabVisualization();
+
                     // Configurar MediaRecorder
                     const options = {
                         mimeType: 'video/webm;codecs=vp8,opus',
@@ -586,34 +757,103 @@
             }
 
             async combineStreams() {
+                if (this.audioContext) {
+                    await this.audioContext.close();
+                }
                 this.audioContext = new AudioContext();
                 const destination = this.audioContext.createMediaStreamDestination();
+                const audioSource = this.audioOutputSelect ? this.audioOutputSelect.value : 'tab';
 
-                // Áudio do microfone
-                if (this.micStream.getAudioTracks().length > 0) {
-                    const micSource = this.audioContext.createMediaStreamSource(this.micStream);
-                    this.micAnalyser = this.audioContext.createAnalyser();
-                    this.micAnalyser.fftSize = 256;
-                    micSource.connect(this.micAnalyser);
-                    micSource.connect(destination);
+                console.log('=== DEBUG COMBINE STREAMS ===');
+                console.log('Fonte de áudio selecionada:', audioSource);
+                console.log('micStream existe:', !!this.micStream);
+                console.log('micStream tracks:', this.micStream?.getAudioTracks().length || 0);
+                console.log('displayStream tracks:', this.displayStream?.getAudioTracks().length || 0);
+
+                // Configurar microfone se ativado
+                if (this.isMicEnabled && this.microphoneSelect.value) {
+                    console.log('Configurando microfone...');
+                    try {
+                        if (!this.micStream || !this.micStream.getAudioTracks().length) {
+                            const constraints = {
+                                audio: { deviceId: { exact: this.microphoneSelect.value } }
+                            };
+                            this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
+                        }
+                        const micSource = this.audioContext.createMediaStreamSource(this.micStream);
+                        this.micAnalyser = this.audioContext.createAnalyser();
+                        this.micAnalyser.fftSize = 256;
+                        this.micAnalyser.smoothingTimeConstant = 0.3;
+                        micSource.connect(this.micAnalyser);
+                        micSource.connect(destination);
+                        console.log('Microfone conectado ao destino!');
+                    } catch (error) {
+                        console.warn('Erro ao configurar microfone:', error);
+                    }
+                } else {
+                    console.warn('Microfone desativado ou sem dispositivo selecionado');
                 }
 
-                // Áudio da tela/guia
-                if (this.displayStream.getAudioTracks().length > 0) {
+                // Configurar áudio da guia ou sistema
+                if (this.displayStream && this.displayStream.getAudioTracks().length > 0 && audioSource !== 'mic') {
+                    console.log('Configurando áudio da guia/sistema...');
                     const displaySource = this.audioContext.createMediaStreamSource(this.displayStream);
                     this.tabAnalyser = this.audioContext.createAnalyser();
                     this.tabAnalyser.fftSize = 256;
+                    this.tabAnalyser.smoothingTimeConstant = 0.3;
                     displaySource.connect(this.tabAnalyser);
                     displaySource.connect(destination);
-                } else {
-                    console.warn('Áudio da guia não disponível');
+                    console.log('Áudio da guia/sistema conectado ao destino!');
                 }
 
-                // Combinar vídeo da tela com áudio combinado
+                // Combinar vídeo e áudio
                 const videoTrack = this.displayStream.getVideoTracks()[0];
-                const audioTrack = destination.stream.getAudioTracks()[0];
+                const audioTracks = destination.stream.getAudioTracks();
+                this.combinedStream = new MediaStream([videoTrack, ...audioTracks]);
+                console.log('Stream combinado criado com', audioTracks.length, 'faixas de áudio');
+
                 
-                this.combinedStream = new MediaStream([videoTrack, audioTrack]);
+                // Reconfigurar MediaRecorder se necessário
+                if (this.isRecording && this.mediaRecorder) {
+                    const wasPaused = this.isPaused;
+                    if (!wasPaused) this.togglePause();
+                    
+                    // Parar o MediaRecorder atual, mas não acionar onstop
+                    if (this.mediaRecorder.state !== 'inactive') {
+                        this.mediaRecorder.stop();
+                    }
+                    
+                    // Aguardar a coleta dos chunks pendentes
+                    await new Promise(resolve => {
+                        this.mediaRecorder.ondataavailable = (event) => {
+                            if (event.data.size > 0) {
+                                this.recordedChunks.push(event.data);
+                            }
+                            resolve();
+                        };
+                    });
+
+                    // Criar novo MediaRecorder
+                    this.mediaRecorder = new MediaRecorder(this.combinedStream, {
+                        mimeType: 'video/webm;codecs=vp8,opus',
+                        videoBitsPerSecond: 2500000,
+                        audioBitsPerSecond: 128000
+                    });
+
+                    this.mediaRecorder.ondataavailable = (event) => {
+                        if (event.data.size > 0) {
+                            this.recordedChunks.push(event.data);
+                        }
+                    };
+                    this.mediaRecorder.onstop = () => this.saveRecording();
+                    this.mediaRecorder.onerror = (event) => {
+                        console.error('Erro no MediaRecorder:', event.error);
+                        this.updateStatus('Erro na gravação', 'error');
+                    };
+
+                    this.mediaRecorder.start(1000);
+                    if (!wasPaused) this.togglePause();
+                }
             }
 
             togglePause() {
@@ -673,25 +913,24 @@
                     this.displayStream.getTracks().forEach(track => track.stop());
                     this.displayStream = null;
                 }
-
-                if (this.micStream) {
-                    this.micStream.getTracks().forEach(track => track.stop());
+                
+                // Manter micStream e audioContext ativos para visualização contínua
+                if (this.micStream && !this.micStream.getTracks().some(track => track.readyState === 'live')) {
                     this.micStream = null;
+                    this.micAnalyser = null;
+                    // Reiniciar monitoramento do microfone
+                    this.startMicrophoneMonitoring();
                 }
+                
 
                 if (this.combinedStream) {
                     this.combinedStream.getTracks().forEach(track => track.stop());
                     this.combinedStream = null;
                 }
 
-                // Fechar AudioContext
-                if (this.audioContext) {
-                    this.audioContext.close();
-                    this.audioContext = null;
+                if (this.displayStream && this.displayStream.getAudioTracks().length > 0) {
+                    this.startTabVisualization();
                 }
-
-                this.micAnalyser = null;
-                this.tabAnalyser = null;
             }
 
             saveRecording() {
@@ -778,13 +1017,26 @@
                     if (this.micAnalyser) {
                         const micData = new Uint8Array(this.micAnalyser.frequencyBinCount);
                         this.micAnalyser.getByteFrequencyData(micData);
+                        
+                        // Debug melhorado
+                        const micSum = micData.reduce((a, b) => a + b, 0);
+                        const micMax = Math.max(...micData);
+                        //console.log('Mic - Soma:', micSum, 'Máximo:', micMax, 'Primeiro valor:', micData[0]);
+                        
                         this.updateVisualizationBars(this.micViz, micData);
+                    } else {
+                        console.log('micAnalyser não existe!');
                     }
 
                     // Visualização do áudio da guia
                     if (this.tabAnalyser) {
                         const tabData = new Uint8Array(this.tabAnalyser.frequencyBinCount);
                         this.tabAnalyser.getByteFrequencyData(tabData);
+                        
+                        const tabSum = tabData.reduce((a, b) => a + b, 0);
+                        const tabMax = Math.max(...tabData);
+                        //console.log('Tab - Soma:', tabSum, 'Máximo:', tabMax);
+                        
                         this.updateVisualizationBars(this.tabViz, tabData);
                     }
 
@@ -792,6 +1044,32 @@
                 };
 
                 updateViz();
+            }
+
+            startMicVisualization() {
+                const updateMicViz = () => {
+                    if (this.micAnalyser) {
+                        const micData = new Uint8Array(this.micAnalyser.frequencyBinCount);
+                        this.micAnalyser.getByteFrequencyData(micData);
+                        this.updateVisualizationBars(this.micViz, micData);
+                    }
+                    
+                    this.micAnimationId = requestAnimationFrame(updateMicViz);
+                };
+                
+                updateMicViz();
+            }
+
+            startTabVisualization() {
+                const updateTabViz = () => {
+                    if (this.tabAnalyser) {
+                        const tabData = new Uint8Array(this.tabAnalyser.frequencyBinCount);
+                        this.tabAnalyser.getByteFrequencyData(tabData);
+                        this.updateVisualizationBars(this.tabViz, tabData);
+                    }
+                    this.tabAnimationId = requestAnimationFrame(updateTabViz);
+                };
+                updateTabViz();
             }
 
             updateVisualizationBars(container, data) {
@@ -802,6 +1080,8 @@
                     const value = data[i * step] || 0;
                     const height = Math.max(2, (value / 255) * 60);
                     bars[i].style.height = `${height}px`;
+                    // Adicionar opacidade baseada na atividade
+                    bars[i].style.opacity = value > 10 ? '1' : '0.3';
                 }
             }
 
@@ -828,7 +1108,9 @@
                     };
                     
                     this.micStream = await navigator.mediaDevices.getUserMedia(constraints);
-                    
+
+                    this.startMicrophoneMonitoring();
+
                     // Reconectar áudio
                     await this.combineStreams();
                     
@@ -843,10 +1125,87 @@
                 }
             }
 
-            async updateAudioOutput() {
-                // Esta funcionalidade seria para trocar a saída de áudio
-                // Por limitações da API, mantemos apenas áudio da guia
+            async updateAudioSource() {
+                if (!this.isRecording) return;
+                
                 console.log('Saída de áudio alterada:', this.audioOutputSelect.value);
+                
+                const selectedValue = this.audioOutputSelect.value;
+                
+                try {
+                    // Se for um dispositivo de saída, apenas informar que será aplicado na próxima gravação
+                    if (selectedValue !== 'tab' && selectedValue !== 'mic' && selectedValue !== 'both') {
+                        await this.updateSystemAudio();
+                        this.updateStatus('Saída de áudio do sistema selecionada', 'success');
+                        return;
+}
+
+                    // Pausar gravação temporariamente
+                    const wasPaused = this.isPaused;
+                    if (!wasPaused) {
+                        this.togglePause();
+                    }
+
+                    // Parar stream atual da tela
+                    if (this.displayStream) {
+                        this.displayStream.getTracks().forEach(track => track.stop());
+                        this.displayStream = null;
+                    }
+
+                    // Solicitar novo displayStream com configurações padrão
+                    this.displayStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { 
+                            mediaSource: 'screen',
+                            width: { ideal: 1920 },
+                            height: { ideal: 1080 }
+                        },
+                        audio: {
+                            echoCancellation: false,
+                            noiseSuppression: false,
+                            autoGainControl: false,
+                            sampleRate: 48000
+                        }
+                    });
+
+                    // Verificar se o áudio da guia foi capturado
+                    const hasTabAudio = this.displayStream.getAudioTracks().length > 0;
+                    if (!hasTabAudio) {
+                        console.warn('⚠️ Áudio da guia não foi capturado.');
+                        this.updateStatus('Atenção: Áudio da guia não detectado', 'error');
+                    }
+
+                    // Reconectar streams
+                    await this.combineStreams();
+                    this.startTabVisualization();
+
+                    // Retomar se não estava pausado
+                    if (!wasPaused) {
+                        this.togglePause();
+                    }
+
+                    this.updateStatus('Saída de áudio alterada com sucesso', 'success');
+                } catch (error) {
+                    console.error('Erro ao alterar saída de áudio:', error);
+                    this.updateStatus('Erro ao alterar saída de áudio', 'error');
+                }
+            }
+
+            async updateSystemAudio() {
+                try {
+                    if (this.displayStream) {
+                        this.displayStream.getTracks().forEach(track => track.stop());
+                    }
+                    this.displayStream = await navigator.mediaDevices.getDisplayMedia({
+                        video: { mediaSource: 'screen' },
+                        audio: true
+                    });
+                    await this.combineStreams();
+                    this.startTabVisualization();
+                    this.updateStatus('Saída de áudio do sistema atualizada', 'success');
+                } catch (error) {
+                    console.error('Erro ao atualizar áudio do sistema:', error);
+                    this.updateStatus('Erro ao mudar saída de áudio', 'error');
+                }
             }
 
             handleRecordingError(error) {
