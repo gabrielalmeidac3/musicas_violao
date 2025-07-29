@@ -146,15 +146,7 @@
   
 
     <script src="fechado_script.js"></script>
-    <script>
-      // Verifica se a página é acessada diretamente (não via fechado_geral_protegido_site.html)
-      if (window.location.pathname.includes('fechado_geral2')) {
-          const botaoCursoCompleto = document.querySelector('button[onclick*="fechado_index.html"]');
-          if (botaoCursoCompleto) {
-              botaoCursoCompleto.setAttribute('onclick', "window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/fechado_curso'");
-          }
-      }
-  </script>
+   
 <script>// Controla a visibilidade do botão flutuante
     function handleScrollButton() {
         const modalContent = document.querySelector('#pontuacao .modal-content');
