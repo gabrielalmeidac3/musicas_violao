@@ -11,43 +11,8 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
 
 </head>
-<body style="visibility: hidden;">
-  <script>
-    let auth;
-    let db;
+<body>
   
-    
-
-    fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev')
-      .then(response => response.json())
-      .then(firebaseConfig => {
-        firebase.initializeApp(firebaseConfig);
-        auth = firebase.auth();
-        db = firebase.firestore();
-  
-        auth.onAuthStateChanged((user) => {
-          if (user) {
-            const telefone = user.email.split('@')[0];
-            db.collection('alunos').where('telefone', '==', telefone).get()
-              .then((snapshot) => {
-                if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
-                  document.body.style.visibility = 'visible';
-                } else {
-                  alert('Acesso negado.');
-                  auth.signOut();
-                  window.location.href = 'fechado_geral_protegido.html';
-                }
-              })
-              .catch(error => console.error('Erro ao verificar aluno:', error));
-          } else {
-            window.location.href = 'fechado_geral_protegido.html';
-          }
-        });
-      })
-      .catch(error => console.error('Erro ao carregar configuração do Firebase:', error));
-
-      
-  </script>
 <div id="content">
 
 <div class="header">
@@ -660,8 +625,7 @@
 <script>
     
     
-    document.body.style.display = 'block';
-    document.body.style.visibility = 'visible';
+ 
     document.querySelector('.toggle-header').textContent = 'Procurar aulas';
     
     
