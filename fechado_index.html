@@ -50,65 +50,30 @@
                     db.collection('alunos').where('telefone', '==', telefone).get()
                         .then((snapshot) => {
                             if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
-                                fetch('fechado_curso.html')
-                                    .then(response => response.text())
-                                    .then(data => {
-                                        const parser = new DOMParser();
-                                        const doc = parser.parseFromString(data, 'text/html');
-                                        
-                                        // Insere o conteúdo em #content
-                                        document.getElementById('content').innerHTML = doc.body.innerHTML;
-    
-                                        // Carrega scripts de fechado_curso.html
-                                        const scripts = doc.querySelectorAll('script');
-                                        const scriptPromises = [];
-                                        scripts.forEach(oldScript => {
-                                            if (oldScript.src && !oldScript.src.includes('firebase')) {
-                                                const newScript = document.createElement('script');
-                                                newScript.src = oldScript.src;
-                                                newScript.async = false;
-                                                scriptPromises.push(new Promise((resolve, reject) => {
-                                                    newScript.onload = resolve;
-                                                    newScript.onerror = reject;
-                                                    document.body.appendChild(newScript);
-                                                }));
-                                            } else if (!oldScript.src) {
-                                                if (!oldScript.textContent.includes('firebase.initializeApp') && !oldScript.textContent.includes('auth =')) {
-                                                    const newScript = document.createElement('script');
-                                                    newScript.textContent = oldScript.textContent;
-                                                    document.body.appendChild(newScript);
-                                                }
-                                            }
-                                        });
-    
-                                        // Aplica o override após carregar todos os scripts
-                                        Promise.all(scriptPromises).then(() => {
-                                            const button = document.querySelector('button[onclick="voltarPaginaGeral()"]');
-                                            if (button) {
-                                                window.voltarPaginaGeral = function() {
-                                                    window.location.href = 'fechado_geral_protegido_site.html';
-                                                };
-                                                document.getElementById('loading').style.display = 'none';
-                                            }
-                                        }).catch(error => console.error('Erro ao carregar scripts:', error));
-                                    })
-                                    .catch(error => console.error('Erro ao carregar fechado_curso.html:', error));
+                                fetch('fechado_curso.html').then(response => response.text()).then(data => {
+                                    document.getElementById('content').innerHTML = data;
+                                    document.getElementById('loading').style.display = 'none';
+                                }).catch(error => console.error('Erro ao carregar conteúdo:', error));
                             } else {
                                 alert('Acesso negado.');
                                 auth.signOut();
-                                window.location.href = 'fechado_geral_protegido_site.html';
+                                const urlParams = new URLSearchParams(window.location.search);
+                                const from = urlParams.get('from');
+                                window.location.href = `fechado_geral_protegido.html${from ? '?from=' + from : ''}`;
                             }
                         })
                         .catch(error => console.error('Erro ao verificar aluno:', error));
                 } else {
-                    window.location.href = 'fechado_geral_protegido_site.html';
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const from = urlParams.get('from');
+                    window.location.href = `fechado_geral_protegido.html${from ? '?from=' + from : ''}`;
                 }
             });
         }
     
         function logout() {
             auth.signOut().then(() => {
-                window.location.href = 'fechado_geral_protegido_site.html';
+                window.location.href = 'fechado_geral_protegido.html';
             }).catch((error) => {
                 console.error('Erro ao fazer logout:', error);
                 alert('Erro ao sair. Tente novamente.');

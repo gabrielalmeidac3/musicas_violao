@@ -48,7 +48,9 @@ initFirebase().then(() => {
                 if (aluno.acesso === "Liberado") {
                     const senhaFirebase = aluno.senha + "00";
                     await auth.signInWithEmailAndPassword(email, senhaFirebase);
-                    window.location.href = "fechado_geral_protegido_site.html";
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const from = urlParams.get('from');
+                    window.location.href = from === 'geral2' ? 'fechado_index.html' : 'fechado_geral_protegido_site.html';
                 } else {
                     erroMsg.textContent = "Acesso bloqueado para este aluno.";
                     erroMsg.style.display = "block";
@@ -59,7 +61,9 @@ initFirebase().then(() => {
                 await auth.signInWithEmailAndPassword(email, senhaFirebase);
                 const aluno = alunoSnapshot.docs[0].data();
                 if (aluno.acesso === "Liberado") {
-                    window.location.href = "fechado_curso.html";
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const from = urlParams.get('from');
+                    window.location.href = from === 'geral2' ? 'fechado_index.html' : 'fechado_geral_protegido_site.html';
                 } else {
                     erroMsg.textContent = "Acesso bloqueado para este aluno.";
                     erroMsg.style.display = "block";
