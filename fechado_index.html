@@ -52,6 +52,11 @@
                             if (!snapshot.empty && snapshot.docs[0].data().acesso === 'Liberado') {
                                 fetch('fechado_curso.html').then(response => response.text()).then(data => {
                                     document.getElementById('content').innerHTML = data;
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const from = urlParams.get('from');
+                                    window.voltarPaginaGeral = function() {
+                                        window.location.href = from === 'geral2' ? 'fechado_geral2.html' : 'fechado_geral_protegido_site.html';
+                                    };
                                     document.getElementById('loading').style.display = 'none';
                                 }).catch(error => console.error('Erro ao carregar conteúdo:', error));
                             } else {

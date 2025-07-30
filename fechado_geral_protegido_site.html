@@ -96,6 +96,12 @@
                 botaoMusicas.setAttribute('onclick', "window.location.href='https://gabrielalmeidac3.github.io/musicas_violao/pagina_c2'");
             }
 
+            // Modifica o link do botão "Curso" para remover ?from=geral2
+            const botaoCurso = contentDiv.querySelector('button[onclick*="fechado_index.html"]');
+            if (botaoCurso) {
+                botaoCurso.setAttribute('onclick', "window.location.href='fechado_index.html'");
+            }
+
             // Carrega apenas scripts necessários do conteúdo
             const scripts = doc.querySelectorAll('script[src]');
             let scriptsToLoad = scripts.length;
