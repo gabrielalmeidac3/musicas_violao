@@ -76,6 +76,11 @@
             });
         }
     
+        function loadVideo(element) {
+            const src = element.getAttribute('data-src');
+            element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
+        }
+
         function logout() {
             auth.signOut().then(() => {
                 window.location.href = 'fechado_geral_protegido.html';
