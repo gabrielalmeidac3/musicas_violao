@@ -39,7 +39,6 @@ function convertLinks(text) {
 function extractCifraLinks(text) {
     const lines = text.split('\n');
     const cifraLinks = [];
-    let lastTitle = null;
 
     for (let i = 0; i < lines.length; i++) {
         const line = lines[i].trim();
@@ -47,7 +46,8 @@ function extractCifraLinks(text) {
         if (match) {
             const fileId = match[1];
             const downloadLink = `https://drive.google.com/uc?export=download&id=${fileId}`;
-            cifraLinks.push({ title: lastTitle, link: downloadLink, originalId: fileId });
+            const title = i > 0 ? lines[i - 1].trim() : null; // Pega a linha anterior como título
+            cifraLinks.push({ title: title, link: downloadLink, originalId: fileId });
         }
     }
     return cifraLinks.length > 1 
