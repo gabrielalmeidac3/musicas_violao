@@ -6,6 +6,137 @@
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>Curso de Violão do Zero ao Repertório</title>
 <link href="fechado_styles.css" rel="stylesheet"/>
+<style>
+  .search-container {
+    margin: 10px 0;
+    position: relative;
+    z-index: 1000;
+    background: linear-gradient(135deg, #2594a3 0%, #1e7a87 100%);
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(37, 148, 163, 0.3);
+  }
+  
+  #searchInput {
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: none;
+    border-radius: 30px;
+    outline: none;
+    background: rgba(107, 107, 107, 0.95);
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.1), 0 4px 20px rgba(255,255,255,0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    margin-bottom: 40px;
+    box-sizing: border-box;
+  }
+
+
+
+  #searchInput::placeholder {
+    color: #ddd; /* mais claro para aparecer no fundo escuro */
+    font-style: italic;
+}
+
+  
+  .search-results {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    background: #2a2a2a;
+    border-radius: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    display: none;
+    
+    backdrop-filter: blur(20px);
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+  
+  .search-result-item {
+      padding: 15px 20px;
+      border-bottom: 1px solid #404040;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: none;
+  }
+  .search-result-item:hover {
+      background: #404040;
+  }
+
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+  
+  .result-title {
+      font-weight: 600;
+      color: white;
+      margin-bottom: 5px;
+      font-size: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: none;
+  }
+  
+  .result-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+  }
+  
+  
+  .no-results {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .search-results::-webkit-scrollbar {
+      width: 8px;
+  }
+
+  .search-results::-webkit-scrollbar-track {
+      background: #111;
+      border-radius: 4px;
+  }
+
+  .search-results::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+  }
+
+  .search-results::-webkit-scrollbar-thumb:hover {
+      background: #666;
+  }
+
+  /* Scrollbar para Firefox - search results */
+  .search-results {
+      scrollbar-width: thin;
+      scrollbar-color: #555 #111;
+  }
+
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+
+  
+  </style>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
@@ -14,7 +145,7 @@
 <body>
   
 <div id="content">
-
+  
 <div class="header">
 <h1>Curso de Violão do Zero ao Repertório</h1>
 <p>por Gabriel Almeida</p>
@@ -46,10 +177,21 @@
 
   </div>
   
-<div class="toggle-section">
-<div><p style="color: gray; text-align: center;">Obs: M1, M2, M3 e M4 são os módulos; Exemplo: M1 = Módulo 1</p></div>    
+
+    
+  
+  <div><p style="color: gray; text-align: center;">Obs: M1, M2, M3 e M4 são os módulos; Exemplo: M1 = Módulo 1</p></div>    
 <div class="toggle-header" onclick="toggleSection(this)">Procurar aulas</div>
 <div class="toggle-content">
+  <div class="toggle-section">
+    <div class="search-wrapper">
+      <input style="color:white" type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+      <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
+
+  
+  
+</div>
+
 <div class="modules">
 <div class="module"><h3>Módulo 1</h3><div class="lesson" onclick="scrollToLesson(0)">Aula de Boas Vindas Curso do Zero Ao Repertório</div><div class="lesson" onclick="scrollToLesson(1)">Aula 1 Como Tocar Violão Sem Teoria</div><div class="lesson" onclick="scrollToLesson(2)">Aula 2 Mentalidade Pra Aprender Violão</div><div class="lesson" onclick="scrollToLesson(3)">Aula 3 Como Escolher o Seu Violão</div><div class="lesson" onclick="scrollToLesson(4)">Aula 4 Como Afinar o Violão</div><div class="lesson" onclick="scrollToLesson(5)">Aula 5 Como Segurar o Violão</div><div class="lesson" onclick="scrollToLesson(6)">Aula 6 O Que São Acordes Parte 1</div><div class="lesson" onclick="scrollToLesson(7)">Aula 7 O Que São Acordes Parte 2</div><div class="lesson" onclick="scrollToLesson(8)">Aula 8 O Que São Diagramas de Acordes</div><div class="lesson" onclick="scrollToLesson(9)">Aula 9 Aprenda Todos os Acordes</div><div class="lesson" onclick="scrollToLesson(10)">Aula 10 Fazendo Acordes na Prática</div><div class="lesson" onclick="scrollToLesson(11)">Aula 11 Aumente a Velocidade nas Trocas de Acordes</div><div class="lesson" onclick="scrollToLesson(12)">Aula 12 Acordes de pestana feitos sem pestana</div><div class="lesson" onclick="scrollToLesson(13)">Aula 13 O que são e como fazer Ritmos</div><div class="lesson" onclick="scrollToLesson(14)">Aula 14 Como Fazer Qualquer Ritmo no Violão</div><div class="lesson" onclick="scrollToLesson(15)">Aula 15 Dicas Sobre Ritmos</div><div class="lesson" onclick="scrollToLesson(16)">Aula 16 Ritmos Fáceis Guarânia</div><div class="lesson" onclick="scrollToLesson(17)">Aula 17 Ritmos Fáceis Valsa</div><div class="lesson" onclick="scrollToLesson(18)">Aula 18 Como Tocar Qualquer Música no Violão</div><div class="lesson" onclick="scrollToLesson(19)">Aula 19 Toque Sua Primeira Música</div><div class="lesson" onclick="scrollToLesson(20)">Aula 20 A Única Coisa</div><div class="lesson" onclick="scrollToLesson(21)">Aula 21 O Que São Cifras</div><div class="lesson" onclick="scrollToLesson(22)">Aula 22 Encontrando Cifras</div><div class="lesson" onclick="scrollToLesson(23)">Aula 23 90 Cifras Simples</div><div class="lesson" onclick="scrollToLesson(24)">Aula 24 Juntando Ritmo e Acordes</div><div class="lesson" onclick="scrollToLesson(25)">Aula 25 Encaixe da Voz Dicas</div><div class="lesson" onclick="scrollToLesson(26)">Aula 26 Encaixe da Voz Na prática</div><div class="lesson" onclick="scrollToLesson(27)">Aula 27 Como Criar um Repertório</div></div><div class="module"><h3>Módulo 2</h3><div class="lesson" onclick="scrollToLesson(28)">Aula 1 Ritmo de Rock</div><div class="lesson" onclick="scrollToLesson(29)">Aula 2 Ritmo Pop Rock</div><div class="lesson" onclick="scrollToLesson(30)">Aula 3 Ritmo de Toada</div><div class="lesson" onclick="scrollToLesson(31)">Aula 4 Ritmo de Vanera</div><div class="lesson" onclick="scrollToLesson(32)">Aula 5 Ritmo de 6 por 8</div><div class="lesson" onclick="scrollToLesson(33)">Aula 6 Quebra de Ritmo</div><div class="lesson" onclick="scrollToLesson(34)">Aula 7 Como Aprender Ritmo em Outros Lugares</div><div class="lesson" onclick="scrollToLesson(35)">Aula 8 Aprenda Ritmo na Prática Comigo</div><div class="lesson" onclick="scrollToLesson(36)">Aula 9 Ritmo Bolero Bachata</div></div><div class="module"><h3>Módulo 3</h3><div class="lesson" onclick="scrollToLesson(37)">Aula 1 Pestanas</div><div class="lesson" onclick="scrollToLesson(38)">Aula 2 Como Fazer Dedilhado</div><div class="lesson" onclick="scrollToLesson(39)">Aula 3 Ritmos de Dedilhado Parte 1</div><div class="lesson" onclick="scrollToLesson(40)">Aula 4 Ritmos de Dedilhado Parte 2</div><div class="lesson" onclick="scrollToLesson(41)">Aula 5 O Que São e Como Fazer Solos</div><div class="lesson" onclick="scrollToLesson(42)">Aula 6 Como Ler Tablaturas</div><div class="lesson" onclick="scrollToLesson(43)">Aula 7 Elementos da Tablatura Parte 1</div><div class="lesson" onclick="scrollToLesson(44)">Aula 7 Elementos da Tablatura Parte 2</div><div class="lesson" onclick="scrollToLesson(45)">Aula 8 Como Encontrar Tablaturas</div><div class="lesson" onclick="scrollToLesson(46)">Aula 9 O que é Tocar de Ouvido</div><div class="lesson" onclick="scrollToLesson(47)">Aula 10 Apostila Teoria Musical PDF</div><div class="lesson" onclick="scrollToLesson(48)">Aula 10 Escala Cromática</div><div class="lesson" onclick="scrollToLesson(49)">Aula 11 O que é Tom</div><div class="lesson" onclick="scrollToLesson(50)">Aula 12 O Que é Campo Harmônico e Como Usar</div><div class="lesson" onclick="scrollToLesson(51)">Aula 13 Como Tocar de Ouvido Parte 1</div><div class="lesson" onclick="scrollToLesson(52)">Aula 14 Como Tocar de Ouvido Parte 2</div><div class="lesson" onclick="scrollToLesson(53)">Aula 15 Sistema CAGED</div><div class="lesson" onclick="scrollToLesson(54)">Aula 16 Como Descobrir o Tom da Música</div></div><div class="module"><h3>Módulo 4</h3><div class="lesson" onclick="scrollToLesson(55)">Aula 1 Perca a Vergonha de Tocar em Público</div><div class="lesson" onclick="scrollToLesson(56)">Aula 2 Como Continuar Aprendendo no Violão Sempre</div><div class="lesson" onclick="scrollToLesson(57)">Depoimentos Gabriel Almeida</div><div class="lesson" onclick="scrollToLesson(58)">Finalização do Curso</div></div>
 </div>
@@ -1224,7 +1366,198 @@ ALO MEU DEUS PE ZEZINHO Católica
     
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
-    }</script>
+    }
+    
+    // Sistema de busca
+    // Não precisamos de filteredResults mais
+
+    const lessons = [
+        { id: 0, title: "Aula de Boas Vindas Curso do Zero Ao Repertório", module: "M1", keywords: "boas vindas apresentação início começar" },
+        { id: 1, title: "Como Tocar Violão Sem Teoria", module: "M1", keywords: "sem teoria prático básico iniciante" },
+        { id: 2, title: "Mentalidade Pra Aprender Violão", module: "M1", keywords: "mentalidade motivação persistência paciência" },
+        { id: 3, title: "Como Escolher o Seu Violão", module: "M1", keywords: "escolher violão comprar instrumento" },
+        { id: 4, title: "Como Afinar o Violão", module: "M1", keywords: "afinar afinação cordas som" },
+        { id: 5, title: "Como Segurar o Violão", module: "M1", keywords: "segurar postura posição corpo" },
+        { id: 6, title: "O Que São Acordes Parte 1", module: "M1", keywords: "acordes básico teoria harmonia" },
+        { id: 7, title: "O Que São Acordes Parte 2", module: "M1", keywords: "acordes continuação teoria" },
+        { id: 8, title: "O Que São Diagramas de Acordes", module: "M1", keywords: "diagramas acordes representação visual" },
+        { id: 9, title: "Aprenda Todos os Acordes", module: "M1", keywords: "todos acordes dicionário família" },
+        { id: 10, title: "Fazendo Acordes na Prática", module: "M1", keywords: "prática acordes exercício treino" },
+        { id: 11, title: "Aumente a Velocidade nas Trocas de Acordes", module: "M1", keywords: "velocidade troca acordes rapidez" },
+        { id: 12, title: "Acordes de pestana feitos sem pestana", module: "M1", keywords: "pestana acordes sem facilitar" },
+        { id: 13, title: "O que são e como fazer Ritmos", module: "M1", keywords: "ritmos batida compasso tempo" },
+        { id: 14, title: "Como Fazer Qualquer Ritmo no Violão", module: "M1", keywords: "qualquer ritmo técnica método" },
+        { id: 15, title: "Dicas Sobre Ritmos", module: "M1", keywords: "dicas ritmos conselhos" },
+        { id: 16, title: "Ritmos Fáceis Guarânia", module: "M1", keywords: "guarânia ritmo fácil básico" },
+        { id: 17, title: "Ritmos Fáceis Valsa", module: "M1", keywords: "valsa ritmo fácil básico" },
+        { id: 18, title: "Como Tocar Qualquer Música no Violão", module: "M1", keywords: "qualquer música tocar método" },
+        { id: 19, title: "Toque Sua Primeira Música", module: "M1", keywords: "primeira música começar prática" },
+        { id: 20, title: "A Única Coisa", module: "M1", keywords: "música única coisa prática" },
+        { id: 21, title: "O Que São Cifras", module: "M1", keywords: "cifras notação símbolos" },
+        { id: 22, title: "Encontrando Cifras", module: "M1", keywords: "encontrar cifras sites buscar" },
+        { id: 23, title: "+450 Cifras Simples", module: "M1", keywords: "450 cifras simples repertório" },
+        { id: 24, title: "Juntando Ritmo e Acordes", module: "M1", keywords: "juntar ritmo acordes coordenação" },
+        { id: 25, title: "Encaixe da Voz Dicas", module: "M1", keywords: "voz cantar encaixe dicas" },
+        { id: 26, title: "Encaixe da Voz Na prática", module: "M1", keywords: "voz cantar prática encaixe" },
+        { id: 27, title: "Como Criar um Repertório", module: "M1", keywords: "repertório criar músicas lista" },
+        { id: 28, title: "Ritmo de Rock", module: "M2", keywords: "rock ritmo batida estilo" },
+        { id: 29, title: "Ritmo Pop Rock", module: "M2", keywords: "pop rock ritmo batida" },
+        { id: 30, title: "Ritmo de Toada", module: "M2", keywords: "toada ritmo regional" },
+        { id: 31, title: "Ritmo de Vanera", module: "M2", keywords: "vanera ritmo regional" },
+        { id: 32, title: "Ritmo de 6 por 8", module: "M2", keywords: "6 por 8 ritmo compasso" },
+        { id: 33, title: "Quebra de Ritmo", module: "M2", keywords: "quebra ritmo variação" },
+        { id: 34, title: "Como Aprender Ritmo em Outros Lugares", module: "M2", keywords: "aprender ritmo outros lugares" },
+        { id: 35, title: "Aprenda Ritmo na Prática Comigo", module: "M2", keywords: "ritmo prática exercício" },
+        { id: 36, title: "Ritmo Bolero Bachata", module: "M2", keywords: "bolero bachata ritmo latino" },
+        { id: 37, title: "Pestanas", module: "M3", keywords: "pestana técnica avançada" },
+        { id: 38, title: "Como Fazer Dedilhado", module: "M3", keywords: "dedilhado técnica dedos" },
+        { id: 39, title: "Ritmos de Dedilhado Parte 1", module: "M3", keywords: "dedilhado ritmos parte 1" },
+        { id: 40, title: "Ritmos de Dedilhado Parte 2", module: "M3", keywords: "dedilhado ritmos parte 2" },
+        { id: 41, title: "O Que São e Como Fazer Solos", module: "M3", keywords: "solos melodia técnica" },
+        { id: 42, title: "Como Ler Tablaturas", module: "M3", keywords: "tablatura ler notação" },
+        { id: 43, title: "Elementos da Tablatura Parte 1", module: "M3", keywords: "tablatura elementos símbolos" },
+        { id: 44, title: "Elementos da Tablatura Parte 2", module: "M3", keywords: "tablatura elementos continuação" },
+        { id: 45, title: "Como Encontrar Tablaturas", module: "M3", keywords: "encontrar tablatura sites" },
+        { id: 46, title: "O que é Tocar de Ouvido", module: "M3", keywords: "tocar ouvido percepção" },
+        { id: 47, title: "Apostila Teoria Musical PDF", module: "M3", keywords: "teoria musical apostila pdf" },
+        { id: 48, title: "Escala Cromática", module: "M3", keywords: "escala cromática notas" },
+        { id: 49, title: "O que é Tom", module: "M3", keywords: "tom tonalidade altura" },
+        { id: 50, title: "O Que é Campo Harmônico e Como Usar", module: "M3", keywords: "campo harmônico acordes família" },
+        { id: 51, title: "Como Tocar de Ouvido Parte 1", module: "M3", keywords: "tocar ouvido parte 1" },
+        { id: 52, title: "Como Tocar de Ouvido Parte 2", module: "M3", keywords: "tocar ouvido parte 2" },
+        { id: 53, title: "Sistema CAGED", module: "M3", keywords: "sistema caged acordes" },
+        { id: 54, title: "Como Descobrir o Tom da Música", module: "M3", keywords: "descobrir tom música" },
+        { id: 55, title: "Perca a Vergonha de Tocar em Público", module: "M4", keywords: "vergonha público apresentar" },
+        { id: 56, title: "Como Continuar Aprendendo no Violão Sempre", module: "M4", keywords: "continuar aprendendo sempre" },
+        { id: 57, title: "Depoimentos Gabriel Almeida", module: "M4", keywords: "depoimentos testemunhos" },
+        { id: 58, title: "Finalização do Curso", module: "M4", keywords: "finalização fim conclusão" }
+    ];
+
+    function searchFor(query) {
+        document.getElementById('searchInput').value = query;
+        performSearch(query);
+    }
+
+    function performSearch(query) {
+        currentPage = 0; // Resetar a página ao iniciar nova busca
+
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+
+        // Mostrar todas as aulas que contêm a query no título (full title)
+        const results = lessons.filter(lesson =>
+            (`${lesson.module} Aula ${lesson.id} ${lesson.title}`).toLowerCase().includes(query.toLowerCase())
+        );
+
+        displayResults(results, query);
+    }
+
+
+
+    let currentPage = 0;
+    const resultsPerPage = 10;
+
+    function displayResults(results, query) {
+        const resultsContainer = document.getElementById('searchResults');
+        console.log('displayResults chamado - query:', query);
+        console.log('results length:', results.length);
+
+        if (query.trim() === '') {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<div class="no-results">Nenhuma aula encontrada para "' + query + '"</div>';
+            resultsContainer.style.display = 'block';
+            return;
+        }
+
+        const start = currentPage * resultsPerPage;
+        const end = start + resultsPerPage;
+        const paginatedResults = results.slice(start, end);
+        console.log('Paginação - start:', start, 'end:', end);
+        console.log('paginatedResults:', paginatedResults);
+        const html = paginatedResults.map(lesson => {
+            // Conta quantas aulas já existem nesse módulo
+            const moduleLessons = lessons.filter(l => l.module === lesson.module);
+            const lessonNumber = moduleLessons.indexOf(lesson) + 1; // +1 porque index começa em 0
+            return `
+                <div class="search-result-item" onclick="goToLesson(${lesson.id})">
+                    <div class="result-title">${lesson.module} Aula ${lessonNumber} ${lesson.title}</div>
+                </div>
+            `;
+        }).join('');
+
+
+
+        let buttonHtml = '';
+        if (end < results.length) {
+            buttonHtml = `
+                <div class="search-result-item" style="background: #2594a3; padding: 15px 20px; cursor: pointer;" onclick="showMoreResults()">
+                    <div class="result-title">Ver mais</div>
+                </div>
+            `;
+        }
+
+        // Remover botão "Ver mais" antigo, se existir
+        const oldButton = resultsContainer.querySelector('.ver-mais-btn');
+        if (oldButton) oldButton.remove();
+
+        // Adicionar os resultados da página atual
+        resultsContainer.insertAdjacentHTML('beforeend', html);
+
+        // Adicionar botão "Ver mais" se ainda houver resultados
+        if (end < results.length) {
+            resultsContainer.insertAdjacentHTML('beforeend', `
+                <div class="search-result-item ver-mais-btn" style="background:#2594a3;padding:15px 20px;cursor:pointer;" onclick="showMoreResults(event)">
+                    <div class="result-title">Ver mais</div>
+                </div>
+
+            `);
+        }
+
+        resultsContainer.style.display = 'block';
+    }
+
+    function showMoreResults(ev) {
+        if (ev) {
+            ev.preventDefault();
+            ev.stopPropagation(); // impede que o listener global feche a lista
+        }
+        currentPage++;
+        console.log('showMoreResults chamado - currentPage:', currentPage);
+        console.log('filteredResults length:', filteredResults.length);
+        displayResults(filteredResults, document.getElementById('searchInput').value);
+    }
+
+
+    function goToLesson(lessonId) {
+        document.getElementById('searchResults').style.display = 'none';
+        scrollToLesson(lessonId);
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        performSearch(e.target.value);
+    });
+
+    
+
+    document.addEventListener('click', function(e) {
+        // Se clicou dentro da search-wrapper, não fecha
+        if (e.target.closest('.search-wrapper')) return;
+        // Se por algum motivo o alvo for o próprio botão/filho, também não fecha
+        if (e.target.closest('.ver-mais-btn')) return;
+
+        document.getElementById('searchResults').style.display = 'none';
+    });
+
+
+
+    
+    
+    </script>
 </div>
 
 
