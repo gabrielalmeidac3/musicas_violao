@@ -81,6 +81,13 @@
             element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
         }
 
+        function toggleSection(element) {
+            const content = element.nextElementSibling;
+            const isOpen = content.style.display === 'block';
+            content.style.display = isOpen ? 'none' : 'block';
+            element.textContent = isOpen ? 'Procurar aulas' : 'Procurar aulas (fechar)';
+        }
+        
         function logout() {
             auth.signOut().then(() => {
                 window.location.href = 'fechado_geral_protegido.html';
@@ -108,3 +115,4 @@
 </body>
 
 </html>
+
