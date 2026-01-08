@@ -185,7 +185,7 @@
 <div class="toggle-content">
   <div class="toggle-section">
     <div class="search-wrapper">
-      <input style="color:white" type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+      <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
       <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
 
   
@@ -316,7 +316,7 @@
 </div>
 <div class="video-title">M1 Aula 2 Mentalidade Pra Aprender Violão</div>
 <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
-<div class="video-description">Aula de Mentalidade pra Aprender Violão  - É uma coisa que você gosta, então vale a pena - Você deve priorizar você, é seu compromisso estar com o violão - Treinar todo dia é essencial - Decidir horários dos dias - Saber que é questão de tempo - Vão haver coisas mais fáceis e rápidas e outras mais demoradas pra se aprender - As duas coisas principais são paciencia e persistencia - Todo esse curso é sem teoria, na prática então não tem porque desistir, é só ter paciência e persistencia que você vai alcançar seu objetivo de tocar músicas nas rodas de amigos ou na sua igreja</div>
+<div class="video-description">Aula de Mentalidade pra Aprender Violão  - É uma coisa que você gosta, então vale a pena - Você deve priorizar você, é seu compromisso estar com o violão - Treinar todo dia é essencial - Decidir horários dos dias - Saber que é questão de tempo - Vão haver coisas mais fáceis e rápidas e outras mais demoradas pra se aprender - As duas coisas principais são paciência e persistência - Todo esse curso é sem teoria, na prática então não tem porque desistir, é só ter paciência e persistencia que você vai alcançar seu objetivo de tocar músicas nas rodas de amigos ou na sua igreja</div>
 </div>
 <div class="video-container" id="lesson-3">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/unHdc8Hw4j0" onclick="loadVideo(this)">
@@ -1298,8 +1298,7 @@ ALO MEU DEUS PE ZEZINHO Católica
     }
     
     // Sistema de busca
-    // Não precisamos de filteredResults mais
-
+    let filteredResults = [];
     const lessons = [
         { id: 0, title: "Aula de Boas Vindas Curso do Zero Ao Repertório", module: "M1", keywords: "boas vindas apresentação início começar" },
         { id: 1, title: "Como Tocar Violão Sem Teoria", module: "M1", keywords: "sem teoria prático básico iniciante" },
@@ -1367,20 +1366,33 @@ ALO MEU DEUS PE ZEZINHO Católica
         performSearch(query);
     }
 
+    function getAulaPrefix(lesson) {
+        if (lesson.module === 'M1') {
+            return lesson.id === 0 ? '' : 'Aula ' + lesson.id + ' ';
+        } else if (lesson.module === 'M2') {
+            return 'Aula ' + (lesson.id - 27) + ' ';
+        } else if (lesson.module === 'M3') {
+            return 'Aula ' + (lesson.id - 36) + ' ';
+        } else if (lesson.module === 'M4') {
+            return (lesson.id === 57 || lesson.id === 58) ? '' : 'Aula ' + (lesson.id - 54) + ' ';
+        }
+        return '';
+    }
+
     function performSearch(query) {
         currentPage = 0; // Resetar a página ao iniciar nova busca
+        filteredResults = lessons.filter(lesson => {
+            const prefix = getAulaPrefix(lesson);
+            const searchText = `${lesson.module} ${prefix}${lesson.title}`.toLowerCase();
+            return searchText.includes(query.toLowerCase());
+        });
 
+        // Limpar resultados sempre que iniciar nova busca
         const resultsContainer = document.getElementById('searchResults');
         resultsContainer.innerHTML = '';
 
-        // Mostrar todas as aulas que contêm a query no título (full title)
-        const results = lessons.filter(lesson =>
-            (`${lesson.module} Aula ${lesson.id} ${lesson.title}`).toLowerCase().includes(query.toLowerCase())
-        );
-
-        displayResults(results, query);
+        displayResults(filteredResults, query);
     }
-
 
 
     let currentPage = 0;
@@ -1388,8 +1400,7 @@ ALO MEU DEUS PE ZEZINHO Católica
 
     function displayResults(results, query) {
         const resultsContainer = document.getElementById('searchResults');
-        console.log('displayResults chamado - query:', query);
-        console.log('results length:', results.length);
+        
 
         if (query.trim() === '') {
             resultsContainer.style.display = 'none';
@@ -1405,20 +1416,15 @@ ALO MEU DEUS PE ZEZINHO Católica
         const start = currentPage * resultsPerPage;
         const end = start + resultsPerPage;
         const paginatedResults = results.slice(start, end);
-        console.log('Paginação - start:', start, 'end:', end);
-        console.log('paginatedResults:', paginatedResults);
+        
         const html = paginatedResults.map(lesson => {
-            // Conta quantas aulas já existem nesse módulo
-            const moduleLessons = lessons.filter(l => l.module === lesson.module);
-            const lessonNumber = moduleLessons.indexOf(lesson) + 1; // +1 porque index começa em 0
+            const prefix = getAulaPrefix(lesson);
             return `
                 <div class="search-result-item" onclick="goToLesson(${lesson.id})">
-                    <div class="result-title">${lesson.module} Aula ${lessonNumber} ${lesson.title}</div>
+                    <div class="result-title">${lesson.module} ${prefix}${lesson.title}</div>
                 </div>
             `;
         }).join('');
-
-
 
         let buttonHtml = '';
         if (end < results.length) {
@@ -1455,8 +1461,7 @@ ALO MEU DEUS PE ZEZINHO Católica
             ev.stopPropagation(); // impede que o listener global feche a lista
         }
         currentPage++;
-        console.log('showMoreResults chamado - currentPage:', currentPage);
-        console.log('filteredResults length:', filteredResults.length);
+        
         displayResults(filteredResults, document.getElementById('searchInput').value);
     }
 
@@ -1481,7 +1486,7 @@ ALO MEU DEUS PE ZEZINHO Católica
 
         document.getElementById('searchResults').style.display = 'none';
     });
-
+    
 
 
     
