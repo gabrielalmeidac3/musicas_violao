@@ -81,50 +81,6 @@
             element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
         }
 
-        function toggleSection(element) {
-            const content = element.nextElementSibling;
-            const isOpen = content.style.display === 'block';
-            content.style.display = isOpen ? 'none' : 'block';
-            element.textContent = isOpen ? 'Procurar aulas' : 'Procurar aulas (fechar)';
-        }
-        
-        function toggleNivel() {
-            const content = document.getElementById("nivelContent");
-            const toggleBtn = document.querySelector(".toggle-nivel");
-            const aberto = content.style.display === "block";
-            content.style.display = aberto ? "none" : "block";
-            toggleBtn.textContent = aberto
-                ? "Veja em qual nível de violão você está"
-                : "Veja em qual nível de violão você está (fechar)";
-        }
-        
-        function toggleSongList(element) {
-            const list = element.nextElementSibling;
-            const isOpen = list.style.display === 'block';
-            list.style.display = isOpen ? 'none' : 'block';
-            element.style.color = isOpen ? 'white' : 'rgb(255, 188, 188)';
-            element.textContent = isOpen ? element.getAttribute('data-original-text') : 'Fechar lista';
-        }
-        
-        function scrollToLesson(lessonNumber) {
-            const lesson = document.getElementById(`lesson-${lessonNumber}`);
-            if (lesson) {
-                lesson.scrollIntoView({ behavior: 'smooth' });
-                const wrapper = lesson.querySelector('.video-wrapper');
-                if (wrapper) loadVideo(wrapper);
-            }
-        }
-        
-        function toggleDescription(element) {
-            const description = element.nextElementSibling;
-            description.style.display = description.style.display === 'block' ? 'none' : 'block';
-            element.textContent = description.style.display === 'block' ? 'Ocultar descrição' : 'Mostrar descrição';
-        }
-        
-        function scrollToTop() {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-        
         function logout() {
             auth.signOut().then(() => {
                 window.location.href = 'fechado_geral_protegido.html';
@@ -152,4 +108,3 @@
 </body>
 
 </html>
-

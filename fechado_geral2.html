@@ -30,120 +30,119 @@
     
           <button class="toggle-header" style="background-color: #653698;" onclick="redirecionarIniciante()">✍️ Iniciante do Zero</button>
 
-          <button class="toggle-header" style="background-color: #bf1313;" onclick="openModal('modal1')">🎥 Como funcionam as videochamadas</button>
-          <button class="toggle-header" style="background-color: #89733c;" onclick="openModal('modal2')">💻 Como entrar na videochamada</button>
-          <button class="toggle-header" style="background-color: #31a96d;" onclick="openModal('modal3')">📱 Como funciona o grupo WhatsApp</button>
+          <button class="toggle-header" style="background-color: #bf1313;" onclick="openModal('horarios')">🎥 Horários Videochamadas</button>
+          <button class="toggle-header" style="background-color: #31a96d;" onclick="openModal('modal3')">📱 Mande sua gravação para o professor analisar</button>
     
           <button class="toggle-header" style="background-color: #535556;" onclick="window.location.href='https://youtube.com/playlist?list=PLQFrIFIh3VvJlQEkcsDMzPn50rOdQYh89&si=gnL5iG7nADlvIUX9'">📺 Gravações das videochamadas</button>
-          <button class="toggle-header" style="background-color: #74907f;" onclick="openModal('modal4')">📅 Dias do Acompanhamento</button>
-          <button class="toggle-header" style="background-color: #86256c;" onclick="openModal('pontuacao')">⭐ Sistema de Premiação</button>
+
+          <button class="toggle-header" style="background-color: #86256c;" onclick="openModal('pontuacao')">⭐ Como funciona a Parede da Vitória</button>
         </div>
       </div>
 
-    <!-- Modal 1 -->
-    <div id="modal1" class="modal">
-        <div class="modal-content" style="text-align: left;">
-            <p>As videochamadas são realizadas uma vez por semana.<br>Segunda-feira 20h (8 horas da noite).<br><br>
-            Nelas você vai poder falar diretamente comigo.<br><br>
-            Eu vou saber como você está no violão.<br><br>
-            E vou te passar qual o teu objetivo pra semana.<br>
-            <p style="font-size: 18px; font-weight: bold; color:#d15a5a">Caso você não participar da videochamada, diga o motivo e faça uma dessas coisas na segunda-feira mesmo:</p>
-            1 - Escolha o seu objetivo pra semana e mande no grupo<br>
-            2 - Me fale sua dúvida ou dificuldade que passo o que você deve fazer</p>
-            <button class="modal-close" onclick="closeModal('modal1')">Voltar</button>
-        </div>
-    </div>
-
-    <!-- Modal 2 -->
-    <div id="modal2" class="modal">
-        <div class="modal-content">
-            <iframe width="100%" height="315" src="https://www.youtube.com/embed/-pktnbKCK_g" frameborder="0" allowfullscreen></iframe>
-            <button class="modal-close" onclick="closeModal('modal2')">Voltar</button>
+    <!-- Horários Videochamadas -->
+    <div id="horarios" class="modal" style="overflow: visible;">
+        <div class="modal-content" style="--size: calc(min(100vw, 100vh) / 1.2); width: var(--size); height: auto; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-radius: 3vmin; box-shadow: 0 4vmin 8vmin rgba(0,0,0,0.5); display: flex; flex-direction: column; overflow: visible; padding: 0;">
+            <div style="flex: 1; display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 3vmin;">
+                <h3 style="margin-bottom: 5vmin; color: #fff; text-align: center; font-size: 6vmin;">Horários das Videochamadas</h3>
+                <div style="width: 100%; text-align: left;">
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1.5vmin; width: 100%;">
+                        <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 2vmin; border-radius: 2vmin; flex: 1; margin-right: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">Segunda a Quarta</div>
+                        <div style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); padding: 2vmin; border-radius: 2vmin; flex: 0 0 auto; margin-left: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">20h</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; margin-bottom: 1.5vmin; width: 100%;">
+                        <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 2vmin; border-radius: 2vmin; flex: 1; margin-right: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">Quinta</div>
+                        <div style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); padding: 2vmin; border-radius: 2vmin; flex: 0 0 auto; margin-left: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">16h</div>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; width: 100%;">
+                        <div style="background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%); padding: 2vmin; border-radius: 2vmin; flex: 1; margin-right: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">Sexta</div>
+                        <div style="background: linear-gradient(135deg, #4ecdc4 0%, #44a08d 100%); padding: 2vmin; border-radius: 2vmin; flex: 0 0 auto; margin-left: 1.5vmin; color: #fff; text-align: center; font-weight: bold; font-size: 4vmin;">18h</div>
+                    </div>
+                </div>
+            </div>
+            <div style="padding: 1vmin 0 3vmin 0; display: flex; justify-content: center; align-items: center; flex-shrink: 0;">
+                <button onclick="closeModal('horarios')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 2vmin 5vmin; border-radius: 5vmin; font-size: 4vmin; font-weight: bold; cursor: pointer; box-shadow: 0 1vmin 3vmin rgba(0,0,0,0.3);">Voltar</button>
+            </div>
         </div>
     </div>
 
     <!-- Modal 3 -->
-    <div id="modal3" class="modal">
-        <div class="modal-content"style="text-align: left;">
-            <p style="font-size: 25px; font-weight: bold;">Toda terça e quinta você pode mandar seu vídeo ou seu áudio tocando pra eu analisar.<br></p>
-            <p>Obs: Máximo de 2 envios por aluno por dia.<br><br>
-            Às vezes eu não consigo responder todos no mesmo dia (na terça ou na quinta), mas no próximo dia eu respondo.<br><br>
-            Pode mandar dúvidas também na terça ou quinta (caso não mande material pra análise)<br><br>
-            Nos outros dias você pode mandar vídeos e áudios também pra compartilhar com os colegas.<br><br>
-            Mas os dias em que eu vou analisar mesmo é só terça e quinta.<br><br>
-            ⚠️ Aviso: Os materiais a serem analisados devem ser mandados apenas na terça e na quinta (pra manter a organização do grupo).</p>
-            <button class="modal-close" onclick="closeModal('modal3')">Voltar</button>
+    <div id="modal3" class="modal" style="display: none;">
+        <div class="modal-content" style="text-align: left; max-height: 90vh; overflow-y: auto; padding: 3vmin; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); border-radius: 3vmin; box-shadow: 0 4vmin 8vmin rgba(0,0,0,0.5); max-width: 95vw; margin: 0 auto; position: relative;">
+            <h3 style="margin-bottom: 5vmin; color: #fff; text-align: center; font-size: 6vmin;">📱 Mande sua gravação para o professor analisar</h3>
+            <h2 style="margin-top: -10px; color: #fff; text-align: center; font-size: 5vmin; font-weight: normal;">Como funciona?</h2>
+            <div style="width: 100%; text-align: left;">
+                <div style="background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%); padding: 3vmin; border-radius: 2vmin; margin-bottom: 2vmin; color: #fff; font-size: 4vmin; line-height: 1.4;">
+                    <div style="font-weight: bold; margin-bottom: 1vmin;">📹 Análise Semanal</div>
+                    Você vai poder mandar seu vídeo ou áudio pra eu analisar uma vez por semana.
+                </div>
+                <div style="background: linear-gradient(135deg, #5cb85c 0%, #4cae4c 100%); padding: 3vmin; border-radius: 2vmin; margin-bottom: 2vmin; color: #fff; font-size: 4vmin; line-height: 1.4;">
+                    <div style="font-weight: bold; margin-bottom: 1vmin;">🎵 Até 2 Gravações por Dia</div>
+                    No dia cada aluno pode mandar no máximo 2 gravações.
+                </div>
+                <div style="background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 100%); padding: 3vmin; border-radius: 2vmin; margin-bottom: 2vmin; color: #fff; font-size: 4vmin; line-height: 1.4;">
+                    <div style="font-weight: bold; margin-bottom: 1vmin;">📅 Escolha Seu Dia</div>
+                    É só escolher qual o melhor dia pra você entre domingo até quinta.
+                </div>
+                <div style="background: linear-gradient(135deg, #3498db 0%, #2980b9 100%); padding: 3vmin; border-radius: 2vmin; margin-bottom: 2vmin; color: #fff; font-size: 4vmin; line-height: 1.4;">
+                    <div style="font-weight: bold; margin-bottom: 1vmin;">🔄 Dia Fixo</div>
+                    Vai ser um dia fixo pra todas as semanas.
+                </div>
+                <div style="background: linear-gradient(135deg, #95a5a6 0%, #7f8c8d 100%); padding: 3vmin; border-radius: 2vmin; color: #fff; font-size: 4vmin; line-height: 1.4;">
+                    <div style="font-weight: bold; margin-bottom: 1vmin;">⚠️ Alteração com Antecedência</div>
+                    Se quiser alterar o dia terá de ser com 30 dias de antecedência pra manter organização do grupo.
+                </div>
+            </div>
+            <div style="display: flex; justify-content: center; align-items: center; flex-shrink: 0; padding-top: 2vmin; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 3vmin;">
+                <button onclick="closeModal('modal3')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 2vmin 5vmin; border-radius: 5vmin; font-size: 4vmin; font-weight: bold; cursor: pointer; box-shadow: 0 1vmin 3vmin rgba(0,0,0,0.3);">Voltar</button>
+            </div>
         </div>
     </div>
 
-    <!-- Modal 4 - Dias do Acompanhamento -->
-    <div id="modal4" class="modal">
-        <div class="modal-content" style="text-align: left; max-height: 90vh; overflow-y: auto; padding: 24px; box-sizing: border-box;">
-        <h2 style="color: #0b76f0; text-align: center;">Dias do Acompanhamento<br>Violão Depois dos 40</h2>
-    
-        <p style="margin: 20px 0;"><strong>Segunda 20h:</strong><br>Videochamada em grupo com os alunos</p>
-        <p style="margin: 20px 0;"><strong>Terça e Quinta (o dia todo):</strong><br>Os alunos devem mandar vídeos ou áudios pra análise</p>
-        <p style="margin: 20px 0;"><strong>Outros dias:</strong><br>O grupo fica aberto pra interação de todos<br>(desde que sempre haja respeito)</p>
-    
-        <div style="margin-top: 30px; text-align: center;">
-            <button class="modal-close" onclick="closeModal('modal4')">Voltar</button>
-        </div>
-        </div>
-  </div>
+
   
   <!-- Modal 5 - Sistema de premiação -->
 
- <!-- Modal 5 - Sistema de premiação (TEMA ESCURO) -->
+ <!-- Modal 5 - Como funciona a Parede da Vitória (TEMA ESCURO) -->
 <div id="pontuacao" class="modal" style="display: none;">
-    <div class="modal-content" style="text-align: left; max-height: 85vh; overflow-y: auto; padding: 20px; box-sizing: border-box; background-color: #121212; color: #fff; max-width: 90vw; margin: 0 auto; position: relative; border-radius: 12px;">
-      <div style="background: #1e1e1e; padding: 25px; border-radius: 15px; box-shadow: 0 10px 30px rgba(0,0,0,0.6);">
-        <h2 style="color: #ffd700; text-align: center; margin-bottom: 25px; font-size: 28px;">
-          🏆 Sistema de Pontuação
+    <div class="modal-content" style="text-align: left; max-height: 90vh; overflow-y: auto; padding: 8vmin; box-sizing: border-box; background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%); color: #fff; max-width: 95vw; margin: 0 auto; position: relative; border-radius: 5vmin; box-shadow: 0 2.5vmin 10vmin rgba(0,0,0,0.8); font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+        <h2 style="color: #ffd700; text-align: center; margin-bottom: 9vmin; font-size: 8vmin; font-weight: 700; letter-spacing: 0.25vmin;">
+          🏆 Como funciona a Parede da Vitória
         </h2>
-  
-        <div style="background: #2a2a2a; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #86256c;">
-          <p><strong>📊 Como funciona:</strong><br>
-          Cada semana medimos sua participação e dedicação no acompanhamento VD40.</p>
+
+        <div style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); padding: 6.5vmin; border-radius: 4vmin; margin-bottom: 6.5vmin; border: 0.5vmin solid rgba(255,255,255,0.1); box-shadow: 0 1vmin 4vmin rgba(0,0,0,0.3);">
+          <p style="font-size: 4.5vmin; line-height: 1.6; margin: 0; font-weight: 400; color: #ffffff;">Cada semana acompanhamos sua participação e dedicação na Comunidade VD40.</p>
         </div>
-  
-        <div style="background: #1f1f1f; padding: 20px; border-radius: 10px; margin-bottom: 20px; border-left: 5px solid #38b2ac;">
-          <p><strong>✅ Vale ponto:</strong></p>
-          <div style="margin-left: 15px;">
-            <div style="display: flex; align-items: center; margin-bottom: 12px; padding: 8px; background: #2a2a2a; border-radius: 8px;">
-              <span style="color: #38b2ac; font-size: 18px; margin-right: 10px;">📹</span>
-              <span>Participar da videochamada (ou mandar objetivo + progresso no grupo + informar o motivo da ausência)</span>
+
+        <div style="background: linear-gradient(135deg, #34495e 0%, #2c3e50 100%); padding: 6.5vmin; border-radius: 4vmin; margin-bottom: 6.5vmin; border: 0.5vmin solid rgba(255,255,255,0.1); box-shadow: 0 1vmin 4vmin rgba(0,0,0,0.3);">
+          <p style="font-size: 5vmin; font-weight: 600; margin-bottom: 5vmin; color: #ffffff;">✅ Como ganhar pontos:</p>
+          <div style="margin-left: 0;">
+            <div style="display: flex; align-items: flex-start; margin-bottom: 4.5vmin; padding: 4vmin; background: rgba(255,255,255,0.05); border-radius: 3vmin; border: 0.25vmin solid rgba(255,255,255,0.1);">
+              <span style="color: #4a90e2; font-size: 6vmin; margin-right: 4vmin; flex-shrink: 0;">📹</span>
+              <span style="font-size: 4vmin; line-height: 1.5; color: #ffffff;">Participar da videochamada (ou informar o motivo da ausência)</span>
             </div>
-            <div style="display: flex; align-items: center; margin-bottom: 12px; padding: 8px; background: #2a2a2a; border-radius: 8px;">
-              <span style="color: #38b2ac; font-size: 18px; margin-right: 10px;">🎯</span>
-              <span>Definir um objetivo claro para a semana</span>
+            <div style="display: flex; align-items: flex-start; margin-bottom: 4.5vmin; padding: 4vmin; background: rgba(255,255,255,0.05); border-radius: 3vmin; border: 0.25vmin solid rgba(255,255,255,0.1);">
+              <span style="color: #4a90e2; font-size: 6vmin; margin-right: 4vmin; flex-shrink: 0;">🎯</span>
+              <span style="font-size: 4vmin; line-height: 1.5; color: #ffffff;">Definir um objetivo claro para a semana (Se participar da videochamada eu defino com você)</span>
             </div>
-            <div style="display: flex; align-items: center; margin-bottom: 8px; padding: 8px; background: #2a2a2a; border-radius: 8px;">
-              <span style="color: #38b2ac; font-size: 18px; margin-right: 10px;">🎵</span>
-              <span>Mandar vídeo/áudio nas terças e quintas no WhatsApp</span>
+            <div style="display: flex; align-items: flex-start; padding: 4vmin; background: rgba(255,255,255,0.05); border-radius: 3vmin; border: 0.25vmin solid rgba(255,255,255,0.1);">
+              <span style="color: #4a90e2; font-size: 6vmin; margin-right: 4vmin; flex-shrink: 0;">🎵</span>
+              <span style="font-size: 4vmin; line-height: 1.5; color: #ffffff;">Mandar sua gravação da semana</span>
             </div>
           </div>
         </div>
-  
-        <div style="background: #333; padding: 20px; border-radius: 15px; text-align: center; color: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.6);">
-          <div style="font-size: 24px; margin-bottom: 10px;">🎁</div>
-          <p style="font-size: 18px; font-weight: bold;">PRÊMIO ESPECIAL</p>
-          <p style="font-size: 16px;">Alunos com <strong>100% de pontuação</strong> nas 4 semanas do mês<br>concorrem a <strong style="color: #ffd700;">50% de desconto</strong> na mensalidade! 💰</p>
-          <br><br><p>Se o mesmo aluno for sorteado 2 vezes consecutivas, esse aluno ganha uma videochamada individual e é repetido o sorteio</p>
+
+        <div style="background: linear-gradient(135deg, #1e3a5f 0%, #2c3e50 100%); padding: 7.5vmin; border-radius: 5vmin; text-align: center; color: #ffffff; box-shadow: 0 1vmin 4vmin rgba(0,0,0,0.3); border: 0.5vmin solid rgba(255,255,255,0.1);">
+          <div style="font-size: 9vmin; margin-bottom: 4vmin;">🎁</div>
+          <p style="font-size: 6vmin; font-weight: 700; margin-bottom: 4vmin; color: #ffffff;">PRÊMIO ESPECIAL</p>
+          <p style="font-size: 4.5vmin; line-height: 1.6; margin-bottom: 5vmin; color: #ffffff;">Alunos com <strong style="color: #ffd700;">100% de pontuação</strong> nas 4 semanas do mês<br>concorrem a <strong style="color: #ffd700;">50% de desconto</strong> na mensalidade! 💰</p>
+          <p style="font-size: 4vmin; line-height: 1.5; font-style: italic; color: #cccccc;">Se o mesmo aluno for sorteado 2 vezes consecutivas, esse aluno ganha uma videochamada individual e é repetido o sorteio</p>
         </div>
-  
-        <div id="botao-final" style="margin-top: 30px; text-align: center; padding-bottom: 20px; opacity: 0;">
-          <button class="modal-close" onclick="closeModal('pontuacao')" style="background: #86256c; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer;">
+
+        <div style="display: flex; justify-content: center; align-items: center; flex-shrink: 0; padding-top: 2vmin; border-top: 1px solid rgba(255,255,255,0.1); margin-top: 3vmin;">
+          <button onclick="closeModal('pontuacao')" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border: none; padding: 2vmin 5vmin; border-radius: 5vmin; font-size: 4vmin; font-weight: 600; cursor: pointer; box-shadow: 0 1vmin 3vmin rgba(102,126,234,0.4); transition: all 0.3s ease;">
             Voltar
           </button>
         </div>
-      </div>
-  
-      <!-- Botão flutuante -->
-      <button id="botao-flutuante" class="modal-close" onclick="closeModal('pontuacao')" style="position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #86256c; color: white; border: none; padding: 12px 30px; border-radius: 25px; font-size: 16px; font-weight: bold; cursor: pointer; z-index: 1000;">
-        Voltar
-      </button>
-    </div>
-  </div>
   
   <script>
     function redirecionarIniciante() {
@@ -158,37 +157,6 @@
 
     <script src="fechado_script.js"></script>
    
-<script>// Controla a visibilidade do botão flutuante
-    function handleScrollButton() {
-        const modalContent = document.querySelector('#pontuacao .modal-content');
-        const botaoFlutuante = document.getElementById('botao-flutuante');
-        const botaoFinal = document.getElementById('botao-final');
-        
-        if (modalContent && botaoFlutuante && botaoFinal) {
-            modalContent.addEventListener('scroll', function() {
-                const scrollTop = this.scrollTop;
-                const scrollHeight = this.scrollHeight;
-                const clientHeight = this.clientHeight;
-                
-                // Se chegou perto do final (últimos 50px)
-                if (scrollTop + clientHeight >= scrollHeight - 50) {
-                    botaoFlutuante.style.opacity = '0';
-                    botaoFinal.style.opacity = '1';
-                } else {
-                    botaoFlutuante.style.opacity = '1';
-                    botaoFinal.style.opacity = '0';
-                }
-            });
-        }
-    }
-    
-    // Chama a função quando o modal for aberto
-    const originalOpenModal = window.openModal;
-    window.openModal = function(modalId) {
-        originalOpenModal(modalId);
-        if (modalId === 'pontuacao') {
-            setTimeout(handleScrollButton, 100);
-        }
-    };</script>
+
 </body>
 </html>
