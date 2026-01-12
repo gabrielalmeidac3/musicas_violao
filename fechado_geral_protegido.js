@@ -25,26 +25,39 @@ initFirebase().then(() => {
         const telefone = document.getElementById("telefone").value;
         const senha = document.getElementById("senha").value;
         const erroMsg = document.getElementById("erro");
-    
+
         erroMsg.style.display = "none"; // Reseta a mensagem de erro
-    
+
         try {
-            const email = `${telefone.replace(/\D/g, '')}@curso.com`;
-    
+            let cleanedTelefone = telefone.replace(/\D/g, '');
+            if (cleanedTelefone.length === 11 && cleanedTelefone[2] === '9') {
+                cleanedTelefone = cleanedTelefone.substring(0, 2) + cleanedTelefone.substring(3);
+            }
+
             // Verifica se o telefone existe na coleção 'alunos' antes de tentar login
-            const alunoSnapshot = await db.collection("alunos")
-                .where("telefone", "==", telefone)
+            let alunoSnapshot = await db.collection("alunos")
+                .where("telefone", "==", cleanedTelefone)
                 .get();
-    
+
+            if (alunoSnapshot.empty && cleanedTelefone.length === 10) {
+                const with9 = cleanedTelefone.substring(0, 2) + '9' + cleanedTelefone.substring(2);
+                alunoSnapshot = await db.collection("alunos")
+                    .where("telefone", "==", with9)
+                    .get();
+            }
+
             if (alunoSnapshot.empty) {
                 erroMsg.textContent = "Telefone não encontrado.";
                 erroMsg.style.display = "block";
                 return; // Para aqui se o telefone não existe
             }
+
+            const aluno = alunoSnapshot.docs[0].data();
+            const storedTelefone = aluno.telefone;
+            const email = `${storedTelefone.replace(/\D/g, '')}@curso.com`;
     
             // Caso da senha coringa "1585"
             if (senha === "1585") {
-                const aluno = alunoSnapshot.docs[0].data();
                 if (aluno.acesso === "Liberado") {
                     const senhaFirebase = aluno.senha + "00";
                     await auth.signInWithEmailAndPassword(email, senhaFirebase);
@@ -59,7 +72,6 @@ initFirebase().then(() => {
                 // Login normal com senha de 4 dígitos fornecida
                 const senhaFirebase = senha + "00";
                 await auth.signInWithEmailAndPassword(email, senhaFirebase);
-                const aluno = alunoSnapshot.docs[0].data();
                 if (aluno.acesso === "Liberado") {
                     const urlParams = new URLSearchParams(window.location.search);
                     const from = urlParams.get('from');
