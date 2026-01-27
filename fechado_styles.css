@@ -79,9 +79,7 @@ button {
     transition: background-color 0.3s;
 }
 
-button:hover {
-    background: #45a049; /* Efeito ao passar o mouse */
-}
+
 
 /* Mensagem de erro */
 #erro {
