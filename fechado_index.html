@@ -60,7 +60,10 @@
                                     // Execute scripts from fechado_curso.html
                                     const script = document.createElement('script');
                                     script.textContent = `
-                                        document.querySelector('.toggle-header').textContent = 'Procurar aulas';
+                                        const toggleHeader = document.querySelector('.toggle-header');
+                                        if (toggleHeader) {
+                                            toggleHeader.textContent = 'Procurar aulas';
+                                        }
                                         
                                         function toggleSongList(element) {
                                             const list = element.nextElementSibling;
@@ -69,14 +72,18 @@
                                             element.style.color = isOpen ? 'white' : 'rgb(255, 188, 188)';
                                             element.textContent = isOpen ? element.getAttribute('data-original-text') : 'Fechar lista';
                                         }
+
+                                        window.toggleSongList = toggleSongList;    
                                         
                                         function toggleSection(element) {
                                             const content = element.nextElementSibling;
                                             const isOpen = content.style.display === 'block';
                                             content.style.display = isOpen ? 'none' : 'block';
                                             element.textContent = isOpen ? 'Procurar aulas' : 'Procurar aulas (fechar)';
+                                            
                                         }
-                                        
+                                        window.toggleSection = toggleSection;
+
                                         function scrollToLesson(lessonNumber) {
                                             const lesson = document.getElementById(\`lesson-\${lessonNumber}\`);
                                             if (lesson) {
@@ -286,24 +293,129 @@
                                             document.getElementById('searchResults').style.display = 'none';
                                         });
                                         
-                                        document.getElementById('toggleModulesBtn').addEventListener('click', function() {
+                                        const toggleModulesBtn = document.getElementById('toggleModulesBtn');
+                                        if (toggleModulesBtn) {
+                                            toggleModulesBtn.addEventListener('click', function() {
                                             const modules = document.querySelector('.modules');
                                             const button = this;
+                                            const btnText = button.querySelector('.btn-scroll-text');
                                             const isOpen = modules.classList.contains('show');
                                             modules.classList.toggle('show', !isOpen);
-                                            button.textContent = isOpen ? 'Abrir pesquisa por módulos' : 'Fechar pesquisa por módulos';
+                                            if (btnText) {
+                                                btnText.textContent = isOpen ? 'Abrir pesquisa por módulos' : 'Fechar pesquisa por módulos';
+                                            }
                                             button.classList.toggle('active', !isOpen);
-                                        });
+                                            setTimeout(calcularRolagemTexto, 50);
+                                            });
+                                        }
                                         
                                         function toggleNivel() {
-                                            const content = document.getElementById("nivelContent");
+                                            const modal = document.getElementById("modalNiveis");
                                             const toggleBtn = document.querySelector(".toggle-nivel");
-                                            const aberto = content.style.display === "block";
-                                            content.style.display = aberto ? "none" : "block";
-                                            toggleBtn.textContent = aberto
-                                                ? "Veja em qual nível de violão você está"
-                                                : "Veja em qual nível de violão você está (fechar)";
+                                            if (modal) {
+                                                const isOpen = modal.style.display === "flex";
+                                                modal.style.display = isOpen ? "none" : "flex";
+                                                if (toggleBtn) {
+                                                    const btnText = toggleBtn.querySelector(".btn-scroll-text");
+                                                    if (btnText) {
+                                                        btnText.textContent = isOpen
+                                                            ? "Veja em qual nível de violão você está"
+                                                            : "Veja em qual nível de violão você está (fechar)";
+                                                    }
+                                                }
+                                            }
                                         }
+                                        
+                                        window.toggleNivel = toggleNivel;
+                                        function openModal(modalId) {
+                                            const modal = document.getElementById(modalId);
+                                            if (modal) {
+                                                modal.style.display = 'flex';
+                                            }
+                                        }
+                                        
+                                        function closeModal(modalId) {
+                                            const modal = document.getElementById(modalId);
+                                            if (modal) {
+                                                modal.style.display = 'none';
+                                            }
+                                        }
+                                        
+                                        window.openModal = openModal;
+                                        window.closeModal = closeModal;
+                                        
+                                        function calcularRolagemTexto() {
+                                            const divs = document.querySelectorAll('.btn-scroll-text');
+                                            
+                                            divs.forEach(div => {
+                                                div.style.animation = 'none';
+                                                
+                                                setTimeout(() => {
+                                                    const parentWidth = div.parentElement.offsetWidth;
+                                                    const textWidth = div.scrollWidth;
+                                                    
+                                                    const marginTotal = 30;
+                                                    const distancia = -(textWidth - (parentWidth - marginTotal));
+                                                    
+                                                    if (textWidth > parentWidth) {
+                                                        div.style.setProperty('--scroll-distance', distancia + 'px');
+                                                        div.style.animation = 'rolarTexto 5s ease-in-out infinite';
+                                                    }
+                                                }, 10);
+                                            });
+                                        }
+                                        
+                                        window.addEventListener('load', calcularRolagemTexto);
+                                        window.addEventListener('resize', calcularRolagemTexto);
+                                        
+                                        window.calcularRolagemTexto = calcularRolagemTexto;
+                                        function initializeModules() {
+                                            const modules = document.querySelectorAll('.module');
+                                            
+                                            modules.forEach((module, moduleIndex) => {
+                                                const lessons = module.querySelectorAll('.lesson');
+                                                const totalLessons = lessons.length;
+                                                
+                                                if (totalLessons > 2) {
+                                                    lessons.forEach((lesson, index) => {
+                                                        if (index >= 2) {
+                                                            lesson.classList.add('hidden');
+                                                        }
+                                                    });
+                                                    
+                                                    const toggleBtn = document.createElement('div');
+                                                    toggleBtn.className = 'lesson lesson-toggle';
+                                                    toggleBtn.textContent = 'Mostrar mais (' + (totalLessons - 2) + ')';
+                                                    toggleBtn.setAttribute('data-expanded', 'false');
+                                                    
+                                                    toggleBtn.onclick = function() {
+                                                        const isExpanded = this.getAttribute('data-expanded') === 'true';
+                                                        
+                                                        if (isExpanded) {
+                                                            lessons.forEach((lesson, index) => {
+                                                                if (index >= 2) {
+                                                                    lesson.classList.add('hidden');
+                                                                }
+                                                            });
+                                                            this.textContent = 'Mostrar mais (' + (totalLessons - 2) + ')';
+                                                            this.setAttribute('data-expanded', 'false');
+                                                        } else {
+                                                            lessons.forEach(lesson => {
+                                                                lesson.classList.remove('hidden');
+                                                            });
+                                                            this.textContent = 'Mostrar menos';
+                                                            this.setAttribute('data-expanded', 'true');
+                                                        }
+                                                    };
+                                                    
+                                                    module.appendChild(toggleBtn);
+                                                }
+                                            });
+                                        }
+                                        
+                                        setTimeout(initializeModules, 100);
+                                        setTimeout(calcularRolagemTexto, 200);
+                                        window.initializeModules = initializeModules;
                                     `;
                                     document.body.appendChild(script);
                                     document.getElementById('loading').style.display = 'none';
@@ -340,7 +452,24 @@
         }
     </script>
     <style>
-     
+     @keyframes rolarTexto {
+            0% {
+                transform: translateX(0);
+            }
+            85% {
+                transform: translateX(var(--scroll-distance, 0px));
+            }
+            100% {
+                transform: translateX(var(--scroll-distance, 0px));
+            }
+        }
+        
+        .btn-scroll-text {
+            display: inline-block;
+            animation: rolarTexto 5s ease-in-out infinite;
+            margin: 0 15px;
+            box-sizing: content-box;
+        }
         #loading {
             text-align: center;
             position: fixed;
