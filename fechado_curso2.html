@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Curso de Violão do Zero ao Repertório</title>
+<link href="fechado_styles.css" rel="stylesheet"/>
+<style>
+  .search-container {
+    margin: 10px 0;
+    position: relative;
+    z-index: 1000;
+    background: linear-gradient(135deg, #2594a3 0%, #1e7a87 100%);
+    padding: 12px;
+    border-radius: 15px;
+    box-shadow: 0 8px 32px rgba(37, 148, 163, 0.3);
+  }
+  
+  #searchInput {
+    width: 100%;
+    margin: 0 auto;
+    display: block;
+    color: white;
+    padding: 12px 20px;
+    font-size: 16px;
+    border: 1px solid white;
+    border-radius: 30px;
+    outline: none;
+    background: rgba(107, 107, 107, 0.95);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    margin-bottom: 2px;
+    box-sizing: border-box;
+  }
+
+
+
+  #searchInput::placeholder {
+    color: #ddd; /* mais claro para aparecer no fundo escuro */
+    font-style: italic;
+}
+
+  
+  .search-results {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    background: #2a2a2a;
+    border-radius: 15px;
+    max-height: 400px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1000;
+    display: none;
+    
+    backdrop-filter: blur(20px);
+    margin-top: 10px;
+    box-sizing: border-box;
+}
+  
+  .search-result-item {
+      padding: 15px 20px;
+      border-bottom: 1px solid #404040;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+      color: white;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: none;
+  }
+  .search-result-item:hover {
+      background: #404040;
+  }
+
+  .search-result-item:last-child {
+    border-bottom: none;
+  }
+  
+  .result-title {
+      font-weight: 600;
+      color: white;
+      margin-bottom: 5px;
+      font-size: 16px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      hyphens: none;
+  }
+  
+  .result-description {
+    font-size: 14px;
+    color: #666;
+    line-height: 1.4;
+  }
+  
+  
+  .no-results {
+    padding: 20px;
+    text-align: center;
+    color: #666;
+  }
+
+  .search-results::-webkit-scrollbar {
+      width: 8px;
+  }
+
+  .search-results::-webkit-scrollbar-track {
+      background: #111;
+      border-radius: 4px;
+  }
+
+  .search-results::-webkit-scrollbar-thumb {
+      background: #555;
+      border-radius: 4px;
+  }
+
+  .search-results::-webkit-scrollbar-thumb:hover {
+      background: #666;
+  }
+
+  /* Scrollbar para Firefox - search results */
+  .search-results {
+      scrollbar-width: thin;
+      scrollbar-color: #555 #111;
+  }
+
+  .search-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 100%;
+    box-sizing: border-box;
+}
+
+  .toggle-modules-btn {
+    display: block;
+    margin: 15px 0 15px 0;
+    padding: 10px 20px;
+    background: #747a46;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background 0.3s;
+  }
+  .toggle-modules-btn.active {
+    background: #535831;
+  }
+
+
+  .modules {
+    display: none;
+  }
+
+  .modules.show {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+  }
+
+  @media (max-width: 768px) {
+    .modules.show {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .module {
+    padding: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+  }
+
+
+  
+  </style>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+</head>
+<body>
+  
+<div id="content">
+  
+<div class="header">
+<h1>Curso de Violão do Zero ao Repertório</h1>
+<p>por Gabriel Almeida</p>
+</div>
+<div style="text-align: left;">
+  <button onclick="voltarPaginaGeral()" style="
+    display: inline-block;
+    padding: 8px 16px;
+    font-size: 13px;
+    color: white;
+    background: #2594a3;
+    border-radius: 5px;
+    text-decoration: none;
+    text-align: center;
+    transition: background 0.3s;
+    border: none;
+    cursor: pointer;
+  ">
+    Voltar para a Página Geral
+  </button>
+
+  <script>
+  function voltarPaginaGeral() {
+    
+    window.location.href = 'fechado_geral2.html';
+    
+  }
+  </script>
+
+  </div>
+  
+
+    
+  
+  <div><p style="color: gray; text-align: center;">Obs: M1, M2, M3 e M4 são os módulos; Exemplo: M1 = Módulo 1</p></div>    
+<div class="toggle-header" onclick="toggleSection(this)">Procurar aulas</div>
+<div class="toggle-content">
+  <div class="toggle-section">
+    <div class="search-wrapper">
+      <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+      <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
+
+      <button id="toggleModulesBtn" class="toggle-modules-btn">Abrir pesquisa por módulos</button>
+
+</div>
+
+<div class="modules">
+<div class="module"><h3>Módulo 1</h3><div class="lesson" onclick="scrollToLesson(0)">Aula de Boas Vindas Curso do Zero Ao Repertório</div><div class="lesson" onclick="scrollToLesson(1)">Aula 1 Como Tocar Violão Sem Teoria</div><div class="lesson" onclick="scrollToLesson(2)">Aula 2 Mentalidade Pra Aprender Violão</div><div class="lesson" onclick="scrollToLesson(3)">Aula 3 Como Escolher o Seu Violão</div><div class="lesson" onclick="scrollToLesson(4)">Aula 4 Como Afinar o Violão</div><div class="lesson" onclick="scrollToLesson(5)">Aula 5 Como Segurar o Violão</div><div class="lesson" onclick="scrollToLesson(6)">Aula 6 O Que São Acordes Parte 1</div><div class="lesson" onclick="scrollToLesson(7)">Aula 7 O Que São Acordes Parte 2</div><div class="lesson" onclick="scrollToLesson(8)">Aula 8 O Que São Diagramas de Acordes</div><div class="lesson" onclick="scrollToLesson(9)">Aula 9 Aprenda Todos os Acordes</div><div class="lesson" onclick="scrollToLesson(10)">Aula 10 Fazendo Acordes na Prática</div><div class="lesson" onclick="scrollToLesson(11)">Aula 11 Aumente a Velocidade nas Trocas de Acordes</div><div class="lesson" onclick="scrollToLesson(12)">Aula 12 Acordes de pestana feitos sem pestana</div><div class="lesson" onclick="scrollToLesson(13)">Aula 13 O que são e como fazer Ritmos</div><div class="lesson" onclick="scrollToLesson(14)">Aula 14 Como Fazer Qualquer Ritmo no Violão</div><div class="lesson" onclick="scrollToLesson(15)">Aula 15 Dicas Sobre Ritmos</div><div class="lesson" onclick="scrollToLesson(16)">Aula 16 Ritmos Fáceis Guarânia</div><div class="lesson" onclick="scrollToLesson(17)">Aula 17 Ritmos Fáceis Valsa</div><div class="lesson" onclick="scrollToLesson(18)">Aula 18 Como Tocar Qualquer Música no Violão</div><div class="lesson" onclick="scrollToLesson(19)">Aula 19 Toque Sua Primeira Música</div><div class="lesson" onclick="scrollToLesson(20)">Aula 20 A Única Coisa</div><div class="lesson" onclick="scrollToLesson(21)">Aula 21 O Que São Cifras</div><div class="lesson" onclick="scrollToLesson(22)">Aula 22 Encontrando Cifras</div><div class="lesson" onclick="scrollToLesson(23)">Aula 23 +450 Cifras Simples</div><div class="lesson" onclick="scrollToLesson(24)">Aula 24 Juntando Ritmo e Acordes</div><div class="lesson" onclick="scrollToLesson(25)">Aula 25 Encaixe da Voz Dicas</div><div class="lesson" onclick="scrollToLesson(26)">Aula 26 Encaixe da Voz Na prática</div><div class="lesson" onclick="scrollToLesson(27)">Aula 27 Como Criar um Repertório</div></div><div class="module"><h3>Módulo 2</h3><div class="lesson" onclick="scrollToLesson(28)">Aula 1 Ritmo de Rock</div><div class="lesson" onclick="scrollToLesson(29)">Aula 2 Ritmo Pop Rock</div><div class="lesson" onclick="scrollToLesson(30)">Aula 3 Ritmo de Toada</div><div class="lesson" onclick="scrollToLesson(31)">Aula 4 Ritmo de Vaneira</div><div class="lesson" onclick="scrollToLesson(32)">Aula 5 Ritmo de 6 por 8</div><div class="lesson" onclick="scrollToLesson(33)">Aula 6 Quebra de Ritmo</div><div class="lesson" onclick="scrollToLesson(34)">Aula 7 Como Aprender Ritmo em Outros Lugares</div><div class="lesson" onclick="scrollToLesson(35)">Aula 8 Aprenda Ritmo na Prática Comigo</div><div class="lesson" onclick="scrollToLesson(36)">Aula 9 Ritmo Bolero Bachata</div><div class="lesson" onclick="scrollToLesson(37)">Aula 10 Ritmo Country 1 e 2</div>
+</div><div class="module"><h3>Módulo 3</h3><div class="lesson" onclick="scrollToLesson(38)">Aula 1 Pestanas</div><div class="lesson" onclick="scrollToLesson(39)">Aula 2 Como Fazer Dedilhado</div><div class="lesson" onclick="scrollToLesson(40)">Aula 3 Ritmos de Dedilhado Parte 1</div><div class="lesson" onclick="scrollToLesson(41)">Aula 4 Ritmos de Dedilhado Parte 2</div><div class="lesson" onclick="scrollToLesson(42)">Aula 5 O Que São e Como Fazer Solos</div><div class="lesson" onclick="scrollToLesson(43)">Aula 6 Como Ler Tablaturas</div><div class="lesson" onclick="scrollToLesson(44)">Aula 7 Elementos da Tablatura Parte 1</div><div class="lesson" onclick="scrollToLesson(45)">Aula 7 Elementos da Tablatura Parte 2</div><div class="lesson" onclick="scrollToLesson(46)">Aula 8 Como Encontrar Tablaturas</div><div class="lesson" onclick="scrollToLesson(47)">Aula 9 O que é Tocar de Ouvido</div><div class="lesson" onclick="scrollToLesson(48)">Aula 10 Apostila Teoria Musical PDF</div><div class="lesson" onclick="scrollToLesson(49)">Aula 10 Escala Cromática</div><div class="lesson" onclick="scrollToLesson(50)">Aula 11 O que é Tom</div><div class="lesson" onclick="scrollToLesson(51)">Aula 12 O Que é Campo Harmônico e Como Usar</div><div class="lesson" onclick="scrollToLesson(52)">Aula 13 Como Tocar de Ouvido Parte 1</div><div class="lesson" onclick="scrollToLesson(53)">Aula 14 Como Tocar de Ouvido Parte 2</div><div class="lesson" onclick="scrollToLesson(54)">Aula 15 Sistema CAGED</div><div class="lesson" onclick="scrollToLesson(55)">Aula 16 Como Descobrir o Tom da Música</div></div><div class="module"><h3>Módulo 4</h3><div class="lesson" onclick="scrollToLesson(56)">Aula 1 Perca a Vergonha de Tocar em Público</div><div class="lesson" onclick="scrollToLesson(57)">Aula 2 Como Continuar Aprendendo no Violão Sempre</div><div class="lesson" onclick="scrollToLesson(58)">Aula 3 Acompanhamento Violão em Ação</div><div class="lesson" onclick="scrollToLesson(59)">Aula 4 Depoimentos Gabriel Almeida</div><div class="lesson" onclick="scrollToLesson(60)">Aula 5 Finalização do Curso</div></div>
+
+</div>
+</div>
+</div>
+<div class="toggle-section">
+
+<!-- Início do botão nível -->
+
+<div class="toggle-section">
+    <div class="toggle-header toggle-nivel" onclick="toggleNivel()">
+      Veja em qual nível de violão você está
+    </div>
+    <div class="toggle-content" id="nivelContent">
+      <div class="nivel nivel-0">
+        <div class="nivel-titulo">NÍVEL 0 - Ainda não sabe afinar, e ainda não sabe pelo menos 3 acordes e um ritmo</div>
+        <div class="nivel-info">
+          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+          <ul>
+            <li>Como segurar, afinar e entender o braço do violão</li>
+            <li>O que são acordes e como tocá-los</li>
+            <li>Preparação para tocar seus primeiros ritmos</li>
+            <li>Ritmo Guarânia e/ou Valsa</li>
+          </ul>
+          <p><strong>Aulas:</strong> Da aula M1 1 até a aula M1 17</p>
+        </div>
+      </div>
+
+      <div class="nivel nivel-1">
+        <div class="nivel-titulo">NÍVEL 1 - Já sabe afinar, já sabe pelo menos 3 acordes e um ritmo mas ainda não toca nenhuma música</div>
+        <div class="nivel-info">
+          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+          <ul>
+            <li>Tocar sua primeira música no violão sem precisar cantar ainda</li>
+            <li>Juntar ritmo e acordes com tranquilidade</li>
+          </ul>
+          <p><strong>Aulas:</strong> Da aula M1 18 até a aula 24</p>
+        </div>
+      </div>
+
+      <div class="nivel nivel-2">
+        <div class="nivel-titulo">NÍVEL 2 - Já toca pelo menos uma música no violão mas não canta ainda</div>
+        <div class="nivel-info">
+          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+          <ul>
+            <li>Tocar sua primeira música no violão cantando junto</li>
+            <li>Aprender vários ritmos, acordes e músicas novas</li>
+          </ul>
+          <p><strong>Aulas:</strong> Da aula M1 25 até todo o Módulo 2</p>
+        </div>
+      </div>
+
+      <div class="nivel nivel-3">
+        <div class="nivel-titulo">NÍVEL 3 - Já toca e canta junto pelo menos uma música</div>
+        <div class="nivel-info">
+          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+          <ul>
+            <li>Pestanas e dedilhados</li>
+          </ul>
+          <p><strong>Aulas:</strong> Da aula M3 1 até a aula 4</p>
+        </div>
+      </div>
+
+      <div class="nivel nivel-4">
+        <div class="nivel-titulo">NÍVEL 4 - Já toca músicas usando pestanas e dedilhados</div>
+        <div class="nivel-info">
+          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+          <ul>
+            <li>Solos (ler tablaturas e tocar)</li>
+            <li>O básico da teoria musical (campo harmônico, escala cromática, intervalos)</li>
+            <li>Tocar de ouvido</li>
+          </ul>
+          <p><strong>Aulas:</strong> Da aula M3 5 até todo o Módulo 4</p>
+        </div>
+      </div>
+
+      <div class="nivel nivel-5">
+        <div class="nivel-titulo">NÍVEL 5 - Já sabe solos, teoria musical e tocar de ouvido</div>
+        <div class="nivel-info">
+          <p><strong>Parabéns!</strong> Você chegou ao último nível atual.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleNivel() {
+      const content = document.getElementById("nivelContent");
+      const toggleBtn = document.querySelector(".toggle-nivel");
+      const aberto = content.style.display === "block";
+      content.style.display = aberto ? "none" : "block";
+      toggleBtn.textContent = aberto
+        ? "Veja em qual nível de violão você está"
+        : "Veja em qual nível de violão você está (fechar)";
+    }
+  </script>
+
+
+<!-- Fim do botão nível -->
+
+<div class="container" id="video-container">
+<div class="video-container" id="lesson-0">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/SVsIRM4-q3Q" onclick="loadVideo(this)">
+<img alt="M1 Aula de Boas Vindas Curso do Zero Ao Repertório" src="https://img.youtube.com/vi/SVsIRM4-q3Q/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula de Boas Vindas Curso do Zero Ao Repertório</div>
+</div>
+<div class="video-container" id="lesson-1">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/Z5FlKf1j3MY" onclick="loadVideo(this)">
+<img alt="M1 Aula 1 Como Tocar Violão Sem Teoria" src="https://img.youtube.com/vi/Z5FlKf1j3MY/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 1 Como Tocar Violão Sem Teoria</div>
+</div>
+<div class="video-container" id="lesson-2">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/80KEqUFLcVQ" onclick="loadVideo(this)">
+<img alt="M1 Aula 2 Mentalidade Pra Aprender Violão" src="https://img.youtube.com/vi/80KEqUFLcVQ/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 2 Mentalidade Pra Aprender Violão</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">Aula de Mentalidade pra Aprender Violão  - É uma coisa que você gosta, então vale a pena - Você deve priorizar você, é seu compromisso estar com o violão - Treinar todo dia é essencial - Decidir horários dos dias - Saber que é questão de tempo - Vão haver coisas mais fáceis e rápidas e outras mais demoradas pra se aprender - As duas coisas principais são paciência e persistência - Todo esse curso é sem teoria, na prática então não tem porque desistir, é só ter paciência e persistencia que você vai alcançar seu objetivo de tocar músicas nas rodas de amigos ou na sua igreja</div>
+</div>
+<div class="video-container" id="lesson-3">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/unHdc8Hw4j0" onclick="loadVideo(this)">
+<img alt="M1 Aula 3 Como Escolher o Seu Violão" src="https://img.youtube.com/vi/unHdc8Hw4j0/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 3 Como Escolher o Seu Violão</div>
+</div>
+<div class="video-container" id="lesson-4">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/7EgDa7NYsdo" onclick="loadVideo(this)">
+<img alt="M1 Aula 4 Como Afinar o Violão" src="https://img.youtube.com/vi/7EgDa7NYsdo/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 4 Como Afinar o Violão</div>
+</div>
+<div class="video-container" id="lesson-5">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/ePa5F8LhqfQ" onclick="loadVideo(this)">
+<img alt="M1 Aula 5 Como Segurar o Violão" src="https://img.youtube.com/vi/ePa5F8LhqfQ/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 5 Como Segurar o Violão</div>
+</div>
+<div class="video-container" id="lesson-6">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/E6Nia9cCuqQ" onclick="loadVideo(this)">
+<img alt="M1 Aula 6 O Que São Acordes Parte 1" src="https://img.youtube.com/vi/E6Nia9cCuqQ/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 6 O Que São Acordes Parte 1</div>
+</div>
+<div class="video-container" id="lesson-7">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/Iczr36mhURA" onclick="loadVideo(this)">
+<img alt="M1 Aula 7 O Que São Acordes Parte 2" src="https://img.youtube.com/vi/Iczr36mhURA/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 7 O Que São Acordes Parte 2</div>
+</div>
+<div class="video-container" id="lesson-8">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/JzWU6d_YWG0" onclick="loadVideo(this)">
+<img alt="M1 Aula 8 O Que São Diagramas de Acordes" src="https://img.youtube.com/vi/JzWU6d_YWG0/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 8 O Que São Diagramas de Acordes</div>
+</div>
+<div class="video-container" id="lesson-9">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/Xl7HDv5CYLk" onclick="loadVideo(this)">
+<img alt="M1 Aula 9 Aprenda Todos os Acordes" src="https://img.youtube.com/vi/Xl7HDv5CYLk/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 9 Aprenda Todos os Acordes</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">Baixe o Dicionário de Acordes - Link Abaixo <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>  FAMÍLIAS DE ACORDES MAIS SIMPLES PRA VOCÊ JÁ COMEÇAR NO VIOLÃO  Família 1 - A, E, D Família 2 - D, A, G Família 3 - G, D, C Família 4 - E, B7, A</div>
+</div>
+<div class="video-container" id="lesson-10">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/hJ3oQR9rtF4" onclick="loadVideo(this)">
+<img alt="M1 Aula 10 Fazendo Acordes na Prática" src="https://img.youtube.com/vi/hJ3oQR9rtF4/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 10 Fazendo Acordes na Prática</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Escolher 3 acordes pra começar, de preferência o A, E, D  Como deixar o som do acorde bonito   - Dedo final da casa não no meio e nem no começo e nem no traste - Apertar bem - Dedos bem em pé - Não encostar a palma da mão no braço - De preferência, deixar o polegar na parte de trás do braço do violão - Cortar unhas  Como ganhar velocidade  - Treino de montagem e desmontagem  - Treino de Pares</div>
+</div>
+<div class="video-container" id="lesson-11">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/8tGb85mUtO8" onclick="loadVideo(this)">
+<img alt="M1 Aula 11 Aumente a Velocidade nas Trocas de Acordes" src="https://img.youtube.com/vi/8tGb85mUtO8/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 11 Aumente a Velocidade nas Trocas de Acordes</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Treino de Montagem e Desmontagem de Acordes   - Treino de Pares   Escolher 2 acordes (o par) e ficar trocando de um pro outro.   A, E, D   A, E - 20x - 1 toque em cada acorde e troca E, D - 20x - 1 toque em cada acorde e troca D, A - 20x - 1 toque em cada acorde e troca   Escolher um número de repetições em cada par.   ______________________________   Se você estiver aprendendo alguma música - use os acordes dessa música.   Treino de pares com C, G.</div>
+</div>
+<div class="video-container" id="lesson-12">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/bXmb1EAYHy8" onclick="loadVideo(this)">
+<img alt="M1 Aula 12 Acordes de pestana feitos sem pestana" src="https://img.youtube.com/vi/bXmb1EAYHy8/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 12 Acordes de pestana feitos sem pestana</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">BAIXE O DICIONÁRIO DE ACORDES: <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>    - Existe a hora certa de colocar a voz em relação às batidas  Guarânia - 5 batidas - ↓↑↓↑↓  - Geralmente o ritmo começa na sílaba forte da palavra   - Faça pedaço por pedaço até ficar bom   - Dica de cantarolar a melodia   - Acertar o começo pra depois continuar  - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
+</div>
+<div class="video-container" id="lesson-13">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/T_cLeLBc5wY" onclick="loadVideo(this)">
+<img alt="M1 Aula 13 O que são e como fazer Ritmos" src="https://img.youtube.com/vi/T_cLeLBc5wY/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 13 O que são e como fazer Ritmos</div>
+</div>
+<div class="video-container" id="lesson-14">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/Q6b36lXHmzM" onclick="loadVideo(this)">
+<img alt="M1 Aula 14 Como Fazer Qualquer Ritmo no Violão" src="https://img.youtube.com/vi/Q6b36lXHmzM/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 14 Como Fazer Qualquer Ritmo no Violão</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Sempre aprenda os mais simples primeiro  - Usando referências (vídeos de pessoas tocando/ensinando)  - Setinhas que são visuais  - Tempo (velocidade dos toques e pausas)  - Pulsação mais forte e mais fraca  - Repetição (compasso, começo e fim)  - Bater nas cordas de uma vez e não como uma harpa  - Pra começo não precisa recursos como abafamento, contra tempo, rasqueado  - Existem uma infinidade de ritmos, com o tempo você mesmo vai criar as suas próprias formas de fazer ritmo.</div>
+</div>
+<div class="video-container" id="lesson-15">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/NxKHn-aJz0E" onclick="loadVideo(this)">
+<img alt="M1 Aula 15 Dicas Sobre Ritmos" src="https://img.youtube.com/vi/NxKHn-aJz0E/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 15 Dicas Sobre Ritmos</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Aprenda apenas um por vez   - Foque nos que fazem mais sentido pro seu estilo de música (procure as músicas e veja em qual ritmo ela é tocada e aprenda apenas esse, não tente aprender vários de uma vez)   - Indico começar com os mais fáceis, Guarânia e Valsa, depois aprender os outros conforme a necessidade, existem ritmos mais usados e menos usados nas músicas.</div>
+</div>
+<div class="video-container" id="lesson-16">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/UQHrjYBDgmc" onclick="loadVideo(this)">
+<img alt="M1 Aula 16 Ritmos Fáceis Guarânia" src="https://img.youtube.com/vi/UQHrjYBDgmc/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 16 Ritmos Fáceis Guarânia</div>
+</div>
+<div class="video-container" id="lesson-17">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/4o4WiCxh1bQ" onclick="loadVideo(this)">
+<img alt="M1 Aula 17 Ritmos Fáceis Valsa" src="https://img.youtube.com/vi/4o4WiCxh1bQ/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 17 Ritmos Fáceis Valsa</div>
+</div>
+<div class="video-container" id="lesson-18">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/S7uKLd-skDI" onclick="loadVideo(this)">
+<img alt="M1 Aula 18 Como Tocar Qualquer Música no Violão" src="https://img.youtube.com/vi/S7uKLd-skDI/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 18 Como Tocar Qualquer Música no Violão</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Ordem de treino:  1 - Escolher uma música que seja simples (poucos acordes, acordes simples e ritmo simples - de preferência que você já conheça)  Só 3 Acordes  2 - Saber a música (ouvir bastante durante estar treinando)  3 - Ter a cifra em mãos  4 - Saber os acordes  5 - Saber o ritmo  6 - Tocar o ritmo da música junto com os acordes (de preferência tendo o vídeo de referência, de alguém tocando ou a música original mesmo)  - Você vai saber que está pronto pra colocar a voz quando estiver conseguindo tocar pelo menos uns 2 minutos da música sem errar (colocando o ritmo e os acordes sem errar, trocando os acordes na hora certa e deixando o ritmo no tempo certo)  7 - Adicionar a voz (referência)  MELHOR DICA: APRENDA UMA POR VEZ - COMECE COM UMA</div>
+</div>
+<div class="video-container" id="lesson-19">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/EU5EhCNz8vM" onclick="loadVideo(this)">
+<img alt="M1 Aula 19 Toque Sua Primeira Música" src="https://img.youtube.com/vi/EU5EhCNz8vM/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 19 Toque Sua Primeira Música</div>
+</div>
+<div class="video-container" id="lesson-20">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/no_kLtMdRuA" onclick="loadVideo(this)">
+<img alt="M1 Aula 20 A Única Coisa" src="https://img.youtube.com/vi/no_kLtMdRuA/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 20 A Única Coisa</div>
+</div>
+<div class="video-container" id="lesson-21">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/JYVyLEbfRIo" onclick="loadVideo(this)">
+<img alt="M1 Aula 21 O Que São Cifras" src="https://img.youtube.com/vi/JYVyLEbfRIo/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 21 O Que São Cifras</div>
+</div>
+<div class="video-container" id="lesson-22">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/zfJhsyKyc0k" onclick="loadVideo(this)">
+<img alt="M1 Aula 22 Encontrando Cifras" src="https://img.youtube.com/vi/zfJhsyKyc0k/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 22 Encontrando Cifras</div>
+</div>
+<div class="video-container" id="lesson-23">
+  <img src="450.png" alt="+450 Cifras Simples" style="width: 100%;">
+  <div class="video-title">+450 Cifras Simples - Por Gabriel Almeida</div>
+  <div style="text-align: center; margin-top: 10px;">
+      <ul style="padding-left: 20px;list-style-type: none; font-size: 16px; text-align: left;">
+          <li>PDF 1: 200 Cifras Variadas (Sertanejo, MPB, Brega)</li>
+          <li>PDF 2: 37 Cifras com Setinhas</li>
+          <li>PDF 3: Outras 62 Cifras Variadas</li>
+          <li>PDF 4: 185 Cifras Católicas</li>
+          <li>PDF 5: 39 Cifras Evangélicas</li>
+      </ul>
+      
+      <div class="description-toggle" onclick="toggleSongList(this)" style="background-color: #5e5e5e; text-align: center; padding: 10px; cursor: pointer; margin-top: 10px; font-size: 18px; color: white; text-decoration: none;" data-original-text="Clique para ver a lista de músicas dessas cifras">Clique para ver a lista de músicas dessas cifras</div>
+      <div class="song-list" style="display: none; max-height: 200px; overflow-y: auto; text-align: left; padding-left: 20px; margin-top: 10px; font-size: 16px; background-color: #515151;">
+          <style>
+              .song-list::-webkit-scrollbar {
+                  width: 8px;
+              }
+              .song-list::-webkit-scrollbar-track {
+                  background: #7e7e7e;
+              }
+              .song-list::-webkit-scrollbar-thumb {
+                  background: #282828;
+                  border-radius: 4px;
+              }
+              .song-list::-webkit-scrollbar-thumb:hover {
+                  background: #4a4a4a;
+              }
+          </style>
+          <pre style="white-space: pre-wrap;">
+Relação das Cifras
+
+200 Cifras Variadas
+
+Índia  
+É impossível esquecer um grande amor  
+Tão bem  
+Tristeza Danada  
+Sapatinho de Natal  
+Quarto Negro  
+Quem Ama De Verdade  
+Quando um certo alguém  
+Panela Velha  
+Parabéns pra você  
+Sinfonia da Mata  
+O Ipê e o Prisioneiro  
+Natal das crianças  
+Meu querido meu velho meu amigo  
+Maria  
+Marcas do Que Se Foi  
+Lembrança  
+Gotas De Amor  
+Garça Pantaneira  
+Escolta de Vagalumes  
+Então é Natal  
+E o Destino desfolhou  
+Desespero  
+De repente Califórnia  
+Como uma onda no mar  
+Com Fé a Gente Chega Lá  
+Aquarela  
+Alguém em Meu Caminho  
+Adeus ano velho feliz ano novo  
+Adeus Solidão  
+Meus Segredos  
+Fatalidade  
+Quem Vai Mandar No Mundo É a Mulher  
+Serenata em G  
+Quem Eu Quero Não Me Quer  
+Amaremos  
+Meu Primeiro Amor  
+Mordida Na Maçã  
+Meu Lamento  
+Eu Vou Pedir À Lua  
+Mãe Herói  
+Paixão De Um Homem  
+Naquela Mesa  
+Liguei Pra Te Dizer Que Eu Te Amo  
+Só Você  
+Você deixou alguém a esperar  
+Voa Pombinha  
+Amigos Para Sempre  
+Fica Comigo Essa Noite  
+Férias na Índia  
+A Música da Minha Vida  
+Devaneios  
+Parabéns Parabéns Querida  
+Dia das Mães  
+Mamãe me Regou  
+Sou Igualzinho a Você  
+Lamou'r  
+Beijinho Doce  
+Nas Ondas da Leitura  
+Nesta Cidade  
+A Praça  
+Farrapo Humano  
+Sonho Lindo  
+Verdadeiro Amor  
+O Nosso Amor Morreu  
+Palavras Ao Vento  
+Saia do Meu Caminho  
+As Quatro Estações  
+Você Não Me Ensinou a Te Esquecer  
+Estou Apaixonado  
+Ah Se Eu Pudesse  
+Você Vai Ver  
+Amor Rebelde  
+Absoluta  
+Eu Não Presto Mas Te Amo  
+Que Era Eu  
+Boneca Cobiçada  
+Perdido de Amor  
+Nem Dormindo Eu Consigo Te Esquecer  
+Romance no Deserto  
+Mãe  
+A Última Canção  
+Leviana  
+Fogo e Paixão  
+Como Eu Quero  
+Me Apaixonei  
+Azul da Cor do Mar  
+O Fruto do Nosso Amor  
+No Toca Fita do Meu Carro  
+Decida  
+Barco de Papel  
+Sonho de um Caminhoneiro  
+Tudo Outra Vez  
+Por Um Minuto  
+Eu Queria Dizer Que Te Amo Numa Canção  
+As Andorinhas  
+Um Dia de Domingo  
+Pra Não Dizer Que Não Falei das Flores  
+Morena Tropicana  
+Fuscão Preto  
+Laço Aberto  
+Detalhes  
+Chão de Giz  
+Um Degrau na Escada  
+Franguinho na Panela  
+Página de Amigos  
+Esqueça  
+Dou a Vida Por Um Beijo  
+Deixa  
+Casinha Branca  
+Vida Vazia  
+Só Pro Meu Prazer  
+Temporal de Amor  
+Meiga Senhorita  
+Amor de Violeiro  
+No Dia Que Eu Saí de Casa  
+A Desconhecida  
+Parabéns Pra Você  
+Eu Tive Um Amor  
+Meu Ex Amor  
+24 Horas de Amor  
+Horas de Amor  
+Eu Só Quero um Xodó  
+Meu Erro  
+Secretária  
+Seu Amor Ainda é Tudo  
+Tristeza do Jeca  
+Asa Branca  
+Cade Você  
+Convite de Casamento  
+De Igual Pra Igual  
+Liguei Pra Dizer Que Te Amo  
+Nos Bares da Cidade  
+Quem Disse Que Esqueci  
+Tentei te Esquecer  
+Espumas Ao Vento  
+Do Outro Lado da Cidade  
+A Desconhecida  
+Meu Reino Encantado  
+Borbulhas de Amor  
+Evidências  
+Passou da Conta  
+Sou Eu  
+Feito Eu  
+Caminheiro  
+A Carta  
+Estrelinha  
+É o Amor  
+Sonhei Com Você  
+Você Não Sabe Amar  
+Sozinho  
+Dama de Vermelho  
+Será que foi saudade  
+Nova York  
+Pele de Maçã  
+Ainda Ontem Chorei de Saudade  
+Chico Mineiro  
+Dormi na Praça  
+Fio de Cabelo  
+Seresteiro das Noites  
+Vontade Dividida  
+Garçon  
+Dois Corações e Uma História  
+Dois Corações e Uma História  
+Telefone Mudo  
+Fui Eu  
+Se Não For Por Amor  
+Parabéns pra você  
+Agenda Rabiscada  
+Vestido de Seda  
+Agenda Rabiscada  
+Tocando em Frente  
+Cabecinha no Ombro  
+Cavalo Preto  
+Princesa  
+Duas Vezes Você  
+Menino da Porteira  
+Menino da Porteira  
+Menino da Porteira  
+Folha Seca  
+Chalana  
+Frio da Madrugada  
+Estrada da Vida  
+Fuscão Preto  
+Boate Azul  
+Separados  
+Ligação Urbana  
+Eu Tive Um Amor  
+Canteiros  
+Caminheiro  
+Se Não Tivesse Ido  
+Sou Eu  
+Menino da Porteira  
+Passou da Conta  
+Passou da Conta  
+Chalana  
+Dança Lenta  
+Tocando em Frente  
+Do Outro Lado da Cidade  
+Eu Tive Um Amor
+
+Outras 62 cifras variadas
+
+Ainda Ontem Chorei de Saudade - João Mineiro e Marciano
+Amor Proibido - Maurício Reis
+Canarinho Prisioneiro - Chico Rey e Paraná
+Cartão Postal - Carlos Alexandre
+Cavalo Preto - Sérgio Reis - Setinhas
+Cavalo Preto - Sérgio Reis
+Dormi na Praça - Bruno e Marrone
+Entre Lágrimas Belmonte e Amaraí
+Escolta de Vagalumes - Rick e Renner
+Fim de Noivado - Maurício Reis
+Folha Seca - Amado Batista
+Gosto de Mel - Elino Julião
+Não beba mais - Gino e Geno
+O Escudo - Voz da Verdade
+O Fim da Nossa História - Cristiano Neves
+O Fruto do Nosso Amor - Amado Batista - Setinhas
+Saudade da Minha Terra - Chitãozinho e Xororó
+Secretária - Amado Batista
+Só dá você na minha vida - João Paulo e Daniel
+Só Você me Fascina - Roupa Nova
+Telefone Mais - Chico Rey e Paraná
+Telefone Mudo - Trio Parada Dura
+Vai Passar - Gerson Rufino
+A Força do Amor - Roupa Nova
+A Raposa e as uvas - Reginaldo Rossi
+Adeus ano velho feliz ano novo
+Adeus Solidão - Carmen Silva
+Alguém em Meu Caminho - The Fevers
+Anunciação - Alceu Valença
+Aquarela - Toquinho
+Camisa Manchada - Chrystian e Ralf
+Caso Indefinido - Cristiano Araújo - Cifra
+Cem Ovelhas - Ozeias de Paula
+Chora Carolina - Roberto Leal
+Como uma onda no mar - Lulu Santos - Cifra
+De repente Califórnia - Cifra
+Desespero - Genival Santos
+E o Destino desfolhou - Carlos Galhardo - Paulo Sérgio
+Então é Natal
+Filha - Rick e Renner
+Filho do Dono - Flávio José
+Gita - Raul Seixas
+Gotas De Amor - Odair José
+Lembrança - Milionário e José Rico
+Locutor - Léo Magalhães
+Marcas do Que Se Foi - Os Incríveis
+Meu querido meu velho, meu amigo - Roberto Carlos
+Natal das crianças
+O Ipê e o Prisioneiro
+Orlando Dias - Sinfonia da Mata
+Paixão Proibida - Teodoro e Sampaio
+Panela Velha - Sérgio Reis
+Parabéns pra você - modificado
+Primavera - Tim Maia
+Pássaro de Fogo - Paula Fernandes
+Quando um certo alguém - Lulu Santos
+Quem Ama De Verdade - Fernando Mendes
+Sapatinho de Natal
+Saudade Bandida - Zezé di Camargo e Luciano
+Tristeza Danada - Agnaldo Timóteo
+Tão bem - Lulu Santos
+É impossível esquecer um grande amor - Miro Alves
+
+Evangélicas
+
+Porque Ele Vive  
+Pai Eu Confiarei  
+Espírito Enche Minha Vida  
+Sê Valente  
+Eu Navegarei  
+O Amor é o Bem Maior  
+Rompendo em Fé  
+Espírito Santo  
+A Ti Meu Deus  
+Porque Ele Vive  
+Eu Navegarei  
+Jó  
+Eu Escolho Deus  
+Eu Escolho Deus  
+O Escudo  
+Perfil de Adorador  
+Porque Ele Vive  
+Aleluia  
+Tua Graça Me Basta  
+Vai Passar  
+Deus de Promessas  
+Ao Único  
+Deus de Promessas  
+Raridade  
+Sonda-me  
+Uma Nova História  
+Como Zaqueu  
+Uma Nova História  
+Uma Nova História  
+Novo Vencedor  
+Em Espírito Em Verdade  
+O Rosto de Cristo  
+Jó  
+Foi na Cruz  
+Espírito Enche Minha Vida  
+Lindo És  
+Firme nas Promessas  
+Usei a Fé  
+O Escudo
+          
+Cifras com Setinhas
+
+Indiferença - Setinhas Em D
+Estrelinha - Só Setinhas
+Ainda On - Ch Saud, Setinhas
+A Verdade Sempre Aparece
+Chico Mineiro - Setinhas
+Parabéns Pra Você - Em D, Setinhas
+Nos Bares Da Cidade - Rick E Renner - Setinhas
+Ligação Urbana - Em G, Setinhas
+Dou A Vida Por Um Beijo - Setinhas
+Desculpe Mas Vou Chorar - Em G, Setinhas
+Dormi Na Praça - Setinhas
+Se Não For Por Amor - Em D, 3 Acordes, Setinhas
+Será Que Foi Saudade - Tom G, Setinhas
+Estou Apaixonado - Daniel, Em G, Setinhas
+O Sol - Jota Quest, Em A, Setinhas
+Ainda ontem chorei de Saudade - João Mineiro e Marciano, Setinhas Em C
+Secretária - Amado Batista, Tom D, Setinhas
+É O Amor - Em G, Setinhas
+Passou Da Conta - Bruno E Marrone - Setinhas
+Tocando Em Frente - Em D, Setinhas (Parte 2)
+Tocando Em Frente - Em D, Setinhas (Parte 1)
+Franguinho Na Panela - Setinhas Em D
+Meu Reino Encantado - Em G, Setinhas
+Fio De Cabelo - Setinhas Em D
+Telefone Mudo - Setinhas Em D
+Eu Duvido - Setinhas
+Laço Aberto - Em D, Setinhas
+Chalana - Em A, Setinhas
+Amor De Violeiro - Setinhas Em A
+Tocando Em Frente - Em D, Setinhas
+Princesa - Em A, Setinhas
+Telefone Mudo - Em A, Setinhas Ritmo
+Indiferença - Setinhas Ritmo Em D
+Fio De Cabelo - Em D, Com Vezes Ritmo
+Cavalo Preto - Em A, Vezes Ritmo
+Eu Tive Um Amor - Em D, Ritmo
+Folha Seca - Amado Batista, Em D, Ritmo
+
+Católicas
+
+Vem o Senhor com o teu povo caminhar - Católica
+Vinde Cristãos - Católica
+Vejam, eu  andei pelas vilas Católica
+Vejam, eu  andei pelas vilas2 Católica
+Vem e eu mostrarei - Católica
+Vem e Segue Me Pe José Freitas Católica
+Um Certo Galileu - Pe Zezinho - Católica
+Tantum Ergo Sacramentum (latim) - Católica
+Sobe a Jerusalém - Católica
+Rouxinol - Católica
+Quem é esta que avança como aurora - Católica
+Quando um  filho vai embora padre zezinho Católica
+Preparo esta mesa (oferenda) - Católica
+Pão e Vinho Apresentamos Com Louvor - Católica
+Pelos Prados e Campinas - Pe Zezinho - Católica
+O Senhor necessitou de braços Católica
+Oh Trindade - Católica
+Nós Estamos Aqui Reunidos - Católica
+No Presépio Pequenino - Católica
+Noite Feliz Católica
+Mãe - Padre Joaozinho - Católica
+Mãe do Céu Morena - Católica
+Minha Vida Tem Sentido - Pe Zezinho - Católica
+Maria, Minha Mãe - Padre Reginaldo Manzotti Católica
+Maria, Minha Mãe - Padre Reginaldo Manzotti2 Católica
+Maria de Nazaré - Católica
+Ladainha de Santa Clara Católica
+Jorra Uma Fonte de Graça Em Católica
+Intercessora - Católica
+Ieshuá Pe Zezinho - Católica
+Eu sou Católico Apostólico Romano - Johny - Católica
+Eu Celebrarei - Católica
+Estou pensando em Deus - Padre Zezinho - Católica
+Dois Riscos Padre Zezinho Católica
+Doidin de Deus - Católica
+Deixa a Luz do  Céu Entrar em G - Católica
+De Mãos Estendidas - Católica
+Cristãos Vinde Todos - Católica
+Consagração à Nossa Senhora - Católica
+Cantiga de Sacerdote - Católica
+Batiza-me Senhor - Católica
+Batiza-me Senhor - Católica2
+A nossa oferta apresentamos - Católica
+A Nós Descei, Divina Luz - Católica
+Um Feliz Natal - Ivan Lins - Católica
+Utopia - Pe Zeinho - Católica
+Os Cinco Mandamentos da Igreja - Padre Zezinho - Católica
+Os Sacramentos - Padre Zezinho - Católica
+Os Mandamentos - Padre Zezinho - Católica
+Amar Como Jesus Amou - Católica
+Terra Seca - Fraternidade São João Paulo II - Católica
+Já Chegou! - Nelsinho Corrêa - Católica
+Yeshua - Comunidade Católica Colo de Deus - Católico
+Viva a Mãe de Deus e Nossa - Joanna - Católica
+Os anjos cantam - Católica
+Guia-Me - Padre Antônio Maria - Católica
+Cura, Senhor - Padre Antônio Maria - Católica
+Alô, Meu Deus - Padre Zezinho - Católica em A
+Passa Fogo - DDD Doidin de Deus - Católica
+Pão da Vida - Padre Zeca - Católica
+O Senhor é Santo, Ele Está Aqui - Ministério CAELI - Católica
+Deus de Amor, Nós Te Adoramos - Católica
+Eu Creio Em Deus - Padre Marcelo Rossi - Católica
+Escolhida - Canção Nova - Católica
+Tende Piedade - Padre Zezinho - Católica
+Vocação - Pe Zezinho - Católica
+Deus Infinito (Te Deum) - Padre Zezinho - Católica
+Hosana - Companhia Doce - Católica
+Cantiga de Matrimônio - Padre Zezinho - Católica
+O Pão da Vida - Comunhão - Católica 2
+Daqui do Meu Lugar - Padre Zezinho - Católica
+Hino da Novena e Festa da Padroeira 2023 - Católica
+Maria, Ó Mãe Cheia de Graça - Católica
+Em nome do Pai - Católica
+Eu Sou Feliz (Porque meu Cristo Quer) - Católica
+Palavra de Salvação - Católica
+À Senhora de Aparecida - Católica
+Juras de Amor - Católica
+És Água Viva - Católica
+Põe Teu Coração No Meu - Católica
+A Bíblia É a Palavra de Deus - Católica
+És, Maria, A Virgem Que Sabe Ouvir - Católica
+Quando Teu Pai Revelou o Segredo a Maria - Católica
+Toda Bíblia É Comunicação - Católica
+Kyrie Eleison - Católica
+O Pai, Somos Nós o Povo Eleito - Católica
+Eis-me Aqui Senhor - Católica
+Toda Palavra de Vida - Católica
+Fico Feliz - Católica
+Vitória, Tu Reinarás - Católica
+O Pão da Vida - Comunhão - Católica
+Que Poderei Retribuir (Salmo 115) - Católica
+Eu me Alegrei - Católica
+Vossa Palavra Senhor - Católica
+Bendito Seja Deus - Católica
+Nova Geração (Eu Venho do Sul e do Norte) - Católica
+bendito seja Deus! - Católica
+Um Coração Para Amar - Católica
+Vai Meu Povo - Católica
+Eu Tenho Alguém Por Mim - Católica
+Glória a Deus nos Altos Céus - Católica
+Te Amarei Senhor - Católica Tom A
+Que mais Posso Te dar - Católica
+Procuro Abrigo - Católica
+Se um dia caíres no caminho - Católica
+Aleluia o Pai me Amou - Católica
+A Mãe Será Capaz - Católica
+Por Um Pedaço de Pão - Católica
+Cidadão do Infinito - Católica
+Quando tu Senhor, teu Espírito envias Católica
+Vem Espírito Santo de Amor - Católica
+Coração de Jesus - Católica
+Eu Vim Para Que Todos Tenham Vida - Católica
+Quanto Tempo Eu Desejei - Católica
+Casinhas De Periferia - Padre Zezinho - Católica
+Em Prol da Vida - Pe Zezinho - Católica
+Mãezinha do Céu Eu Já Sei Te Amar - Católica
+Nossa Senhora - Católica
+Quem Me Tocou - Católica
+Samaritana - Católica
+Olhar Somente a Ti - Católica
+Senhor, Eis Aqui o Teu Povo - Católico Católica
+A Cura do Leproso - Católica
+O Senhor Ressurgiu - Católica
+Súplicas ao Coração de Cristo - Católica
+Povo Novo - Católica
+Jesus Cristo, Esperança do Mundo - Católica
+Pão Em Todas As Mesas - Católica
+Por Sua Morte - Católica
+Vendo Jesus Aparecer - Católica
+Antes da Morte - Católica
+Aleluia Alegria - Católica
+Acaso não sabeis com declamação - católica
+Paz, Paz de Cristo - Católica
+Ave Maria Mãe do Salvador - Católica
+Regaço Acolhedor - Católica
+Acaso Não Sabeis - Católica
+Mãos Ensanguentadas de Jesus - Católica
+Aleluia, Aleluia - Católica
+O Senhor Subiu Aos Céus - Católica
+Sonda me - Católica
+Va, Piasero Católica
+Va, Piensero Católica
+Senhor vem salvar o teu povo - Católicas
+Envia a Tua Palavra - Católicas
+Da Cepa Brotou a Rama Católica
+Como o Sol Nasce na Aurora - Católica
+Quem é Ele - Católica
+Tu Me Conheces - Católicas
+Aquele que habita - Católicas
+Ai de Mim - Católica
+O Profeta - Católica
+É Impossível Não Crer - Católica
+Maria de Jesus Cristo - Católica
+A Chave do Coração - Catolica
+Isaíiiias - Católica
+É Natal É Natal - Católica
+Todo Joelho se Dobrará - Católica
+Tudo é do Pai - Católica
+Primeira Cristã - Católicas
+Hino de Nossa Senhora - Católica
+Coração Inquieto - Católica
+Viva Meu Padim - Luiz Gonzaga - Católicas
+Eu Te Amo Oh Senhor Da Minha Vida - Católica
+Viagem - Padre José Carlos - Católica
+Meu Bom Deus - Católica
+DOIS RISCOS - PADRE ZEZINHO  - CATÓLICA
+O Senhor é Rei - Católica
+Eu  Confesso - Católica
+Ele Assumiu Nossas Dores - Católica
+Pai Nosso Tu Que Estás - Católica
+Te Amarei Senhor - Católica
+Tu És Bendita - Católica
+A Liberdade Haverá - Católica
+Glória Anjos no Céu Católica
+Nós Buscamos a Vida em Ti Senhor Católica
+O ressucitado em G Católica
+PRA QUE EU SAIBA PERDOAR Católica
+PRA QUE EU SAIBA PERDOAR EM D Católica
+ORAÇÃO PELA FAMÍLIA EM D 3 COLUNAS Católica
+NOITE FELIZ EM A Católica
+ORAÇÃO PELA FAMÍLIA EM D BATIDAS Católica
+ORAÇÃO PELA FAMÍLIA EM D Católica
+ALO MEU DEUS PE ZEZINHO Católica
+          </pre>
+      </div>
+      <p style="font-size: 18px;"><s>De R$ 90,00</s></p>
+      <p style="font-size: 20px;">Por apenas <span style="color: #25D366;">R$ 30</span></p>
+      <a href="https://wa.me/+5595984224764?text=Oi,%20vou%20querer%20as%20450%20cifras" target="_blank" style="display: inline-block; padding: 10px 20px; background-color: #25D366; color: white; text-decoration: none; border-radius: 5px; font-size: 16px; margin-top: 10px;">Quero as cifras</a>
+  </div>
+</div>
+<div class="video-container" id="lesson-24">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/hnc4u6HWiRk" onclick="loadVideo(this)">
+<img alt="M1 Aula 24 Juntando Ritmo e Acordes" src="https://img.youtube.com/vi/hnc4u6HWiRk/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 24 Juntando Ritmo e Acordes</div>
+</div>
+<div class="video-container" id="lesson-25">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/4UJnkwexCI0" onclick="loadVideo(this)">
+<img alt="M1 Aula 25 Encaixe da Voz Dicas" src="https://img.youtube.com/vi/4UJnkwexCI0/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 25 Encaixe da Voz Dicas</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">- Existe a hora certa de colocar a voz em relação às batidas   Guarânia - 5 batidas - ↓↑↓↑↓   - Geralmente o ritmo começa na sílaba forte da palavra    - Faça pedaço por pedaço até ficar bom    - Dica de cantarolar a melodia    - Acertar o começo pra depois continuar   - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
+</div>
+<div class="video-container" id="lesson-26">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/X3B79GuoEW0" onclick="loadVideo(this)">
+<img alt="M1 Aula 26 Encaixe da Voz Na prática" src="https://img.youtube.com/vi/X3B79GuoEW0/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 26 Encaixe da Voz Na prática</div>
+</div>
+<div class="video-container" id="lesson-27">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/SZvNZlCVHEg" onclick="loadVideo(this)">
+<img alt="M1 Aula 27 Como Criar um Repertório" src="https://img.youtube.com/vi/SZvNZlCVHEg/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M1 Aula 27 Como Criar um Repertório</div>
+</div>
+<div class="video-container" id="lesson-28">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/fUq2OZaaHpQ" onclick="loadVideo(this)">
+<img alt="M2 Aula 1 Ritmo de Rock" src="https://img.youtube.com/vi/fUq2OZaaHpQ/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 1 Ritmo de Rock</div>
+</div>
+<div class="video-container" id="lesson-29">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/jwPduU86nlw" onclick="loadVideo(this)">
+<img alt="M2 Aula 2 Ritmo Pop Rock" src="https://img.youtube.com/vi/jwPduU86nlw/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 2 Ritmo Pop Rock</div>
+</div>
+<div class="video-container" id="lesson-30">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/hBthlO6TYK0" onclick="loadVideo(this)">
+<img alt="M2 Aula 3 Ritmo de Toada" src="https://img.youtube.com/vi/hBthlO6TYK0/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 3 Ritmo de Toada</div>
+</div>
+<div class="video-container" id="lesson-31">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/gAghhVwTALA" onclick="loadVideo(this)">
+<img alt="M2 Aula 4 Ritmo de Vaneira" src="https://img.youtube.com/vi/gAghhVwTALA/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 4 Ritmo de Vaneira</div>
+</div>
+<div class="video-container" id="lesson-32">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/KRgL_KR4B-w" onclick="loadVideo(this)">
+<img alt="M2 Aula 5 Ritmo de 6 por 8" src="https://img.youtube.com/vi/KRgL_KR4B-w/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 5 Ritmo de 6 por 8</div>
+</div>
+<div class="video-container" id="lesson-33">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/4-Bb2Lv0c_4" onclick="loadVideo(this)">
+<img alt="M2 Aula 6 Quebra de Ritmo" src="https://img.youtube.com/vi/4-Bb2Lv0c_4/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 6 Quebra de Ritmo</div>
+</div>
+<div class="video-container" id="lesson-34">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/-DXKS5YqSaU" onclick="loadVideo(this)">
+<img alt="M2 Aula 7 Como Aprender Ritmo em Outros Lugares" src="https://img.youtube.com/vi/-DXKS5YqSaU/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 7 Como Aprender Ritmo em Outros Lugares</div>
+</div>
+<div class="video-container" id="lesson-35">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/qwXXKb48uIA" onclick="loadVideo(this)">
+<img alt="M2 Aula 8 Aprenda Ritmo na Prática Comigo" src="https://img.youtube.com/vi/qwXXKb48uIA/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 8 Aprenda Ritmo na Prática Comigo</div>
+<div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+<div class="video-description">COMO APRENDER RITMOS COM OUTRAS PESSOAS NA PRÁTICA? ASSISTA A AULA APERTANDO NO LINK ABAIXO: <a href="https://drive.google.com/drive/folders/12SOyNWk9Hs7A7JJ8uLpeUr_7URS4fA0S" target="_blank">https://drive.google.com/drive/folders/12SOyNWk9Hs7A7JJ8uLpeUr_7URS4fA0S</a> ______________________________  Ritmo Aprendido na Outra Aula (onde ensino ritmo através de outras fontes)  RITMO VANEIRA D-CAP-CA(C) 1 - 234-56(7)   D - 3 DEDOS C - CIMA (POLEGAR OU INDICADOR) A - ABAFAMENTO P - POLEGAR PRA BAIXO (C) - BATIDA PRA CIMA OPCIONAL</div>
+</div>
+<div class="video-container" id="lesson-36">
+<div class="video-wrapper" data-src="https://www.youtube.com/embed/r_66peYkpXs" onclick="loadVideo(this)">
+<img alt="M2 Aula 9 Ritmo Bolero Bachata" src="https://img.youtube.com/vi/r_66peYkpXs/hqdefault.jpg"/>
+<div class="play-button"></div>
+</div>
+<div class="video-title">M2 Aula 9 Ritmo Bolero Bachata</div>
+</div>
+<div class="video-container" id="lesson-37">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/LHEdojWFqXc" onclick="loadVideo(this)">
+    <img alt="M2 Aula 10 Ritmo Country 1 e 2" src="https://img.youtube.com/vi/LHEdojWFqXc/hqdefault.jpg"/>
+    <div class="play-button"></div>
+  </div>
+  <div class="video-title">M2 Aula 10 Ritmo Country 1 e 2</div>
+</div>
+
+<div class="video-container" id="lesson-38">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/83VTPWq6JpI" onclick="loadVideo(this)">
+  <img alt="M3 Aula 1 Pestanas" src="https://img.youtube.com/vi/83VTPWq6JpI/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 1 Pestanas</div>
+  </div>
+  <div class="video-container" id="lesson-39">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/8PxRceMPQ5Q" onclick="loadVideo(this)">
+  <img alt="M3 Aula 2 Como Fazer Dedilhado" src="https://img.youtube.com/vi/8PxRceMPQ5Q/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 2 Como Fazer Dedilhado</div>
+  </div>
+  <div class="video-container" id="lesson-40">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/K_TylTvctfE" onclick="loadVideo(this)">
+  <img alt="M3 Aula 3 Ritmos de Dedilhado  Parte 1" src="https://img.youtube.com/vi/K_TylTvctfE/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 3 Ritmos de Dedilhado  Parte 1</div>
+  <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+  <div class="video-description">- PIMA NORMAL  POP ROCK COMPLETO (LENTO)  QUEBRA - DOIS TOQUES  - PIMA DOBRADO  METADE DO POP ROCK (RÁPIDO) -  TOCAR DUAS VEZES PRA FAZER O RITMO DE POP ROCK TODO  QUEBRA - FAZER UMA VEZ  - DEDILHADO 1  P I M A M I  ALELUIA SEU AMOR AINDA É TUDO   - DEDILHADO 2  (PA) M I - A M I A M  FOLHA SECA CADEIRA DE RODAS NO DIA QUE SAI DE CASA  RITMO DE ROCK COMPLETO  QUEBRA APÓS 3 TOQUE  - DEDILHADO 3 P I M I A M I M  METADE DO POP ROCK - TOCAR DUAS VEZES PRA FAZER O RITMO DE POP ROCK TODO  QUEBRA - FAZER UMA VEZ</div>
+  </div>
+  <div class="video-container" id="lesson-41">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/O5YA3OjbVCM" onclick="loadVideo(this)">
+  <img alt="M3 Aula 4 Ritmos de Dedilhado Parte 2" src="https://img.youtube.com/vi/O5YA3OjbVCM/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 4 Ritmos de Dedilhado Parte 2</div>
+  <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
+  <div class="video-description">- PIMA NORMAL  POP ROCK COMPLETO (LENTO)  QUEBRA - DOIS TOQUES  - PIMA DOBRADO  METADE DO POP ROCK (RÁPIDO) -  TOCAR DUAS VEZES PRA FAZER O RITMO DE POP ROCK TODO  QUEBRA - FAZER UMA VEZ  - DEDILHADO 1  P I M A M I  ALELUIA SEU AMOR AINDA É TUDO   - DEDILHADO 2  (PA) M I - A M I A M  FOLHA SECA CADEIRA DE RODAS NO DIA QUE SAI DE CASA  RITMO DE ROCK COMPLETO  QUEBRA APÓS 3 TOQUE  - DEDILHADO 3 P I M I A M I M  METADE DO POP ROCK - TOCAR DUAS VEZES PRA FAZER O RITMO DE POP ROCK TODO  QUEBRA - FAZER UMA VEZ</div>
+  </div>
+  <div class="video-container" id="lesson-42">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/QKD8iXKdBRI" onclick="loadVideo(this)">
+  <img alt="M3 Aula 5 O Que São e Como Fazer Solos" src="https://img.youtube.com/vi/QKD8iXKdBRI/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 5 O Que São e Como Fazer Solos</div>
+  </div>
+  <div class="video-container" id="lesson-43">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/afVMhS3Caw4" onclick="loadVideo(this)">
+  <img alt="M3 Aula 6 Como Ler Tablaturas" src="https://img.youtube.com/vi/afVMhS3Caw4/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 6 Como Ler Tablaturas</div>
+  </div>
+  <div class="video-container" id="lesson-44">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/PqfS0Iiuapg" onclick="loadVideo(this)">
+  <img alt="M3 Aula 7 Elementos da Tablatura Parte 1" src="https://img.youtube.com/vi/PqfS0Iiuapg/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 7 Elementos da Tablatura Parte 1</div>
+  </div>
+  <div class="video-container" id="lesson-45">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/gnxTvpGHCvo" onclick="loadVideo(this)">
+  <img alt="M3 Aula 7 Elementos da Tablatura Parte 2" src="https://img.youtube.com/vi/gnxTvpGHCvo/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 7 Elementos da Tablatura Parte 2</div>
+  </div>
+  <div class="video-container" id="lesson-46">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/YV6vpQW8izU" onclick="loadVideo(this)">
+  <img alt="M3 Aula 8 Como Encontrar Tablaturas" src="https://img.youtube.com/vi/YV6vpQW8izU/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 8 Como Encontrar Tablaturas</div>
+  </div>
+  <div class="video-container" id="lesson-47">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/ub5n6MEj_T8" onclick="loadVideo(this)">
+  <img alt="M3 Aula 9 O que é Tocar de Ouvido" src="https://img.youtube.com/vi/ub5n6MEj_T8/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 9 O que é Tocar de Ouvido</div>
+  </div>
+  <div class="video-container" id="lesson-48">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/A7iGiaP7H7A" onclick="loadVideo(this)">
+  <img alt="M3 Aula 10 Apostila Teoria Musical PDF" src="https://img.youtube.com/vi/A7iGiaP7H7A/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 10 Apostila Teoria Musical PDF</div>
+  </div>
+  <div class="video-container" id="lesson-49">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/fFOOJSzPdfg" onclick="loadVideo(this)">
+  <img alt="M3 Aula 10 Escala Cromática" src="https://img.youtube.com/vi/fFOOJSzPdfg/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 10 Escala Cromática</div>
+  </div>
+  <div class="video-container" id="lesson-50">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/YUXe44jQ6Ts" onclick="loadVideo(this)">
+  <img alt="M3 Aula 11 O que é Tom" src="https://img.youtube.com/vi/YUXe44jQ6Ts/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 11 O que é Tom</div>
+  </div>
+  <div class="video-container" id="lesson-51">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/e04vXWjjVpI" onclick="loadVideo(this)">
+  <img alt="M3 Aula 12 O Que é Campo Harmônico e Como Usar" src="https://img.youtube.com/vi/e04vXWjjVpI/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 12 O Que é Campo Harmônico e Como Usar</div>
+  </div>
+  <div class="video-container" id="lesson-52">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/0alAQsl7OPo" onclick="loadVideo(this)">
+  <img alt="M3 Aula 13 Como Tocar de Ouvido Parte 1" src="https://img.youtube.com/vi/0alAQsl7OPo/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 13 Como Tocar de Ouvido Parte 1</div>
+  </div>
+  <div class="video-container" id="lesson-53">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/xkx_uQ1ZUgQ" onclick="loadVideo(this)">
+  <img alt="M3 Aula 14 Como Tocar de Ouvido Parte 2" src="https://img.youtube.com/vi/xkx_uQ1ZUgQ/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 14 Como Tocar de Ouvido Parte 2</div>
+  </div>
+  <div class="video-container" id="lesson-54">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/MI4cvF2llBM" onclick="loadVideo(this)">
+  <img alt="M3 Aula 15 Sistema CAGED" src="https://img.youtube.com/vi/MI4cvF2llBM/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 15 Sistema CAGED</div>
+  </div>
+  <div class="video-container" id="lesson-55">
+  <div class="video-wrapper" data-src="https://www.youtube.com/embed/YpXTDwBxXRo" onclick="loadVideo(this)">
+  <img alt="M3 Aula 16 Como Descobrir o Tom da Música" src="https://img.youtube.com/vi/YpXTDwBxXRo/hqdefault.jpg"/>
+  <div class="play-button"></div>
+  </div>
+  <div class="video-title">M3 Aula 16 Como Descobrir o Tom da Música</div>
+  </div>
+
+  <div class="video-container" id="lesson-56">
+    <div class="video-wrapper" data-src="https://www.youtube.com/embed/0qFXw0eNFZM" onclick="loadVideo(this)">
+    <img alt="M4 Aula 1 Perca a Vergonha de Tocar em Público" src="https://img.youtube.com/vi/0qFXw0eNFZM/hqdefault.jpg"/>
+    <div class="play-button"></div>
+    </div>
+    <div class="video-title">M4 Aula 1 Perca a Vergonha de Tocar em Público</div>
+    </div>
+
+    <div class="video-container" id="lesson-57">
+    <div class="video-wrapper" data-src="https://www.youtube.com/embed/bwa93tkoNnI" onclick="loadVideo(this)">
+    <img alt="M4 Aula 2 Como Continuar Aprendendo no Violão Sempre" src="https://img.youtube.com/vi/bwa93tkoNnI/hqdefault.jpg"/>
+    <div class="play-button"></div>
+    </div>
+    <div class="video-title">M4 Aula 2 Como Continuar Aprendendo no Violão Sempre</div>
+    </div>
+
+    <div class="video-container" id="lesson-58">
+      <div class="video-wrapper" data-src="https://www.youtube.com/embed/XB2DleGZ4Io" onclick="loadVideo(this)">
+      <img alt="M4 Aula 3 Acompanhamento Violão em Ação" src="https://img.youtube.com/vi/XB2DleGZ4Io/hqdefault.jpg"/>
+      <div class="play-button"></div>
+      </div>
+      <div class="video-title">M4 Aula 3 Acompanhamento Violão em Ação</div>
+    </div>
+
+    <div class="video-container" id="lesson-59">
+      <div class="video-wrapper" data-src="https://www.youtube.com/embed/Pr1Zlpvoonw" onclick="loadVideo(this)">
+      <img alt="M4 Aula 4 Depoimentos Gabriel Almeida" src="https://img.youtube.com/vi/Pr1Zlpvoonw/hqdefault.jpg"/>
+      <div class="play-button"></div>
+      </div>
+      <div class="video-title">M4 Aula 4 Depoimentos Gabriel Almeida</div>
+    </div>
+
+    <div class="video-container" id="lesson-60">
+      <div class="video-wrapper" data-src="https://www.youtube.com/embed/Ma3L_JJQ940" onclick="loadVideo(this)">
+      <img alt="M4 Aula 5 Finalização do Curso" src="https://img.youtube.com/vi/Ma3L_JJQ940/hqdefault.jpg"/>
+      <div class="play-button"></div>
+      </div>
+      <div class="video-title">M4 Aula 5 Finalização do Curso</div>
+    </div>
+
+</div>
+<div class="back-to-top" onclick="scrollToTop()">Voltar ao topo</div>
+
+<script>
+
+
+
+    document.querySelector('.toggle-header').textContent = 'Procurar aulas';
+
+    function toggleSongList(element) {
+        const list = element.nextElementSibling;
+        const isOpen = list.style.display === 'block';
+        list.style.display = isOpen ? 'none' : 'block';
+        element.style.color = isOpen ? 'white' : 'rgb(255, 188, 188)';
+        element.textContent = isOpen ? element.getAttribute('data-original-text') : 'Fechar lista';
+    }
+
+    function toggleSection(element) {
+        const content = element.nextElementSibling;
+        const isOpen = content.style.display === 'block';
+        content.style.display = isOpen ? 'none' : 'block';
+        element.textContent = isOpen ? 'Procurar aulas' : 'Procurar aulas (fechar)';
+    }
+
+    function scrollToLesson(lessonNumber) {
+    const lesson = document.getElementById(`lesson-${lessonNumber}`);
+    if (lesson) {
+        lesson.scrollIntoView({ behavior: 'smooth' });
+        const wrapper = lesson.querySelector('.video-wrapper');
+        loadVideo(wrapper);
+    }
+}
+
+    function loadVideo(element) {
+        const src = element.getAttribute('data-src');
+        element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
+    }
+
+    function toggleDescription(element) {
+        const description = element.nextElementSibling;
+        description.style.display = description.style.display === 'block' ? 'none' : 'block';
+        element.textContent = description.style.display === 'block' ? 'Ocultar descrição' : 'Mostrar descrição';
+    }
+
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Sistema de busca
+    let filteredResults = [];
+    const lessons = [
+        { id: 0, title: "Aula de Boas Vindas Curso do Zero Ao Repertório", module: "M1", keywords: "boas vindas apresentação início começar" },
+        { id: 1, title: "Como Tocar Violão Sem Teoria", module: "M1", keywords: "sem teoria prático básico iniciante" },
+        { id: 2, title: "Mentalidade Pra Aprender Violão", module: "M1", keywords: "mentalidade motivação persistência paciência" },
+        { id: 3, title: "Como Escolher o Seu Violão", module: "M1", keywords: "escolher violão comprar instrumento" },
+        { id: 4, title: "Como Afinar o Violão", module: "M1", keywords: "afinar afinação cordas som" },
+        { id: 5, title: "Como Segurar o Violão", module: "M1", keywords: "segurar postura posição corpo" },
+        { id: 6, title: "O Que São Acordes Parte 1", module: "M1", keywords: "acordes básico teoria harmonia" },
+        { id: 7, title: "O Que São Acordes Parte 2", module: "M1", keywords: "acordes continuação teoria" },
+        { id: 8, title: "O Que São Diagramas de Acordes", module: "M1", keywords: "diagramas acordes representação visual" },
+        { id: 9, title: "Aprenda Todos os Acordes", module: "M1", keywords: "todos acordes dicionário família" },
+        { id: 10, title: "Fazendo Acordes na Prática", module: "M1", keywords: "prática acordes exercício treino" },
+        { id: 11, title: "Aumente a Velocidade nas Trocas de Acordes", module: "M1", keywords: "velocidade troca acordes rapidez" },
+        { id: 12, title: "Acordes de pestana feitos sem pestana", module: "M1", keywords: "pestana acordes sem facilitar" },
+        { id: 13, title: "O que são e como fazer Ritmos", module: "M1", keywords: "ritmos batida compasso tempo" },
+        { id: 14, title: "Como Fazer Qualquer Ritmo no Violão", module: "M1", keywords: "qualquer ritmo técnica método" },
+        { id: 15, title: "Dicas Sobre Ritmos", module: "M1", keywords: "dicas ritmos conselhos" },
+        { id: 16, title: "Ritmos Fáceis Guarânia", module: "M1", keywords: "guarânia ritmo fácil básico" },
+        { id: 17, title: "Ritmos Fáceis Valsa", module: "M1", keywords: "valsa ritmo fácil básico" },
+        { id: 18, title: "Como Tocar Qualquer Música no Violão", module: "M1", keywords: "qualquer música tocar método" },
+        { id: 19, title: "Toque Sua Primeira Música", module: "M1", keywords: "primeira música começar prática" },
+        { id: 20, title: "A Única Coisa", module: "M1", keywords: "música única coisa prática" },
+        { id: 21, title: "O Que São Cifras", module: "M1", keywords: "cifras notação símbolos" },
+        { id: 22, title: "Encontrando Cifras", module: "M1", keywords: "encontrar cifras sites buscar" },
+        { id: 23, title: "+450 Cifras Simples", module: "M1", keywords: "450 cifras simples repertório" },
+        { id: 24, title: "Juntando Ritmo e Acordes", module: "M1", keywords: "juntar ritmo acordes coordenação" },
+        { id: 25, title: "Encaixe da Voz Dicas", module: "M1", keywords: "voz cantar encaixe dicas" },
+        { id: 26, title: "Encaixe da Voz Na prática", module: "M1", keywords: "voz cantar prática encaixe" },
+        { id: 27, title: "Como Criar um Repertório", module: "M1", keywords: "repertório criar músicas lista" },
+        { id: 28, title: "Ritmo de Rock", module: "M2", keywords: "rock ritmo batida estilo" },
+        { id: 29, title: "Ritmo Pop Rock", module: "M2", keywords: "pop rock ritmo batida" },
+        { id: 30, title: "Ritmo de Toada", module: "M2", keywords: "toada ritmo regional" },
+        { id: 31, title: "Ritmo de Vaneira", module: "M2", keywords: "vanera ritmo regional" },
+        { id: 32, title: "Ritmo de 6 por 8", module: "M2", keywords: "6 por 8 ritmo compasso" },
+        { id: 33, title: "Quebra de Ritmo", module: "M2", keywords: "quebra ritmo variação" },
+        { id: 34, title: "Como Aprender Ritmo em Outros Lugares", module: "M2", keywords: "aprender ritmo outros lugares" },
+        { id: 35, title: "Aprenda Ritmo na Prática Comigo", module: "M2", keywords: "ritmo prática exercício" },
+        { id: 36, title: "Ritmo Bolero Bachata", module: "M2", keywords: "bolero bachata ritmo latino" },
+        { id: 37, title: "Ritmo Country 1 e 2", module: "M2", keywords: "country ritmo americano" },
+        { id: 38, title: "Pestanas", module: "M3", keywords: "pestana técnica avançada" },
+        { id: 39, title: "Como Fazer Dedilhado", module: "M3", keywords: "dedilhado técnica dedos" },
+        { id: 40, title: "Ritmos de Dedilhado Parte 1", module: "M3", keywords: "dedilhado ritmos parte 1" },
+        { id: 41, title: "Ritmos de Dedilhado Parte 2", module: "M3", keywords: "dedilhado ritmos parte 2" },
+        { id: 42, title: "O Que São e Como Fazer Solos", module: "M3", keywords: "solos melodia técnica" },
+        { id: 43, title: "Como Ler Tablaturas", module: "M3", keywords: "tablatura ler notação" },
+        { id: 44, title: "Elementos da Tablatura Parte 1", module: "M3", keywords: "tablatura elementos símbolos" },
+        { id: 45, title: "Elementos da Tablatura Parte 2", module: "M3", keywords: "tablatura elementos continuação" },
+        { id: 46, title: "Como Encontrar Tablaturas", module: "M3", keywords: "encontrar tablatura sites" },
+        { id: 47, title: "O que é Tocar de Ouvido", module: "M3", keywords: "tocar ouvido percepção" },
+        { id: 48, title: "Apostila Teoria Musical PDF", module: "M3", keywords: "teoria musical apostila pdf" },
+        { id: 49, title: "Escala Cromática", module: "M3", keywords: "escala cromática notas" },
+        { id: 50, title: "O que é Tom", module: "M3", keywords: "tom tonalidade altura" },
+        { id: 51, title: "O Que é Campo Harmônico e Como Usar", module: "M3", keywords: "campo harmônico acordes família" },
+        { id: 52, title: "Como Tocar de Ouvido Parte 1", module: "M3", keywords: "tocar ouvido parte 1" },
+        { id: 53, title: "Como Tocar de Ouvido Parte 2", module: "M3", keywords: "tocar ouvido parte 2" },
+        { id: 54, title: "Sistema CAGED", module: "M3", keywords: "sistema caged acordes" },
+        { id: 55, title: "Como Descobrir o Tom da Música", module: "M3", keywords: "descobrir tom música" },
+        { id: 56, title: "Perca a Vergonha de Tocar em Público", module: "M4", keywords: "vergonha público apresentar" },
+        { id: 57, title: "Como Continuar Aprendendo no Violão Sempre", module: "M4", keywords: "continuar aprendendo sempre" },
+        { id: 58, title: "Acompanhamento Violão em Ação", module: "M4", keywords: "acompanhamento prática" },
+        { id: 59, title: "Depoimentos Gabriel Almeida", module: "M4", keywords: "depoimentos testemunhos" },
+        { id: 60, title: "Finalização do Curso", module: "M4", keywords: "finalização fim conclusão" }
+    ];
+
+    function searchFor(query) {
+        document.getElementById('searchInput').value = query;
+        performSearch(query);
+    }
+
+    function getAulaPrefix(lesson) {
+        if (lesson.module === 'M1') {
+            return lesson.id === 0 ? '' : 'Aula ' + lesson.id + ' ';
+        } else if (lesson.module === 'M2') {
+            return 'Aula ' + (lesson.id - 27) + ' ';
+        } else if (lesson.module === 'M3') {
+            return 'Aula ' + (lesson.id - 36) + ' ';
+        } else if (lesson.module === 'M4') {
+            return 'Aula ' + (lesson.id - 54) + ' ';
+        }
+        return '';
+    }
+
+    function performSearch(query) {
+        currentPage = 0; // Resetar a página ao iniciar nova busca
+        filteredResults = lessons.filter(lesson => {
+            const prefix = getAulaPrefix(lesson);
+            const searchText = `${lesson.module} ${prefix}${lesson.title}`.toLowerCase();
+            return searchText.includes(query.toLowerCase());
+        });
+
+        // Limpar resultados sempre que iniciar nova busca
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+
+        displayResults(filteredResults, query);
+    }
+
+
+    let currentPage = 0;
+    const resultsPerPage = 10;
+
+    function displayResults(results, query) {
+        const resultsContainer = document.getElementById('searchResults');
+
+
+
+        if (query.trim() === '') {
+            resultsContainer.style.display = 'none';
+            return;
+        }
+
+        if (results.length === 0) {
+            resultsContainer.innerHTML = '<div class="no-results">Nenhuma aula encontrada para "' + query + '"</div>';
+            resultsContainer.style.display = 'block';
+            return;
+        }
+
+        const start = currentPage * resultsPerPage;
+        const end = start + resultsPerPage;
+        const paginatedResults = results.slice(start, end);
+
+        const html = paginatedResults.map(lesson => {
+            const prefix = getAulaPrefix(lesson);
+            return `
+                <div class="search-result-item" onclick="goToLesson(${lesson.id})">
+                    <div class="result-title">${lesson.module} ${prefix}${lesson.title}</div>
+                </div>
+            `;
+        }).join('');
+
+        let buttonHtml = '';
+        if (end < results.length) {
+            buttonHtml = `
+                <div class="search-result-item" style="background: #2594a3; padding: 15px 20px; cursor: pointer;" onclick="showMoreResults()">
+                    <div class="result-title">Ver mais</div>
+                </div>
+            `;
+        }
+
+        // Remover botão "Ver mais" antigo, se existir
+        const oldButton = resultsContainer.querySelector('.ver-mais-btn');
+        if (oldButton) oldButton.remove();
+
+        // Adicionar os resultados da página atual
+        resultsContainer.insertAdjacentHTML('beforeend', html);
+
+        // Adicionar botão "Ver mais" se ainda houver resultados
+        if (end < results.length) {
+            resultsContainer.insertAdjacentHTML('beforeend', `
+                <div class="search-result-item ver-mais-btn" style="background:#2594a3;padding:15px 20px;cursor:pointer;" onclick="showMoreResults(event)">
+                    <div class="result-title">Ver mais</div>
+                </div>
+
+            `);
+        }
+
+        resultsContainer.style.display = 'block';
+    }
+
+    function showMoreResults(ev) {
+        if (ev) {
+            ev.preventDefault();
+            ev.stopPropagation(); // impede que o listener global feche a lista
+        }
+        currentPage++;
+
+        displayResults(filteredResults, document.getElementById('searchInput').value);
+    }
+
+
+    function goToLesson(lessonId) {
+        document.getElementById('searchResults').style.display = 'none';
+        scrollToLesson(lessonId);
+    }
+
+    // Event listeners
+    document.getElementById('searchInput').addEventListener('input', function(e) {
+        performSearch(e.target.value);
+    });
+
+
+
+    document.addEventListener('click', function(e) {
+        // Se clicou dentro da search-wrapper, não fecha
+        if (e.target.closest('.search-wrapper')) return;
+        // Se por algum motivo o alvo for o próprio botão/filho, também não fecha
+        if (e.target.closest('.ver-mais-btn')) return;
+
+        document.getElementById('searchResults').style.display = 'none';
+    });
+
+    // Toggle modules button
+    document.getElementById('toggleModulesBtn').addEventListener('click', function() {
+        const modules = document.querySelector('.modules');
+        const button = this;
+        const isOpen = modules.classList.contains('show');
+        modules.classList.toggle('show', !isOpen);
+        button.textContent = isOpen ? 'Abrir pesquisa por módulos' : 'Fechar pesquisa por módulos';
+        button.classList.toggle('active', !isOpen);
+    });
+
+
+
+    </script>
+</div>
+
+
+</body>
+</html>

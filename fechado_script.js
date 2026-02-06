@@ -23,3 +23,14 @@ function closeModal(modalId) {
     console.log('Element not found');
   }
 }
+
+function toggleSection(element) {
+  console.log('toggleSection called with:', element);
+  const content = element.nextElementSibling;
+  console.log('Content found:', content);
+  const aberto = content.style.display === "block";
+  content.style.display = aberto ? "none" : "block";
+  element.textContent = aberto
+    ? element.getAttribute('data-original-text')
+    : element.getAttribute('data-close-text');
+}

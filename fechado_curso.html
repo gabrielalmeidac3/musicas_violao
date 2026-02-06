@@ -11,35 +11,35 @@
     margin: 10px 0;
     position: relative;
     z-index: 1000;
-    background: linear-gradient(135deg, #2594a3 0%, #1e7a87 100%);
-    padding: 12px;
-    border-radius: 15px;
-    box-shadow: 0 8px 32px rgba(37, 148, 163, 0.3);
   }
   
   #searchInput {
     width: 100%;
     margin: 0 auto;
     display: block;
-    color: white;
+    color: white !important;
     padding: 12px 20px;
     font-size: 16px;
-    border: 1px solid white;
+    
     border-radius: 30px;
     outline: none;
-    background: rgba(107, 107, 107, 0.95);
+    background: rgba(90, 78, 50, 0.95);
     backdrop-filter: blur(10px);
     transition: all 0.3s ease;
     margin-bottom: 2px;
     box-sizing: border-box;
   }
 
-
-
-  #searchInput::placeholder {
-    color: #ddd; /* mais claro para aparecer no fundo escuro */
+#searchInput::placeholder {
+    color: rgba(255, 255, 255, 0.7) !important;
     font-style: italic;
-}
+  }
+
+  #searchInput:focus {
+    border: 1px solid rgba(255, 255, 255, 0.6) !important;
+    outline: none !important;
+  }
+
 
   
   .search-results {
@@ -133,22 +133,97 @@
     box-sizing: border-box;
 }
 
+#clearSearch:hover {
+    color: rgba(255, 255, 255, 1);
+  }
+
+body {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  .video-container {
+    max-width: 100%;
+    overflow: hidden;
+  }
+
+  .video-wrapper {
+    max-width: 100%;
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
   .toggle-modules-btn {
     display: block;
+    width: 100%;
     margin: 15px 0 15px 0;
-    padding: 10px 20px;
+    padding: 6px 15px;
     background: #747a46;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
   }
+ 
+  @keyframes rolarTexto {
+    0% {
+      transform: translateX(0);
+    }
+    85% {
+      transform: translateX(var(--scroll-distance, 0px));
+    }
+    100% {
+      transform: translateX(var(--scroll-distance, 0px));
+    }
+  }
+  
+  .btn-scroll-text {
+    display: inline-block;
+    animation: rolarTexto 8s ease-in-out infinite;
+    margin: 0 15px;
+    box-sizing: content-box;
+  }
+  
   .toggle-modules-btn.active {
     background: #747a46;
   }
 
+  .video-container {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
 
+  .description-toggle {
+    display: inline-block;
+    padding: 8px 16px;
+    margin: 10px 0;
+    background: #5a5a5a;
+    color: white;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+    border: 1px solid #707070;
+    text-decoration: none;
+  }
+
+  .description-toggle:hover {
+    background: #6a6a6a;
+  }
+  
   .modules {
     display: none;
   }
@@ -170,6 +245,33 @@
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
   }
+.lesson-toggle {
+    padding: 10px;
+    background: #2a2a2a;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 5px;
+    text-align: center;
+    color: white;
+  }
+
+  .lesson-toggle:hover {
+    background: #3a3a3a;
+  }
+
+  .lesson.hidden {
+    display: none;
+  }
+
+  
+
+
+
+
+
+
+
 
 
   
@@ -182,18 +284,13 @@
 <body>
   
 <div id="content">
-  
-<div class="header">
-<h1>Curso de Violão do Zero ao Repertório</h1>
-<p>por Gabriel Almeida</p>
-</div>
-<div style="text-align: left;">
+  <div style="text-align: left;">
   <button onclick="voltarPaginaGeral()" style="
     display: inline-block;
     padding: 8px 16px;
-    font-size: 13px;
+    font-size: 11px;
     color: white;
-    background: #2594a3;
+    background: #265a80;
     border-radius: 5px;
     text-decoration: none;
     text-align: center;
@@ -201,8 +298,14 @@
     border: none;
     cursor: pointer;
   ">
-    Voltar para a Página Geral
+    < Voltar para a<br>Página Geral
   </button>
+<div class="header">
+<h1>Curso de Violão do Zero ao Repertório 🎸📚
+</h1>
+<p>por Gabriel Almeida</p>
+</div>
+
 
   <script>
   function voltarPaginaGeral() {
@@ -218,118 +321,107 @@
     
   
   <div><p style="color: gray; text-align: center;">Obs: M1, M2, M3 e M4 são os módulos; Exemplo: M1 = Módulo 1</p></div>    
-<div class="toggle-header" onclick="toggleSection(this)">Procurar aulas</div>
-<div class="toggle-content">
-  <div class="toggle-section">
-    <div class="search-wrapper">
-      <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+
+<div class="search-container">
+      <div class="search-wrapper">
+        <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+        <span id="clearSearch" style="position: absolute; right: 35px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.6); font-size: 20px; cursor: pointer; display: none; user-select: none; z-index: 10;">✕</span>
+      </div>
       <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
 
-      <button id="toggleModulesBtn" class="toggle-modules-btn">Abrir pesquisa por módulos</button>
+      <div style="display: flex; gap: 10px; width: 100%; margin: 15px 0;">
+      <button id="toggleModulesBtn" class="toggle-modules-btn" style="flex: 1; margin: 0; padding: 0;">
+        <div class="btn-scroll-text" style="padding: 6px 0; white-space: nowrap;">Abrir pesquisa por módulos</div>
+      </button>
+      <button class="toggle-nivel toggle-modules-btn" onclick="toggleNivel()" style="flex: 1; margin: 0; padding: 0;">
+        <div class="btn-scroll-text" style="padding: 6px 0; white-space: nowrap;">Veja em qual nível de violão você está</div>
+      </button>
+    </div>
 
 </div>
 
 <div class="modules">
-<div class="module"><h3>Módulo 1</h3><div class="lesson" onclick="scrollToLesson(0)">Aula de Boas Vindas Curso do Zero Ao Repertório</div><div class="lesson" onclick="scrollToLesson(1)">Aula 1 Como Tocar Violão Sem Teoria</div><div class="lesson" onclick="scrollToLesson(2)">Aula 2 Mentalidade Pra Aprender Violão</div><div class="lesson" onclick="scrollToLesson(3)">Aula 3 Como Escolher o Seu Violão</div><div class="lesson" onclick="scrollToLesson(4)">Aula 4 Como Afinar o Violão</div><div class="lesson" onclick="scrollToLesson(5)">Aula 5 Como Segurar o Violão</div><div class="lesson" onclick="scrollToLesson(6)">Aula 6 O Que São Acordes Parte 1</div><div class="lesson" onclick="scrollToLesson(7)">Aula 7 O Que São Acordes Parte 2</div><div class="lesson" onclick="scrollToLesson(8)">Aula 8 O Que São Diagramas de Acordes</div><div class="lesson" onclick="scrollToLesson(9)">Aula 9 Aprenda Todos os Acordes</div><div class="lesson" onclick="scrollToLesson(10)">Aula 10 Fazendo Acordes na Prática</div><div class="lesson" onclick="scrollToLesson(11)">Aula 11 Aumente a Velocidade nas Trocas de Acordes</div><div class="lesson" onclick="scrollToLesson(12)">Aula 12 Acordes de pestana feitos sem pestana</div><div class="lesson" onclick="scrollToLesson(13)">Aula 13 O que são e como fazer Ritmos</div><div class="lesson" onclick="scrollToLesson(14)">Aula 14 Como Fazer Qualquer Ritmo no Violão</div><div class="lesson" onclick="scrollToLesson(15)">Aula 15 Dicas Sobre Ritmos</div><div class="lesson" onclick="scrollToLesson(16)">Aula 16 Ritmos Fáceis Guarânia</div><div class="lesson" onclick="scrollToLesson(17)">Aula 17 Ritmos Fáceis Valsa</div><div class="lesson" onclick="scrollToLesson(18)">Aula 18 Como Tocar Qualquer Música no Violão</div><div class="lesson" onclick="scrollToLesson(19)">Aula 19 Toque Sua Primeira Música</div><div class="lesson" onclick="scrollToLesson(20)">Aula 20 A Única Coisa</div><div class="lesson" onclick="scrollToLesson(21)">Aula 21 O Que São Cifras</div><div class="lesson" onclick="scrollToLesson(22)">Aula 22 Encontrando Cifras</div><div class="lesson" onclick="scrollToLesson(23)">Aula 23 +450 Cifras Simples</div><div class="lesson" onclick="scrollToLesson(24)">Aula 24 Juntando Ritmo e Acordes</div><div class="lesson" onclick="scrollToLesson(25)">Aula 25 Encaixe da Voz Dicas</div><div class="lesson" onclick="scrollToLesson(26)">Aula 26 Encaixe da Voz Na prática</div><div class="lesson" onclick="scrollToLesson(27)">Aula 27 Como Criar um Repertório</div></div><div class="module"><h3>Módulo 2</h3><div class="lesson" onclick="scrollToLesson(28)">Aula 1 Ritmo de Rock</div><div class="lesson" onclick="scrollToLesson(29)">Aula 2 Ritmo Pop Rock</div><div class="lesson" onclick="scrollToLesson(30)">Aula 3 Ritmo de Toada</div><div class="lesson" onclick="scrollToLesson(31)">Aula 4 Ritmo de vaneira</div><div class="lesson" onclick="scrollToLesson(32)">Aula 5 Ritmo de 6 por 8</div><div class="lesson" onclick="scrollToLesson(33)">Aula 6 Quebra de Ritmo</div><div class="lesson" onclick="scrollToLesson(34)">Aula 7 Como Aprender Ritmo em Outros Lugares</div><div class="lesson" onclick="scrollToLesson(35)">Aula 8 Aprenda Ritmo na Prática Comigo</div><div class="lesson" onclick="scrollToLesson(36)">Aula 9 Ritmo Bolero Bachata</div><div class="lesson" onclick="scrollToLesson(37)">Aula 10 Ritmo Country 1 e 2</div>
+<div class="module"><h3>Módulo 1</h3><div class="lesson" onclick="scrollToLesson(0)">Aula de Boas Vindas Curso do Zero Ao Repertório</div><div class="lesson" onclick="scrollToLesson(1)">Aula 1 Como Tocar Violão Sem Teoria</div><div class="lesson" onclick="scrollToLesson(2)">Aula 2 Mentalidade Pra Aprender Violão</div><div class="lesson" onclick="scrollToLesson(3)">Aula 3 Como Escolher o Seu Violão</div><div class="lesson" onclick="scrollToLesson(4)">Aula 4 Como Afinar o Violão</div><div class="lesson" onclick="scrollToLesson(5)">Aula 5 Como Segurar o Violão</div><div class="lesson" onclick="scrollToLesson(6)">Aula 6 O Que São Acordes Parte 1</div><div class="lesson" onclick="scrollToLesson(7)">Aula 7 O Que São Acordes Parte 2</div><div class="lesson" onclick="scrollToLesson(8)">Aula 8 O Que São Diagramas de Acordes</div><div class="lesson" onclick="scrollToLesson(9)">Aula 9 Aprenda Todos os Acordes</div><div class="lesson" onclick="scrollToLesson(10)">Aula 10 Fazendo Acordes na Prática</div><div class="lesson" onclick="scrollToLesson(11)">Aula 11 Aumente a Velocidade nas Trocas de Acordes</div><div class="lesson" onclick="scrollToLesson(12)">Aula 12 Acordes de pestana feitos sem pestana</div><div class="lesson" onclick="scrollToLesson(13)">Aula 13 O que são e como fazer Ritmos</div><div class="lesson" onclick="scrollToLesson(14)">Aula 14 Como Fazer Qualquer Ritmo no Violão</div><div class="lesson" onclick="scrollToLesson(15)">Aula 15 Dicas Sobre Ritmos</div><div class="lesson" onclick="scrollToLesson(16)">Aula 16 Ritmos Fáceis Guarânia</div><div class="lesson" onclick="scrollToLesson(17)">Aula 17 Ritmos Fáceis Valsa</div><div class="lesson" onclick="scrollToLesson(18)">Aula 18 Como Tocar Qualquer Música no Violão</div><div class="lesson" onclick="scrollToLesson(19)">Aula 19 Toque Sua Primeira Música</div><div class="lesson" onclick="scrollToLesson(20)">Aula 20 A Única Coisa</div><div class="lesson" onclick="scrollToLesson(21)">Aula 21 O Que São Cifras</div><div class="lesson" onclick="scrollToLesson(22)">Aula 22 Encontrando Cifras</div><div class="lesson" onclick="scrollToLesson(23)">Aula 23 +450 Cifras Simples</div><div class="lesson" onclick="scrollToLesson(24)">Aula 24 Juntando Ritmo e Acordes</div><div class="lesson" onclick="scrollToLesson(25)">Aula 25 Encaixe da Voz Dicas</div><div class="lesson" onclick="scrollToLesson(26)">Aula 26 Encaixe da Voz Na prática</div><div class="lesson" onclick="scrollToLesson(27)">Aula 27 Como Criar um Repertório</div></div><div class="module"><h3>Módulo 2</h3><div class="lesson" onclick="scrollToLesson(28)">Aula 1 Ritmo de Rock</div><div class="lesson" onclick="scrollToLesson(29)">Aula 2 Ritmo Pop Rock</div><div class="lesson" onclick="scrollToLesson(30)">Aula 3 Ritmo de Toada</div><div class="lesson" onclick="scrollToLesson(31)">Aula 4 Ritmo de Vaneira</div><div class="lesson" onclick="scrollToLesson(32)">Aula 5 Ritmo de 6 por 8</div><div class="lesson" onclick="scrollToLesson(33)">Aula 6 Quebra de Ritmo</div><div class="lesson" onclick="scrollToLesson(34)">Aula 7 Como Aprender Ritmo em Outros Lugares</div><div class="lesson" onclick="scrollToLesson(35)">Aula 8 Aprenda Ritmo na Prática Comigo</div><div class="lesson" onclick="scrollToLesson(36)">Aula 9 Ritmo Bolero Bachata</div><div class="lesson" onclick="scrollToLesson(37)">Aula 10 Ritmo Country 1 e 2</div>
 </div><div class="module"><h3>Módulo 3</h3><div class="lesson" onclick="scrollToLesson(38)">Aula 1 Pestanas</div><div class="lesson" onclick="scrollToLesson(39)">Aula 2 Como Fazer Dedilhado</div><div class="lesson" onclick="scrollToLesson(40)">Aula 3 Ritmos de Dedilhado Parte 1</div><div class="lesson" onclick="scrollToLesson(41)">Aula 4 Ritmos de Dedilhado Parte 2</div><div class="lesson" onclick="scrollToLesson(42)">Aula 5 O Que São e Como Fazer Solos</div><div class="lesson" onclick="scrollToLesson(43)">Aula 6 Como Ler Tablaturas</div><div class="lesson" onclick="scrollToLesson(44)">Aula 7 Elementos da Tablatura Parte 1</div><div class="lesson" onclick="scrollToLesson(45)">Aula 7 Elementos da Tablatura Parte 2</div><div class="lesson" onclick="scrollToLesson(46)">Aula 8 Como Encontrar Tablaturas</div><div class="lesson" onclick="scrollToLesson(47)">Aula 9 O que é Tocar de Ouvido</div><div class="lesson" onclick="scrollToLesson(48)">Aula 10 Apostila Teoria Musical PDF</div><div class="lesson" onclick="scrollToLesson(49)">Aula 10 Escala Cromática</div><div class="lesson" onclick="scrollToLesson(50)">Aula 11 O que é Tom</div><div class="lesson" onclick="scrollToLesson(51)">Aula 12 O Que é Campo Harmônico e Como Usar</div><div class="lesson" onclick="scrollToLesson(52)">Aula 13 Como Tocar de Ouvido Parte 1</div><div class="lesson" onclick="scrollToLesson(53)">Aula 14 Como Tocar de Ouvido Parte 2</div><div class="lesson" onclick="scrollToLesson(54)">Aula 15 Sistema CAGED</div><div class="lesson" onclick="scrollToLesson(55)">Aula 16 Como Descobrir o Tom da Música</div></div><div class="module"><h3>Módulo 4</h3><div class="lesson" onclick="scrollToLesson(56)">Aula 1 Perca a Vergonha de Tocar em Público</div><div class="lesson" onclick="scrollToLesson(57)">Aula 2 Como Continuar Aprendendo no Violão Sempre</div><div class="lesson" onclick="scrollToLesson(58)">Aula 3 Acompanhamento Violão em Ação</div><div class="lesson" onclick="scrollToLesson(59)">Aula 4 Depoimentos Gabriel Almeida</div><div class="lesson" onclick="scrollToLesson(60)">Aula 5 Finalização do Curso</div></div>
 
 </div>
-</div>
-</div>
 <div class="toggle-section">
 
-<!-- Início do botão nível -->
+<!-- Modal dos níveis -->
+<div id="modalNiveis" class="modal">
+  <div class="modal-content">
+    <div class="nivel nivel-0">
+      <div class="nivel-titulo">NÍVEL 0 - Ainda não sabe afinar, e ainda não sabe pelo menos 3 acordes e um ritmo</div>
+      <div class="nivel-info">
+        <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+        <ul>
+          <li>Como segurar, afinar e entender o braço do violão</li>
+          <li>O que são acordes e como tocá-los</li>
+          <li>Preparação para tocar seus primeiros ritmos</li>
+          <li>Ritmo Guarânia e/ou Valsa</li>
+        </ul>
+        <p><strong>Aulas:</strong> Da aula M1 1 até a aula M1 17</p>
+      </div>
+    </div>
 
-<div class="toggle-section">
-    <div class="toggle-header toggle-nivel" onclick="toggleNivel()">
-      Veja em qual nível de violão você está
-    </div>
-    <div class="toggle-content" id="nivelContent">
-      <div class="nivel nivel-0">
-        <div class="nivel-titulo">NÍVEL 0 - Ainda não sabe afinar, e ainda não sabe pelo menos 3 acordes e um ritmo</div>
-        <div class="nivel-info">
-          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
-          <ul>
-            <li>Como segurar, afinar e entender o braço do violão</li>
-            <li>O que são acordes e como tocá-los</li>
-            <li>Preparação para tocar seus primeiros ritmos</li>
-            <li>Ritmo Guarânia e/ou Valsa</li>
-          </ul>
-          <p><strong>Aulas:</strong> Da aula M1 1 até a aula M1 17</p>
-        </div>
-      </div>
-  
-      <div class="nivel nivel-1">
-        <div class="nivel-titulo">NÍVEL 1 - Já sabe afinar, já sabe pelo menos 3 acordes e um ritmo mas ainda não toca nenhuma música</div>
-        <div class="nivel-info">
-          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
-          <ul>
-            <li>Tocar sua primeira música no violão sem precisar cantar ainda</li>
-            <li>Juntar ritmo e acordes com tranquilidade</li>
-          </ul>
-          <p><strong>Aulas:</strong> Da aula M1 18 até a aula 24</p>
-        </div>
-      </div>
-  
-      <div class="nivel nivel-2">
-        <div class="nivel-titulo">NÍVEL 2 - Já toca pelo menos uma música no violão mas não canta ainda</div>
-        <div class="nivel-info">
-          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
-          <ul>
-            <li>Tocar sua primeira música no violão cantando junto</li>
-            <li>Aprender vários ritmos, acordes e músicas novas</li>
-          </ul>
-          <p><strong>Aulas:</strong> Da aula M1 25 até todo o Módulo 2</p>
-        </div>
-      </div>
-  
-      <div class="nivel nivel-3">
-        <div class="nivel-titulo">NÍVEL 3 - Já toca e canta junto pelo menos uma música</div>
-        <div class="nivel-info">
-          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
-          <ul>
-            <li>Pestanas e dedilhados</li>
-          </ul>
-          <p><strong>Aulas:</strong> Da aula M3 1 até a aula 4</p>
-        </div>
-      </div>
-  
-      <div class="nivel nivel-4">
-        <div class="nivel-titulo">NÍVEL 4 - Já toca músicas usando pestanas e dedilhados</div>
-        <div class="nivel-info">
-          <div class="nivel-subtitulo">Necessário para subir de nível:</div>
-          <ul>
-            <li>Solos (ler tablaturas e tocar)</li>
-            <li>O básico da teoria musical (campo harmônico, escala cromática, intervalos)</li>
-            <li>Tocar de ouvido</li>
-          </ul>
-          <p><strong>Aulas:</strong> Da aula M3 5 até todo o Módulo 4</p>
-        </div>
-      </div>
-  
-      <div class="nivel nivel-5">
-        <div class="nivel-titulo">NÍVEL 5 - Já sabe solos, teoria musical e tocar de ouvido</div>
-        <div class="nivel-info">
-          <p><strong>Parabéns!</strong> Você chegou ao último nível atual.</p>
-        </div>
+    <div class="nivel nivel-1">
+      <div class="nivel-titulo">NÍVEL 1 - Já sabe afinar, já sabe pelo menos 3 acordes e um ritmo mas ainda não toca nenhuma música</div>
+      <div class="nivel-info">
+        <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+        <ul>
+          <li>Tocar sua primeira música no violão sem precisar cantar ainda</li>
+          <li>Juntar ritmo e acordes com tranquilidade</li>
+        </ul>
+        <p><strong>Aulas:</strong> Da aula M1 18 até a aula 24</p>
       </div>
     </div>
+
+    <div class="nivel nivel-2">
+      <div class="nivel-titulo">NÍVEL 2 - Já toca pelo menos uma música no violão mas não canta ainda</div>
+      <div class="nivel-info">
+        <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+        <ul>
+          <li>Tocar sua primeira música no violão cantando junto</li>
+          <li>Aprender vários ritmos, acordes e músicas novas</li>
+        </ul>
+        <p><strong>Aulas:</strong> Da aula M1 25 até todo o Módulo 2</p>
+      </div>
+    </div>
+
+    <div class="nivel nivel-3">
+      <div class="nivel-titulo">NÍVEL 3 - Já toca e canta junto pelo menos uma música</div>
+      <div class="nivel-info">
+        <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+        <ul>
+          <li>Pestanas e dedilhados</li>
+        </ul>
+        <p><strong>Aulas:</strong> Da aula M3 1 até a aula 4</p>
+      </div>
+    </div>
+
+    <div class="nivel nivel-4">
+      <div class="nivel-titulo">NÍVEL 4 - Já toca músicas usando pestanas e dedilhados</div>
+      <div class="nivel-info">
+        <div class="nivel-subtitulo">Necessário para subir de nível:</div>
+        <ul>
+          <li>Solos (ler tablaturas e tocar)</li>
+          <li>O básico da teoria musical (campo harmônico, escala cromática, intervalos)</li>
+          <li>Tocar de ouvido</li>
+        </ul>
+        <p><strong>Aulas:</strong> Da aula M3 5 até todo o Módulo 4</p>
+      </div>
+    </div>
+
+    <div class="nivel nivel-5">
+      <div class="nivel-titulo">NÍVEL 5 - Já sabe solos, teoria musical e tocar de ouvido</div>
+      <div class="nivel-info">
+        <p><strong>Parabéns!</strong> Você chegou ao último nível atual.</p>
+      </div>
+    </div>
+
+    <button class="modal-close" onclick="closeModal('modalNiveis')">Fechar</button>
   </div>
-  
-  <script>
-    function toggleNivel() {
-      const content = document.getElementById("nivelContent");
-      const toggleBtn = document.querySelector(".toggle-nivel");
-      const aberto = content.style.display === "block";
-      content.style.display = aberto ? "none" : "block";
-      toggleBtn.textContent = aberto
-        ? "Veja em qual nível de violão você está"
-        : "Veja em qual nível de violão você está (fechar)";
-    }
-  </script>
-  
-
-<!-- Fim do botão nível -->
+</div>
 
 <div class="container" id="video-container">
 <div class="video-container" id="lesson-0">
@@ -404,7 +496,7 @@
 </div>
 <div class="video-title">M1 Aula 9 Aprenda Todos os Acordes</div>
 <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
-<div class="video-description">Baixe o Dicionário de Acordes - Link Abaixo <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>  FAMÍLIAS DE ACORDES MAIS SIMPLES PRA VOCÊ JÁ COMEÇAR NO VIOLÃO  Família 1 - A, E, D Família 2 - D, A, G Família 3 - G, D, C Família 4 - E, B7, A</div>
+<div class="video-description">Baixe o Dicionário de Acordes - Link Abaixo <a href="https://drive.google.com/file/d/1EkNHpQaz_n_laIe8CNuidyi99BNLR0py/view?usp=drive_link" target="_blank">https://drive.google.com/file/d/1EkNHpQaz_n_laIe8CNuidyi99BNLR0py/view?usp=drive_link</a>  FAMÍLIAS DE ACORDES MAIS SIMPLES PRA VOCÊ JÁ COMEÇAR NO VIOLÃO  Família 1 - A, E, D Família 2 - D, A, G Família 3 - G, D, C Família 4 - E, B7, A</div>
 </div>
 <div class="video-container" id="lesson-10">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/hJ3oQR9rtF4" onclick="loadVideo(this)">
@@ -431,7 +523,7 @@
 </div>
 <div class="video-title">M1 Aula 12 Acordes de pestana feitos sem pestana</div>
 <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
-<div class="video-description">BAIXE O DICIONÁRIO DE ACORDES: <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>    - Existe a hora certa de colocar a voz em relação às batidas  Guarânia - 5 batidas - ↓↑↓↑↓  - Geralmente o ritmo começa na sílaba forte da palavra   - Faça pedaço por pedaço até ficar bom   - Dica de cantarolar a melodia   - Acertar o começo pra depois continuar  - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
+<div class="video-description">BAIXE O DICIONÁRIO DE ACORDES: <a href="https://drive.google.com/file/d/1EkNHpQaz_n_laIe8CNuidyi99BNLR0py/view?usp=drive_link" target="_blank">https://drive.google.com/file/d/1EkNHpQaz_n_laIe8CNuidyi99BNLR0py/view?usp=drive_link</a>    - Existe a hora certa de colocar a voz em relação às batidas  Guarânia - 5 batidas - ↓↑↓↑↓  - Geralmente o ritmo começa na sílaba forte da palavra   - Faça pedaço por pedaço até ficar bom   - Dica de cantarolar a melodia   - Acertar o começo pra depois continuar  - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
 </div>
 <div class="video-container" id="lesson-13">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/T_cLeLBc5wY" onclick="loadVideo(this)">
@@ -1137,10 +1229,10 @@ ALO MEU DEUS PE ZEZINHO Católica
 </div>
 <div class="video-container" id="lesson-31">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/gAghhVwTALA" onclick="loadVideo(this)">
-<img alt="M2 Aula 4 Ritmo de vaneira" src="https://img.youtube.com/vi/gAghhVwTALA/hqdefault.jpg"/>
+<img alt="M2 Aula 4 Ritmo de Vaneira" src="https://img.youtube.com/vi/gAghhVwTALA/hqdefault.jpg"/>
 <div class="play-button"></div>
 </div>
-<div class="video-title">M2 Aula 4 Ritmo de vaneira</div>
+<div class="video-title">M2 Aula 4 Ritmo de Vaneira</div>
 </div>
 <div class="video-container" id="lesson-32">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/KRgL_KR4B-w" onclick="loadVideo(this)">
@@ -1363,7 +1455,266 @@ ALO MEU DEUS PE ZEZINHO Católica
 
 
 </div>
+<script>
+function toggleSongList(element) {
+  const songList = element.nextElementSibling;
+  const isOpen = songList.style.display === "block";
+  songList.style.display = isOpen ? "none" : "block";
+  element.textContent = isOpen 
+    ? "Clique para ver a lista de músicas dessas cifras" 
+    : "Clique para fechar a lista de músicas";
+}
+</script>
+<script>
+function toggleSection(element) {
+  const content = element.nextElementSibling;
+  const isOpen = content.style.display === "block";
+  content.style.display = isOpen ? "none" : "block";
+}
+
+function toggleSongList(element) {
+  const songList = element.nextElementSibling;
+  const isOpen = songList.style.display === "block";
+  songList.style.display = isOpen ? "none" : "block";
+  element.textContent = isOpen 
+    ? "Clique para ver a lista de músicas dessas cifras" 
+    : "Clique para fechar a lista de músicas";
+}
+
+function loadVideo(element) {
+  let videoSrc = element.getAttribute('data-src');
+  // Adiciona parâmetros para remover vídeos recomendados
+  videoSrc += (videoSrc.includes('?') ? '&' : '?') + 'rel=0&modestbranding=1';
+  const iframe = document.createElement('iframe');
+  iframe.setAttribute('src', videoSrc);
+  iframe.setAttribute('frameborder', '0');
+  iframe.setAttribute('allow', 'accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture');
+  iframe.setAttribute('allowfullscreen', '');
+  iframe.style.width = '100%';
+  iframe.style.height = '100%';
+  iframe.style.position = 'absolute';
+  iframe.style.top = '0';
+  iframe.style.left = '0';
+  element.innerHTML = '';
+  element.appendChild(iframe);
+}
+
+function scrollToLesson(lessonIndex) {
+  const lesson = document.getElementById('lesson-' + lessonIndex);
+  if (lesson) {
+    lesson.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    
+    // Aguarda o scroll terminar e depois carrega o vídeo
+    setTimeout(() => {
+      const videoWrapper = lesson.querySelector('.video-wrapper');
+      if (videoWrapper && videoWrapper.getAttribute('data-src')) {
+        loadVideo(videoWrapper);
+      }
+    }, 800);
+  }
+}
+
+function scrollToTop() {
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function toggleDescription(element) {
+  const description = element.nextElementSibling;
+  const isOpen = description.style.display === "block";
+  description.style.display = isOpen ? "none" : "block";
+  element.textContent = isOpen ? "Mostrar descrição" : "Ocultar descrição";
+}
 
 
+
+function openModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'flex';
+  }
+}
+
+function closeModal(modalId) {
+  const modal = document.getElementById(modalId);
+  if (modal) {
+    modal.style.display = 'none';
+  }
+}
+
+function toggleNivel() {
+  openModal('modalNiveis');
+}
+
+function calcularRolagemTexto() {
+  const divs = document.querySelectorAll('.btn-scroll-text');
+  
+  divs.forEach(div => {
+    const parentWidth = div.parentElement.offsetWidth;
+    const textWidth = div.scrollWidth;
+    const marginRight = 0;
+    
+    // Calcula quanto precisa mover para o final do texto encostar na margem
+    const marginTotal = 30; // 15px esquerda + 15px direita
+    const distancia = -(textWidth - (parentWidth - marginTotal));
+    
+    // Só aplica animação se o texto for maior que o botão
+    if (textWidth > parentWidth) {
+      div.style.setProperty('--scroll-distance', `${distancia}px`);
+    } else {
+      div.style.animation = 'none';
+    }
+  });
+}
+
+window.addEventListener('load', calcularRolagemTexto);
+window.addEventListener('resize', calcularRolagemTexto);
+
+function initializeModules() {
+  const modules = document.querySelectorAll('.module');
+  
+  modules.forEach((module, moduleIndex) => {
+    const lessons = module.querySelectorAll('.lesson');
+    const totalLessons = lessons.length;
+    
+    if (totalLessons > 2) {
+      // Esconde aulas a partir da terceira
+      lessons.forEach((lesson, index) => {
+        if (index >= 2) {
+          lesson.classList.add('hidden');
+        }
+      });
+      
+      // Cria botão "Mostrar mais"
+      const toggleBtn = document.createElement('div');
+      toggleBtn.className = 'lesson lesson-toggle';
+      toggleBtn.textContent = `Mostrar mais (${totalLessons - 2})`;
+      toggleBtn.setAttribute('data-expanded', 'false');
+      
+      toggleBtn.onclick = function() {
+        const isExpanded = this.getAttribute('data-expanded') === 'true';
+        
+        if (isExpanded) {
+          // Mostrar menos
+          lessons.forEach((lesson, index) => {
+            if (index >= 2) {
+              lesson.classList.add('hidden');
+            }
+          });
+          this.textContent = `Mostrar mais (${totalLessons - 2})`;
+          this.setAttribute('data-expanded', 'false');
+          // Move botão para posição 3
+          module.insertBefore(this, lessons[2]);
+        } else {
+          // Mostrar mais
+          lessons.forEach(lesson => {
+            lesson.classList.remove('hidden');
+          });
+          this.textContent = 'Mostrar menos';
+          this.setAttribute('data-expanded', 'true');
+          // Move botão para o final
+          module.appendChild(this);
+        }
+      };
+      
+      // Insere o botão após a segunda aula
+      module.insertBefore(toggleBtn, lessons[2]);
+    }
+  });
+}
+// Função para o botão de toggle dos módulos
+document.addEventListener('DOMContentLoaded', function() {
+  const toggleBtn = document.getElementById('toggleModulesBtn');
+  const modulesDiv = document.querySelector('.modules');
+  
+  if (toggleBtn && modulesDiv) {
+    let modulesInitialized = false;
+    
+    toggleBtn.addEventListener('click', function() {
+      const isOpen = modulesDiv.classList.contains('show');
+      if (isOpen) {
+        modulesDiv.classList.remove('show');
+        toggleBtn.textContent = 'Abrir pesquisa por módulos';
+      } else {
+        modulesDiv.classList.add('show');
+        toggleBtn.textContent = 'Fechar pesquisa por módulos';
+        
+        // Inicializa os módulos apenas na primeira vez
+        if (!modulesInitialized) {
+          initializeModules();
+          modulesInitialized = true;
+        }
+      }
+    });
+  }
+  
+  // Função de pesquisa
+  const searchInput = document.getElementById('searchInput');
+  const searchResults = document.getElementById('searchResults');
+  
+  if (searchInput && searchResults) {
+    const lessons = [];
+    document.querySelectorAll('.video-container').forEach((container, index) => {
+      const title = container.querySelector('.video-title');
+      if (title) {
+        lessons.push({
+          index: index,
+          title: title.textContent.trim(),
+          id: container.id
+        });
+      }
+    });
+    
+    searchInput.addEventListener('input', function() {
+      const searchTerm = this.value.toLowerCase().trim();
+      const clearBtn = document.getElementById('clearSearch');
+      if (this.value) {
+        clearBtn.style.display = 'block';
+      } else {
+        clearBtn.style.display = 'none';
+      }
+      if (searchTerm === '') {
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+        return;
+      }
+      
+      const filtered = lessons.filter(lesson => 
+        lesson.title.toLowerCase().includes(searchTerm)
+      );
+      
+      if (filtered.length === 0) {
+        searchResults.innerHTML = '<div class="no-results">Nenhuma aula encontrada</div>';
+        searchResults.style.display = 'block';
+        return;
+      }
+      
+      searchResults.innerHTML = filtered.map(lesson => `
+        <div class="search-result-item" onclick="scrollToLesson(${lesson.index})">
+          <div class="result-title">${lesson.title}</div>
+        </div>
+      `).join('');
+      
+      searchResults.style.display = 'block';
+    });
+    // Botão de limpar pesquisa
+    const clearBtn = document.getElementById('clearSearch');
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function() {
+        searchInput.value = '';
+        searchResults.style.display = 'none';
+        searchResults.innerHTML = '';
+        this.style.display = 'none';
+        searchInput.focus();
+      });
+    }
+    // Fechar resultados ao clicar fora
+    document.addEventListener('click', function(e) {
+      if (!searchInput.contains(e.target) && !searchResults.contains(e.target)) {
+        searchResults.style.display = 'none';
+      }
+    });
+  }
+});
+</script>
 </body>
 </html>
