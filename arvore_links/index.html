@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gabriel Almeida - Violão</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #2d2d2d 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            color: #ffffff;
+        }
+
+        .container {
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .buttons-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .glass-btn {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px 30px;
+            color: #ffffff;
+            font-size: 18px;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-btn.youtube {
+            background: rgba(255, 80, 80, 0.15);
+            border: 1px solid rgba(255, 80, 80, 0.35);
+        }
+
+        .glass-btn.youtube:hover {
+            background: rgba(255, 80, 80, 0.25);
+        }
+
+        .glass-btn:active {
+            transform: translateY(0);
+        }
+
+        .watermark {
+            width: 60px;
+            height: auto;
+            opacity: 0.7;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            object-fit: contain;
+        }
+
+        .image-container {
+            margin-top: 20px;
+        }
+
+        @media (max-width: 600px) {
+            .glass-btn {
+                font-size: 16px;
+                padding: 18px 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="buttons-container">
+            <a href="https://gabrielalmeidac3.github.io/violaocomgabriel/" class="glass-btn" target="_blank">
+                🎸 15 dias grátis (Comunidade VD40)
+            </a>
+            <a href="https://www.youtube.com/@gabrielalmeidaviolao" class="glass-btn youtube" target="_blank">
+                📺 Acesse meu canal do YouTube
+            </a>
+        </div>
+
+        <div class="image-container">
+            <p style="font-size: 14px; color: rgba(255, 255, 255, 0.6); margin-bottom: 10px;">Por Gabriel Almeida</p>
+            <img src="img2.png" alt="Gabriel Almeida Violão" class="watermark">
+        </div>
+    </div>
+</body>
+</html>
