@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Desafio Sincronia - VD40</title>
+    <link rel="stylesheet" href="fechado_styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Plus+Jakarta+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            background: radial-gradient(circle at top, #1f242d 0%, #121214 100%);
+            font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        #content {
+            width: 100%;
+            max-width: 650px;
+            margin: 40px auto;
+            padding: 30px 20px;
+            box-sizing: border-box;
+            background: rgba(30, 30, 35, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 24px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+            text-align: center;
+        }
+
+        .back-btn-container {
+            text-align: left;
+            margin-bottom: 20px;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-back:hover {
+            transform: translateY(-2px);
+            background: linear-gradient(135deg, #34495e, #2c3e50);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
+            border-color: rgba(255, 255, 255, 0.2);
+        }
+
+        .challenge-header {
+            margin-bottom: 30px;
+        }
+
+        .challenge-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 10px 0;
+            background: linear-gradient(135deg, #ff9f43 0%, #ff5252 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        .challenge-subtitle {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #e2e8f0;
+            margin: 5px 0 12px 0;
+        }
+
+        .challenge-text-minor {
+            font-size: 0.95rem;
+            color: #a0aec0;
+            line-height: 1.5;
+            max-width: 480px;
+            margin: 0 auto;
+        }
+
+        .challenge-card {
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto 25px auto;
+            padding: 24px;
+            box-sizing: border-box;
+            border-radius: 24px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), 0 10px 30px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .video-label {
+            font-size: 1.3rem;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: 0.5px;
+            text-align: left;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .video-label::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 18px;
+            background: linear-gradient(to bottom, #ff9f43, #ff5252);
+            border-radius: 3px;
+        }
+
+        .video-wrapper-outer {
+            width: 100%;
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #000;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            cursor: pointer;
+        }
+
+        .video-wrapper img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .video-wrapper:hover img {
+            transform: scale(1.03);
+        }
+
+        .play-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 64px;
+            height: 64px;
+            background: rgba(255, 82, 82, 0.9);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 8px 20px rgba(255, 82, 82, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2;
+        }
+
+        .video-wrapper:hover .play-button {
+            background: #ff3838;
+            transform: translate(-50%, -50%) scale(1.1);
+            box-shadow: 0 10px 25px rgba(255, 82, 82, 0.6);
+        }
+
+        .play-button::before {
+            content: '';
+            width: 0;
+            height: 0;
+            border-left: 18px solid white;
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            margin-left: 5px;
+        }
+
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        .download-btn-container {
+            margin-top: 5px;
+            text-align: center;
+        }
+
+        .btn-download {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 10px 24px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #b2bec3;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 12px;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+        }
+
+        .btn-download:hover {
+            color: #2ecc71;
+            background: rgba(46, 204, 113, 0.08);
+            border-color: rgba(46, 204, 113, 0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(46, 204, 113, 0.15);
+        }
+
+        .btn-download:active {
+            transform: translateY(0);
+        }
+
+        @media (max-width: 600px) {
+            #content {
+                margin: 20px 10px;
+                padding: 20px 15px;
+                border-radius: 20px;
+            }
+
+            .challenge-title {
+                font-size: 1.85rem;
+            }
+
+            .challenge-subtitle {
+                font-size: 1.05rem;
+            }
+
+            .challenge-text-minor {
+                font-size: 0.85rem;
+            }
+
+            .btn-download {
+                width: 100%;
+                box-sizing: border-box;
+                padding: 12px 20px;
+                font-size: 14px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <div class="back-btn-container">
+            <button class="btn-back" onclick="voltarPaginaGeral()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="19" y1="12" x2="5" y2="12"></line>
+                    <polyline points="12 19 5 12 12 5"></polyline>
+                </svg>
+                Voltar para a Página Geral
+            </button>
+        </div>
+
+        <div class="challenge-header">
+            <h1 class="challenge-title">Desafio Sincronia</h1>
+            <h2 class="challenge-subtitle">Toque e cante ao mesmo tempo fácil</h2>
+            <p class="challenge-text-minor">um desafio para melhorar sua coordenação motora e encaixe de voz</p>
+        </div>
+
+        <div class="challenge-card">
+            <h3 class="video-label">Desafio 1</h3>
+            <div class="video-wrapper-outer">
+                <div class="video-wrapper" data-src="https://www.youtube.com/embed/f7sBHkT1ebE" onclick="loadVideo(this)">
+                    <img alt="Desafio 1 - Desafio Sincronia" src="https://img.youtube.com/vi/f7sBHkT1ebE/hqdefault.jpg">
+                    <div class="play-button"></div>
+                </div>
+            </div>
+            <div class="download-btn-container">
+                <a href="https://drive.google.com/drive/u/3/folders/1t0e3kBX_gzpSuejdRx_RTkzyDCTAL3YO" target="_blank" class="btn-download">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align: middle;">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    baixar cifra
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadVideo(element) {
+            const src = element.getAttribute('data-src');
+            element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
+        }
+
+        function voltarPaginaGeral() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const from = urlParams.get('from');
+            window.location.href = from === 'geral2' ? 'fechado_geral2.html' : 'fechado_geral_protegido_site.html';
+        }
+    </script>
+</body>
+</html>

@@ -118,6 +118,12 @@
                 botaoCurso.setAttribute('onclick', "window.location.href='fechado_index.html'");
             }
 
+            // Modifica o link do botão "Desafio Sincronia" para remover ?from=geral2
+            const botaoDesafio = contentDiv.querySelector('button[onclick*="desafios.html"]');
+            if (botaoDesafio) {
+                botaoDesafio.setAttribute('onclick', "window.location.href='desafios.html'");
+            }
+
             // Carrega apenas scripts necessários do conteúdo
             const scripts = doc.querySelectorAll('script[src]');
             let scriptsToLoad = scripts.length;
