@@ -190,32 +190,60 @@
                 if (user) {
                     const telefone = user.email.split('@')[0];
                     
-                    // Query otimizada com limit
-                    db.collection('alunos')
-                      .where('telefone', '==', telefone)
-                      .limit(1)
-                      .get()
-                      .then((snapshot) => {
-                          if (!snapshot.empty) {
-                              const userData = snapshot.docs[0].data();
-                              if (userData.acesso === 'Liberado') {
-                                  loadMainContent();
-                              } else {
-                                  alert('Acesso negado.');
-                                  auth.signOut();
-                                  window.location.href = 'fechado_geral_protegido.html';
-                              }
-                          } else {
-                              alert('Usuário não encontrado.');
-                              auth.signOut();
-                              window.location.href = 'fechado_geral_protegido.html';
-                          }
-                      })
-                      .catch(error => {
-                          console.error('Erro ao verificar aluno:', error);
-                          alert('Erro ao verificar acesso. Tente novamente.');
-                          hideLoading();
-                      });
+                    // Função auxiliar para processar dados do aluno
+                    const processAlunoData = (userData) => {
+                        if (userData && userData.acesso === 'Liberado') {
+                            loadMainContent();
+                        } else {
+                            alert('Acesso negado.');
+                            auth.signOut();
+                            window.location.href = 'fechado_geral_protegido.html';
+                        }
+                    };
+
+                    // Busca direta pelo UID do usuário (operação get, permitida pelas regras)
+                    db.collection('alunos').doc(user.uid).get()
+                        .then((docSnap) => {
+                            if (docSnap.exists) {
+                                processAlunoData(docSnap.data());
+                            } else {
+                                // Fallback: tenta buscar com o telefone como ID do doc (registro antigo)
+                                db.collection('alunos').doc(telefone).get()
+                                    .then((docSnap2) => {
+                                        if (docSnap2.exists) {
+                                            processAlunoData(docSnap2.data());
+                                        } else {
+                                            // Fallback final: tenta a query where (pode falhar caso o list público seja restrito)
+                                            db.collection('alunos').where('telefone', '==', telefone).limit(1).get()
+                                                .then((snapshot) => {
+                                                    if (!snapshot.empty) {
+                                                        processAlunoData(snapshot.docs[0].data());
+                                                    } else {
+                                                        alert('Usuário não encontrado.');
+                                                        auth.signOut();
+                                                        window.location.href = 'fechado_geral_protegido.html';
+                                                    }
+                                                })
+                                                .catch(err => {
+                                                    console.error('Erro na query de backup:', err);
+                                                    alert('Usuário não encontrado.');
+                                                    auth.signOut();
+                                                    window.location.href = 'fechado_geral_protegido.html';
+                                                });
+                                        }
+                                    })
+                                    .catch(err => {
+                                        console.error('Erro ao ler doc de telefone:', err);
+                                        alert('Erro ao verificar acesso. Tente novamente.');
+                                        hideLoading();
+                                    });
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Erro ao verificar aluno:', error);
+                            alert('Erro ao verificar acesso. Tente novamente.');
+                            hideLoading();
+                        });
                 } else {
                     window.location.href = 'fechado_geral_protegido.html';
                 }

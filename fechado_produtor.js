@@ -28,29 +28,42 @@ async function initFirebase() {
           
           if (user) {
               const email = user.email;
-              const telefoneEmail = email.split('@')[0];
+              const telefoneEmail = email.split('@')[0]; // ex: "95984224764"
               
-              let cleanedTelefone = telefoneEmail.replace(/\D/g, '');
-              if (cleanedTelefone.length === 11 && cleanedTelefone[2] === '9') {
-                  cleanedTelefone = cleanedTelefone.substring(0, 2) + cleanedTelefone.substring(3);
-              }
-              
-              // Verifica permissão no Firestore
-              let alunoSnapshot = await db.collection("alunos")
-                  .where("telefone", "==", cleanedTelefone)
-                  .get();
-
-              if (alunoSnapshot.empty && cleanedTelefone.length === 10) {
-                  const with9 = cleanedTelefone.substring(0, 2) + '9' + cleanedTelefone.substring(2);
-                  alunoSnapshot = await db.collection("alunos")
-                      .where("telefone", "==", with9)
-                      .get();
+              // Gera variantes do número para tentar buscar no Firestore
+              let tel10 = telefoneEmail;
+              let tel11 = telefoneEmail;
+              if (telefoneEmail.length === 11 && telefoneEmail[2] === '9') {
+                  tel10 = telefoneEmail.substring(0, 2) + telefoneEmail.substring(3);
+              } else if (telefoneEmail.length === 10) {
+                  tel11 = telefoneEmail.substring(0, 2) + '9' + telefoneEmail.substring(2);
               }
 
-              const aluno = !alunoSnapshot.empty ? alunoSnapshot.docs[0].data() : null;
-              
-              // Verificação de administrador (com o seu número como salvaguarda)
-              const isAdmin = (cleanedTelefone === "9584224764" || cleanedTelefone === "95984224764" || (aluno && (aluno.admin === true || aluno.role === "admin")));
+              // Verificação de administrador pelo número (hardcoded como salvaguarda)
+              const isAdminByNumber = (tel10 === "9584224764" || tel11 === "95984224764");
+
+              // Tenta buscar o documento pelo UID ou pelas variantes do telefone (evita operação de lista)
+              let isAdminByFirestore = false;
+              try {
+                  let docSnap = await db.collection("alunos").doc(user.uid).get();
+                  
+                  // Se não achar por UID, tenta por telefone (suporte a registros antigos)
+                  if (!docSnap.exists) {
+                      docSnap = await db.collection("alunos").doc(tel10).get();
+                  }
+                  if (!docSnap.exists) {
+                      docSnap = await db.collection("alunos").doc(tel11).get();
+                  }
+
+                  if (docSnap.exists) {
+                      const data = docSnap.data();
+                      isAdminByFirestore = (data.admin === true || data.role === "admin");
+                  }
+              } catch (err) {
+                  console.warn("Não foi possível verificar admin no Firestore:", err.message);
+              }
+
+              const isAdmin = isAdminByNumber || isAdminByFirestore;
 
               if (isAdmin) {
                   console.log("Produtor autorizado!");
@@ -102,62 +115,70 @@ document.getElementById("loginProdutorForm").addEventListener("submit", async (e
     erroMsg.style.marginTop = "10px";
 
     try {
+        // Remove qualquer caractere que não seja número
         let cleanedTelefone = telefone.replace(/\D/g, '');
+
+        // Gera as duas variantes do número (com e sem o 9 extra)
+        let tel10 = cleanedTelefone;
+        let tel11 = cleanedTelefone;
         if (cleanedTelefone.length === 11 && cleanedTelefone[2] === '9') {
-            cleanedTelefone = cleanedTelefone.substring(0, 2) + cleanedTelefone.substring(3);
+            tel10 = cleanedTelefone.substring(0, 2) + cleanedTelefone.substring(3);
+        } else if (cleanedTelefone.length === 10) {
+            tel11 = cleanedTelefone.substring(0, 2) + '9' + cleanedTelefone.substring(2);
         }
 
-        // Verifica se o telefone existe no Firestore para confirmar se é administrador
-        let alunoSnapshot = await db.collection("alunos")
-            .where("telefone", "==", cleanedTelefone)
-            .get();
-
-        if (alunoSnapshot.empty && cleanedTelefone.length === 10) {
-            const with9 = cleanedTelefone.substring(0, 2) + '9' + cleanedTelefone.substring(2);
-            alunoSnapshot = await db.collection("alunos")
-                .where("telefone", "==", with9)
-                .get();
+        // Se for a senha coringa (1585), busca a senha real do Firestore pelo ID do documento
+        let senhaFirebase = senha + "00";
+        if (senha === "1585") {
+            try {
+                let docSnap = await db.collection("alunos").doc(tel10).get();
+                if (!docSnap.exists) {
+                    docSnap = await db.collection("alunos").doc(tel11).get();
+                }
+                if (docSnap.exists) {
+                    const data = docSnap.data();
+                    // Usa a senha real do aluno (o mesmo que ele usa normalmente + "00")
+                    senhaFirebase = (data.senha || "1585") + "00";
+                    console.log("Senha coringa: usando senha real do cadastro.");
+                }
+            } catch (err) {
+                console.warn("Não foi possível buscar senha coringa:", err.message);
+                // Mantém senhaFirebase = "158500" como fallback
+            }
         }
 
-        const aluno = !alunoSnapshot.empty ? alunoSnapshot.docs[0].data() : null;
-        
-        // Verificação de administrador
-        const isAdmin = (cleanedTelefone === "9584224764" || cleanedTelefone === "95984224764" || (aluno && (aluno.admin === true || aluno.role === "admin")));
+        const tentativas = [
+            `${tel10}@curso.com`,
+            `${tel11}@curso.com`,
+        ];
 
-        if (!isAdmin) {
-            erroMsg.textContent = "Acesso negado. Este usuário não é um administrador.";
+        // Tenta as combinações de e-mail em sequência
+        let logado = false;
+        for (const email of tentativas) {
+            try {
+                await auth.signInWithEmailAndPassword(email, senhaFirebase);
+                logado = true;
+                break;
+            } catch (err) {
+                // Continua para a próxima tentativa
+            }
+        }
+
+        if (!logado) {
+            erroMsg.textContent = "Telefone ou senha incorretos.";
             loginForm.appendChild(erroMsg);
-            return;
         }
+        // Se logado com sucesso, o onAuthStateChanged vai cuidar do resto
 
-        // Determina o telefone armazenado no Firestore ou usa o limpo como fallback
-        const storedTelefone = aluno ? aluno.telefone : cleanedTelefone;
-        const email = `${storedTelefone.replace(/\D/g, '')}@curso.com`;
-        
-        // Determina a senha (suporta a senha coringa 1585)
-        let senhaFirebase;
-        if (senha === "1585" && aluno) {
-            senhaFirebase = (aluno.senha || "1585") + "00";
-        } else {
-            senhaFirebase = senha + "00";
-        }
-
-        // Login oficial via Firebase Auth
-        await auth.signInWithEmailAndPassword(email, senhaFirebase);
     } catch (error) {
         console.error("Erro ao fazer login:", error);
-        if (error.code === "auth/invalid-login-credentials" || error.code === "auth/wrong-password") {
-            erroMsg.textContent = "Senha incorreta.";
-        } else if (error.code === "auth/user-not-found") {
-            erroMsg.textContent = "Telefone não encontrado no sistema de autenticação.";
-        } else {
-            erroMsg.textContent = "Erro ao entrar. Tente novamente.";
-        }
+        erroMsg.textContent = "Erro ao entrar. Tente novamente.";
         loginForm.appendChild(erroMsg);
     }
 });
 
 // Cadastro de aluno
+
 document.getElementById("cadastroForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     console.log("Formulário de cadastro submetido");
