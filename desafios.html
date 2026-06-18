@@ -264,6 +264,206 @@
                 font-size: 14px;
             }
         }
+
+        /* Seção de Colegas e Carrossel */
+        .colaboradores-section {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .section-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        .desafios-tabs {
+            display: inline-flex;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 4px;
+            border-radius: 12px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #a0aec0;
+            background: transparent;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .tab-btn.active {
+            color: #ffffff;
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .tab-btn.disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
+        }
+
+        .badge-em-breve {
+            font-size: 9px;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ff9f43, #ff5252);
+            color: #ffffff;
+            padding: 2px 6px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .carousel-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .carousel-track-container {
+            overflow: hidden;
+            width: 100%;
+            border-radius: 20px;
+        }
+
+        .carousel-track {
+            display: flex;
+            transition: transform 0.45s cubic-bezier(0.25, 0.8, 0.25, 1);
+            width: 100%;
+        }
+
+        .carousel-slide {
+            min-width: 100%;
+            box-sizing: border-box;
+            padding: 5px;
+        }
+
+        .slide-card {
+            background: rgba(255, 255, 255, 0.01);
+            border: 1px solid rgba(255, 255, 255, 0.04);
+            border-radius: 18px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .slide-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 4px;
+        }
+
+        .student-info {
+            text-align: left;
+        }
+
+        .student-name {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: #ffffff;
+        }
+
+        .student-location {
+            font-size: 0.85rem;
+            color: #a0aec0;
+            margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .student-location svg {
+            color: #ff5252;
+        }
+
+        .carousel-nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: rgba(30, 30, 35, 0.9);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 10;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            padding: 0;
+        }
+
+        .carousel-nav-btn:hover {
+            background: #ff5252;
+            border-color: rgba(255, 82, 82, 0.3);
+            box-shadow: 0 6px 15px rgba(255, 82, 82, 0.4);
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        .carousel-nav-btn.prev {
+            left: -19px;
+        }
+
+        .carousel-nav-btn.next {
+            right: -19px;
+        }
+
+        .carousel-dots {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .carousel-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            transition: all 0.25s ease;
+        }
+
+        .carousel-dot.active {
+            background: #ff5252;
+            width: 20px;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 600px) {
+            .carousel-nav-btn.prev {
+                left: 5px;
+            }
+            .carousel-nav-btn.next {
+                right: 5px;
+            }
+            .slide-card {
+                padding: 10px;
+            }
+            .colaboradores-section {
+                margin-top: 30px;
+                padding-top: 20px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -303,9 +503,137 @@
                 </a>
             </div>
         </div>
+
+        <!-- Seção de Apresentações de Colegas -->
+        <div class="colaboradores-section">
+            <h3 class="section-title">Apresentações dos Colegas</h3>
+            <div class="desafios-tabs">
+                <button class="tab-btn active">Desafio 1</button>
+                <button class="tab-btn disabled" title="Em breve">
+                    Desafio 2
+                    <span class="badge-em-breve">Em breve</span>
+                </button>
+            </div>
+            
+            <div class="carousel-wrapper">
+                <button class="carousel-nav-btn prev" onclick="slideAnterior()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="15 18 9 12 15 6"></polyline>
+                    </svg>
+                </button>
+                <div class="carousel-track-container">
+                    <div id="colegas-track" class="carousel-track">
+                        <!-- Carrossel de Alunos gerado dinamicamente -->
+                    </div>
+                </div>
+                <button class="carousel-nav-btn next" onclick="slideProximo()">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="9 18 15 12 9 6"></polyline>
+                    </svg>
+                </button>
+            </div>
+            <div id="colegas-dots" class="carousel-dots">
+                <!-- Indicadores de slide gerados dinamicamente -->
+            </div>
+        </div>
     </div>
 
     <script>
+        // Lista de alunos do Desafio 1 fornecida pelo produtor
+        const colegasDS1 = [
+            { nome: "Geni", local: "Goiás", videoId: "bo0EowNe4hU" },
+            { nome: "Carlos", local: "Foz do Iguaçu - Paraná", videoId: "lxX8IGwdQ4g" },
+            { nome: "Nina", local: "Araxá - Minas Gerais", videoId: "mE6sYgbEP2Y" },
+            { nome: "Gracie", local: "São Paulo", videoId: "bXnIngn6_V4" },
+            { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "J-x5eJylbc4" },
+            { nome: "Clerionise", local: "Monte Carmelo - MG", videoId: "rSEX_GAqN7U" }
+        ];
+
+        let slideAtual = 0;
+
+        function renderColegasCarousel() {
+            const track = document.getElementById('colegas-track');
+            const dotsContainer = document.getElementById('colegas-dots');
+            track.innerHTML = '';
+            dotsContainer.innerHTML = '';
+
+            colegasDS1.forEach((aluno, index) => {
+                // Cria slide
+                const slide = document.createElement('div');
+                slide.className = 'carousel-slide';
+                slide.innerHTML = `
+                    <div class="slide-card">
+                        <div class="slide-header">
+                            <div class="student-info">
+                                <span class="student-name">${aluno.nome}</span>
+                                <div class="student-location">
+                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block; vertical-align:middle;">
+                                        <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                    </svg>
+                                    ${aluno.local}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-wrapper-outer">
+                            <div class="video-wrapper" data-src="https://www.youtube.com/embed/${aluno.videoId}" onclick="loadVideo(this)">
+                                <img alt="Apresentação de ${aluno.nome}" src="https://img.youtube.com/vi/${aluno.videoId}/hqdefault.jpg">
+                                <div class="play-button"></div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                track.appendChild(slide);
+
+                // Cria indicador (dot)
+                const dot = document.createElement('button');
+                dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
+                dot.onclick = () => irParaSlide(index);
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function pararVideosAtivos() {
+            const wrappers = document.querySelectorAll('#colegas-track .video-wrapper');
+            wrappers.forEach((wrapper, idx) => {
+                const iframe = wrapper.querySelector('iframe');
+                if (iframe) {
+                    const videoId = colegasDS1[idx].videoId;
+                    const nome = colegasDS1[idx].nome;
+                    wrapper.innerHTML = `
+                        <img alt="Apresentação de ${nome}" src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg">
+                        <div class="play-button"></div>
+                    `;
+                }
+            });
+        }
+
+        function irParaSlide(index) {
+            const track = document.getElementById('colegas-track');
+            const dots = document.querySelectorAll('.carousel-dot');
+            const totalSlides = colegasDS1.length;
+            
+            if (index < 0) index = totalSlides - 1;
+            if (index >= totalSlides) index = 0;
+            
+            // Para qualquer vídeo em execução antes de trocar de slide
+            pararVideosAtivos();
+            
+            slideAtual = index;
+            track.style.transform = `translateX(-${slideAtual * 100}%)`;
+            
+            dots.forEach((dot, idx) => {
+                dot.classList.toggle('active', idx === slideAtual);
+            });
+        }
+
+        function slideAnterior() {
+            irParaSlide(slideAtual - 1);
+        }
+
+        function slideProximo() {
+            irParaSlide(slideAtual + 1);
+        }
+
         function loadVideo(element) {
             const src = element.getAttribute('data-src');
             element.innerHTML = `<iframe src="${src}?autoplay=1&rel=0&showinfo=0&iv_load_policy=3&modestbranding=1" frameborder="0" allowfullscreen></iframe>`;
@@ -316,6 +644,11 @@
             const from = urlParams.get('from');
             window.location.href = from === 'geral2' ? 'fechado_geral2.html' : 'fechado_geral_protegido_site.html';
         }
+
+        // Inicializa o carrossel quando carregar
+        window.addEventListener('DOMContentLoaded', () => {
+            renderColegasCarousel();
+        });
     </script>
 </body>
 </html>
