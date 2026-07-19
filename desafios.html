@@ -467,6 +467,96 @@
                 padding-top: 20px;
             }
         }
+
+        /* Grid de Aulas de Desafio */
+        .challenges-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin: 20px auto 30px auto;
+            width: 100%;
+            max-width: 560px;
+        }
+
+        .challenge-btn {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 12px;
+            padding: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-sizing: border-box;
+            width: 100%;
+        }
+
+        .challenge-btn:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .challenge-btn.active {
+            background: rgba(255, 82, 82, 0.06);
+            border-color: #ff5252;
+            box-shadow: 0 0 15px rgba(255, 82, 82, 0.2);
+        }
+
+        .challenge-btn-title {
+            font-size: 9px;
+            font-weight: 800;
+            color: #ffffff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+            width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .challenge-btn-thumb-container {
+            width: 100%;
+            aspect-ratio: 16/9;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: #000;
+        }
+
+        .challenge-btn-thumb {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .challenge-btn:hover .challenge-btn-thumb {
+            transform: scale(1.05);
+        }
+
+        /* Animação para o card expansivo */
+        .challenge-card.active-viewer {
+            animation: slideDownChallenge 0.4s cubic-bezier(0.25, 0.8, 0.25, 1) forwards;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @keyframes slideDownChallenge {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
     </style>
 </head>
 <body>
@@ -487,53 +577,8 @@
             <p class="challenge-text-minor">um desafio para melhorar sua coordenação motora e encaixe de voz</p>
         </div>
 
-        <div class="challenge-card">
-            <h3 class="video-label">Desafio 1</h3>
-            <div class="video-wrapper-outer">
-                <div class="video-wrapper" data-src="https://www.youtube.com/embed/f7sBHkT1ebE" onclick="loadVideo(this)">
-                    <img alt="Desafio 1 - Desafio Sincronia" src="https://img.youtube.com/vi/f7sBHkT1ebE/hqdefault.jpg">
-                    <div class="play-button"></div>
-                </div>
-            </div>
-            <div class="download-btn-container">
-                <a href="https://drive.google.com/file/d/1BA4Rfl9DMN3Jh9FBSZ4x9YlJ1Hgr6p8l/view?usp=drive_link" target="_blank" class="btn-download">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align: middle;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    baixar cifra
-                </a>
-            </div>
-        </div>
-
-        <div class="challenge-card">
-            <h3 class="video-label">Desafio 2 e 3</h3>
-            <div class="video-wrapper-outer">
-                <div class="video-wrapper" data-src="https://www.youtube.com/embed/YmGDcOOscyc" onclick="loadVideo(this)">
-                    <img alt="Desafio 2 e 3 - Desafio Sincronia" src="https://img.youtube.com/vi/YmGDcOOscyc/hqdefault.jpg">
-                    <div class="play-button"></div>
-                </div>
-            </div>
-            <div class="download-btn-container">
-                <a href="https://drive.google.com/file/d/1jG6QzaSjIsvLTF6k2IH3Taccl69V25GR/view?usp=drive_link" target="_blank" class="btn-download">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align: middle;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Cifra Desafio 2
-                </a>
-                <a href="https://drive.google.com/file/d/1YL9O9pSQI-RQWRSEZt7WYVpWaSF5S6FN/view?usp=drive_link" target="_blank" class="btn-download">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align: middle;">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    Cifra Desafio 3
-                </a>
-            </div>
-        </div>
+        <div class="challenges-grid" id="challengesGrid"></div>
+        <div class="challenge-card active-viewer" id="activeChallengeViewer" style="display: none;"></div>
 
         <!-- Seção de Apresentações de Colegas -->
         <div class="colaboradores-section">
@@ -542,6 +587,10 @@
                 <button class="tab-btn active">Desafio 1</button>
                 <button class="tab-btn disabled" title="Em breve">
                     Desafio 2 e 3
+                    <span class="badge-em-breve">Em breve</span>
+                </button>
+                <button class="tab-btn disabled" title="Em breve">
+                    Desafio 4
                     <span class="badge-em-breve">Em breve</span>
                 </button>
             </div>
@@ -570,6 +619,35 @@
     </div>
 
     <script>
+        // Dados de todos os desafios e suas respectivas cifras (em formato de array para manter a ordem exata)
+        const dadosDesafios = [
+            {
+                id: "1",
+                titulo: "Desafio 1",
+                videoId: "f7sBHkT1ebE",
+                cifras: [
+                    { texto: "baixar cifra", link: "https://drive.google.com/file/d/1BA4Rfl9DMN3Jh9FBSZ4x9YlJ1Hgr6p8l/view?usp=drive_link" }
+                ]
+            },
+            {
+                id: "2-3",
+                titulo: "Desafio 2 e 3",
+                videoId: "YmGDcOOscyc",
+                cifras: [
+                    { texto: "Cifra Desafio 2", link: "https://drive.google.com/file/d/1jG6QzaSjIsvLTF6k2IH3Taccl69V25GR/view?usp=drive_link" },
+                    { texto: "Cifra Desafio 3", link: "https://drive.google.com/file/d/1YL9O9pSQI-RQWRSEZt7WYVpWaSF5S6FN/view?usp=drive_link" }
+                ]
+            },
+            {
+                id: "4",
+                titulo: "Desafio 4",
+                videoId: "_XcTVvBlz_I",
+                cifras: [
+                    { texto: "Cifra Desafio 4", link: "https://drive.google.com/file/d/12m0-1QvhzZsEeUxydd5dFuAtEZBcidh6/view?usp=drive_link" }
+                ]
+            }
+        ];
+
         // Lista de alunos do Desafio 1 fornecida pelo produtor
         const colegasDS1 = [
             { nome: "Geni", local: "Goiás", videoId: "bo0EowNe4hU" },
@@ -581,7 +659,89 @@
         ];
 
         let slideAtual = 0;
+        let desafioAtivoId = null;
 
+        // Renderiza o grid de botões
+        function renderGridButtons() {
+            const grid = document.getElementById('challengesGrid');
+            grid.innerHTML = '';
+            
+            dadosDesafios.forEach(desafio => {
+                const id = desafio.id;
+                const btn = document.createElement('div');
+                btn.className = `challenge-btn ${desafioAtivoId === id ? 'active' : ''}`;
+                btn.onclick = () => alternarDesafio(id);
+                
+                btn.innerHTML = `
+                    <span class="challenge-btn-title">${desafio.titulo}</span>
+                    <div class="challenge-btn-thumb-container">
+                        <img class="challenge-btn-thumb" src="https://img.youtube.com/vi/${desafio.videoId}/mqdefault.jpg" alt="${desafio.titulo}">
+                    </div>
+                `;
+                grid.appendChild(btn);
+            });
+        }
+
+        // Gerencia a abertura/fechamento das aulas
+        function alternarDesafio(id) {
+            const viewer = document.getElementById('activeChallengeViewer');
+            
+            if (desafioAtivoId === id) {
+                // Toggle off: Fecha o atual
+                viewer.style.display = 'none';
+                viewer.innerHTML = '';
+                desafioAtivoId = null;
+            } else {
+                // Toggle on: Abre o novo
+                viewer.style.display = 'none'; // Reseta animação
+                
+                desafioAtivoId = id;
+                const desafio = dadosDesafios.find(d => d.id === id);
+                
+                let cifrasHtml = desafio.cifras.map(cifra => `
+                    <a href="${cifra.link}" target="_blank" class="btn-download">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block; vertical-align: middle;">
+                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                            <polyline points="7 10 12 15 17 10"></polyline>
+                            <line x1="12" y1="15" x2="12" y2="3"></line>
+                        </svg>
+                        ${cifra.texto}
+                    </a>
+                `).join('');
+
+                viewer.innerHTML = `
+                    <h3 class="video-label" style="margin-bottom: 0;">${desafio.titulo}</h3>
+                    <div class="video-wrapper-outer">
+                        <div class="video-wrapper" data-src="https://www.youtube.com/embed/${desafio.videoId}" onclick="loadVideo(this)">
+                            <img alt="${desafio.titulo}" src="https://img.youtube.com/vi/${desafio.videoId}/hqdefault.jpg">
+                            <div class="play-button"></div>
+                        </div>
+                    </div>
+                    <div class="download-btn-container" style="margin-top: 10px;">
+                        ${cifrasHtml}
+                    </div>
+                `;
+                
+                // Força reflow para ativar animação CSS
+                void viewer.offsetWidth;
+                viewer.style.display = 'flex';
+                
+                // Rola suavemente para focar na aula (especialmente mobile)
+                if (window.innerWidth <= 600) {
+                    setTimeout(() => {
+                        viewer.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }, 100);
+                }
+            }
+            
+            // Atualiza classe ativa no grid de botões
+            document.querySelectorAll('.challenge-btn').forEach((btn, index) => {
+                const idBtn = dadosDesafios[index].id;
+                btn.classList.toggle('active', idBtn === desafioAtivoId);
+            });
+        }
+
+        // Funções do Carrossel de Colegas
         function renderColegasCarousel() {
             const track = document.getElementById('colegas-track');
             const dotsContainer = document.getElementById('colegas-dots');
@@ -589,7 +749,6 @@
             dotsContainer.innerHTML = '';
 
             colegasDS1.forEach((aluno, index) => {
-                // Cria slide
                 const slide = document.createElement('div');
                 slide.className = 'carousel-slide';
                 slide.innerHTML = `
@@ -615,7 +774,6 @@
                 `;
                 track.appendChild(slide);
 
-                // Cria indicador (dot)
                 const dot = document.createElement('button');
                 dot.className = `carousel-dot ${index === 0 ? 'active' : ''}`;
                 dot.onclick = () => irParaSlide(index);
@@ -646,7 +804,6 @@
             if (index < 0) index = totalSlides - 1;
             if (index >= totalSlides) index = 0;
             
-            // Para qualquer vídeo em execução antes de trocar de slide
             pararVideosAtivos();
             
             slideAtual = index;
@@ -678,6 +835,7 @@
 
         // Inicializa o carrossel quando carregar
         window.addEventListener('DOMContentLoaded', () => {
+            renderGridButtons();
             renderColegasCarousel();
         });
     </script>
