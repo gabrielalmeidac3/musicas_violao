@@ -470,15 +470,18 @@
 
         /* Grid de Aulas de Desafio */
         .challenges-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 12px;
             margin: 20px auto 30px auto;
             width: 100%;
             max-width: 560px;
         }
 
         .challenge-btn {
+            flex: 0 0 calc(50% - 6px);
+            max-width: calc(50% - 6px);
             background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(255, 255, 255, 0.06);
             border-radius: 12px;
@@ -506,7 +509,7 @@
         }
 
         .challenge-btn-title {
-            font-size: 9px;
+            font-size: 11px;
             font-weight: 800;
             color: #ffffff;
             text-transform: uppercase;
