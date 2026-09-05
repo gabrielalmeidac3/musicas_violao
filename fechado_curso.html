@@ -8,9 +8,12 @@
 <link href="fechado_styles.css" rel="stylesheet"/>
 <style>
   .search-container {
-    margin: 10px 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 15px auto;
     position: relative;
     z-index: 1000;
+    box-sizing: border-box;
   }
   
   #searchInput {
@@ -18,7 +21,7 @@
     margin: 0 auto;
     display: block;
     color: white !important;
-    padding: 12px 20px;
+    padding: 12px 50px 12px 20px;
     font-size: 16px;
     
     border-radius: 30px;
@@ -161,41 +164,59 @@ body {
   }
 
   .toggle-modules-btn {
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: 100%;
-    margin: 15px 0 15px 0;
-    padding: 6px 15px;
-    background: #747a46;
+    margin: 0;
+    padding: 10px 8px;
+    background: #4a2e1b;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 16px;
-    white-space: nowrap;
-    overflow: hidden;
+    font-size: 15px;
+    line-height: 1.3;
+    white-space: normal;
+    word-break: normal;
+    text-align: center;
+    min-height: 48px;
+    box-sizing: border-box;
+    transition: background 0.3s ease;
   }
  
-  @keyframes rolarTexto {
-    0% {
-      transform: translateX(0);
-    }
-    85% {
-      transform: translateX(var(--scroll-distance, 0px));
-    }
-    100% {
-      transform: translateX(var(--scroll-distance, 0px));
-    }
+  .toggle-modules-btn:hover {
+    background: #5c3a23;
   }
-  
+
   .btn-scroll-text {
-    display: inline-block;
-    animation: rolarTexto 5s ease-in-out infinite;
-    margin: 0 15px;
-    box-sizing: content-box;
+    display: block;
+    width: 100%;
+    text-align: center;
+    white-space: normal;
+    margin: 0;
+    padding: 0;
+    line-height: 1.3;
   }
   
   .toggle-modules-btn.active {
-    background: #747a46;
+    background: #3b2314;
+  }
+
+  .toggle-nivel {
+    background: #4a2e1b !important;
+  }
+
+  .toggle-nivel:hover {
+    background: #5c3a23 !important;
+  }
+
+  @media (max-width: 600px) {
+    .toggle-modules-btn {
+      font-size: 13px;
+      padding: 8px 6px;
+      min-height: 44px;
+    }
   }
 
   .video-container {
@@ -324,17 +345,21 @@ body {
 
 <div class="search-container">
       <div class="search-wrapper">
-        <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
-        <span id="clearSearch" style="position: absolute; right: 35px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.6); font-size: 20px; cursor: pointer; display: none; user-select: none; z-index: 10;">✕</span>
+        <input type="text" id="searchInput" placeholder="Clique aqui para pesquisar pelo..." />
+        <span id="clearSearch" style="position: absolute; right: 46px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.6); font-size: 20px; cursor: pointer; display: none; user-select: none; z-index: 10;">✕</span>
+        <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.7); pointer-events: none; z-index: 10;">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
       </div>
       <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
 
-      <div style="display: flex; gap: 10px; width: 100%; margin: 15px 0;">
-      <button id="toggleModulesBtn" class="toggle-modules-btn" style="flex: 1; margin: 0; padding: 0;">
-        <div class="btn-scroll-text" style="padding: 6px 0; white-space: nowrap;">Abrir pesquisa por módulos</div>
+      <div style="display: flex; gap: 10px; width: 100%; margin: 15px auto; justify-content: center; align-items: stretch;">
+      <button id="toggleModulesBtn" class="toggle-modules-btn" style="flex: 1;">
+        <div class="btn-scroll-text">Abrir pesquisa por módulos</div>
       </button>
-      <button class="toggle-nivel toggle-modules-btn" onclick="toggleNivel()" style="flex: 1; margin: 0; padding: 0;">
-        <div class="btn-scroll-text" style="padding: 6px 0; white-space: nowrap;">Veja em qual nível de violão você está</div>
+      <button class="toggle-nivel toggle-modules-btn" onclick="toggleNivel()" style="flex: 1;">
+        <div class="btn-scroll-text">Veja em qual nível de violão você está</div>
       </button>
     </div>
 
@@ -1546,24 +1571,7 @@ function toggleNivel() {
 }
 
 function calcularRolagemTexto() {
-  const divs = document.querySelectorAll('.btn-scroll-text');
-  
-  divs.forEach(div => {
-    const parentWidth = div.parentElement.offsetWidth;
-    const textWidth = div.scrollWidth;
-    const marginRight = 0;
-    
-    // Calcula quanto precisa mover para o final do texto encostar na margem
-    const marginTotal = 30; // 15px esquerda + 15px direita
-    const distancia = -(textWidth - (parentWidth - marginTotal));
-    
-    // Só aplica animação se o texto for maior que o botão
-    if (textWidth > parentWidth) {
-      div.style.setProperty('--scroll-distance', `${distancia}px`);
-    } else {
-      div.style.animation = 'none';
-    }
-  });
+  // Desativado para permitir quebra de linha natural em 2 linhas
 }
 
 window.addEventListener('load', calcularRolagemTexto);
