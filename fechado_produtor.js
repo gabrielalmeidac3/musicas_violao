@@ -2,6 +2,7 @@ initFirebase();
 
 let auth;
 let db;
+let savedFirebaseConfig = null;
 
 // Verifica se o Firebase está carregado
 if (typeof firebase === 'undefined') {
@@ -14,6 +15,7 @@ async function initFirebase() {
     try {
       const response = await fetch('https://broken-silence-aaa9.2gabrielekaline.workers.dev');
       const firebaseConfig = await response.json();
+      savedFirebaseConfig = firebaseConfig;
   
       firebase.initializeApp(firebaseConfig);
       auth = firebase.auth();
@@ -27,10 +29,10 @@ async function initFirebase() {
           const painel = document.getElementById("painel");
           
           if (user) {
-              const email = user.email;
+              const email = user.email || "";
               const telefoneEmail = email.split('@')[0]; // ex: "95984224764"
               
-              // Gera variantes do número para tentar buscar no Firestore
+              // Gera variantes do número para verificar se é o produtor
               let tel10 = telefoneEmail;
               let tel11 = telefoneEmail;
               if (telefoneEmail.length === 11 && telefoneEmail[2] === '9') {
@@ -39,31 +41,8 @@ async function initFirebase() {
                   tel11 = telefoneEmail.substring(0, 2) + '9' + telefoneEmail.substring(2);
               }
 
-              // Verificação de administrador pelo número (hardcoded como salvaguarda)
-              const isAdminByNumber = (tel10 === "9584224764" || tel11 === "95984224764");
-
-              // Tenta buscar o documento pelo UID ou pelas variantes do telefone (evita operação de lista)
-              let isAdminByFirestore = false;
-              try {
-                  let docSnap = await db.collection("alunos").doc(user.uid).get();
-                  
-                  // Se não achar por UID, tenta por telefone (suporte a registros antigos)
-                  if (!docSnap.exists) {
-                      docSnap = await db.collection("alunos").doc(tel10).get();
-                  }
-                  if (!docSnap.exists) {
-                      docSnap = await db.collection("alunos").doc(tel11).get();
-                  }
-
-                  if (docSnap.exists) {
-                      const data = docSnap.data();
-                      isAdminByFirestore = (data.admin === true || data.role === "admin");
-                  }
-              } catch (err) {
-                  console.warn("Não foi possível verificar admin no Firestore:", err.message);
-              }
-
-              const isAdmin = isAdminByNumber || isAdminByFirestore;
+              // Verificação de administrador exclusivamente pelo número do produtor
+              const isAdmin = (tel10 === "9584224764" || tel11 === "95984224764");
 
               if (isAdmin) {
                   console.log("Produtor autorizado!");
@@ -72,7 +51,7 @@ async function initFirebase() {
                   carregarAlunos();
               } else {
                   console.warn("Acesso negado: usuário não é administrador.");
-                  alert("Acesso negado. Este usuário não possui permissão de administrador.");
+                  alert("Acesso negado. Este painel é exclusivo para o produtor.");
                   await auth.signOut();
                   loginForm.style.display = "block";
                   painel.style.display = "none";
@@ -127,29 +106,19 @@ document.getElementById("loginProdutorForm").addEventListener("submit", async (e
             tel11 = cleanedTelefone.substring(0, 2) + '9' + cleanedTelefone.substring(2);
         }
 
-        // Se for a senha coringa (1585), busca a senha real do Firestore pelo ID do documento
-        let senhaFirebase = senha + "00";
-        if (senha === "1585") {
-            try {
-                let docSnap = await db.collection("alunos").doc(tel10).get();
-                if (!docSnap.exists) {
-                    docSnap = await db.collection("alunos").doc(tel11).get();
-                }
-                if (docSnap.exists) {
-                    const data = docSnap.data();
-                    // Usa a senha real do aluno (o mesmo que ele usa normalmente + "00")
-                    senhaFirebase = (data.senha || "1585") + "00";
-                    console.log("Senha coringa: usando senha real do cadastro.");
-                }
-            } catch (err) {
-                console.warn("Não foi possível buscar senha coringa:", err.message);
-                // Mantém senhaFirebase = "158500" como fallback
-            }
+        // Permite login exclusivamente para o número do produtor
+        if (tel10 !== "9584224764" && tel11 !== "95984224764") {
+            erroMsg.textContent = "Acesso exclusivo para o produtor autorizado.";
+            loginForm.appendChild(erroMsg);
+            return;
         }
 
+        // Prepara a senha para autenticação no Firebase
+        let senhaFirebase = senha + "00";
+
         const tentativas = [
-            `${tel10}@curso.com`,
             `${tel11}@curso.com`,
+            `${tel10}@curso.com`,
         ];
 
         // Tenta as combinações de e-mail em sequência
@@ -178,14 +147,13 @@ document.getElementById("loginProdutorForm").addEventListener("submit", async (e
 });
 
 // Cadastro de aluno
-
 document.getElementById("cadastroForm").addEventListener("submit", async (e) => {
     e.preventDefault();
     console.log("Formulário de cadastro submetido");
 
-    const nome = document.getElementById("nome").value;
-    const telefone = document.getElementById("telefoneCadastro").value;
-    const senhaInput = document.getElementById("senhaCadastro").value;
+    const nome = document.getElementById("nome").value.trim();
+    const telefone = document.getElementById("telefoneCadastro").value.trim();
+    const senhaInput = document.getElementById("senhaCadastro").value.trim();
     const senhaCurta = senhaInput || gerarSenhaAleatoria();
     const senhaFirebase = senhaCurta + "00";
     const email = `${telefone.replace(/\D/g, '')}@curso.com`;
@@ -196,10 +164,27 @@ document.getElementById("cadastroForm").addEventListener("submit", async (e) => 
     mensagemDiv.style.marginTop = "10px";
     formulario.appendChild(mensagemDiv);
 
+    if (!savedFirebaseConfig) {
+        mensagemDiv.textContent = "Aguarde o carregamento do Firebase.";
+        mensagemDiv.style.color = "#ff4444";
+        setTimeout(() => mensagemDiv.remove(), 3000);
+        return;
+    }
+
+    // Cria uma aplicação Firebase secundária temporária para criar a conta sem deslogar o produtor
+    let secondaryApp = null;
     try {
-        const userCredential = await auth.createUserWithEmailAndPassword(email, senhaFirebase);
+        const appName = "Cadastrador_" + Date.now();
+        secondaryApp = firebase.initializeApp(savedFirebaseConfig, appName);
+        const secondaryAuth = secondaryApp.auth();
+
+        const userCredential = await secondaryAuth.createUserWithEmailAndPassword(email, senhaFirebase);
         const uid = userCredential.user.uid;
 
+        // Desconecta a conta secundária imediatamente
+        await secondaryAuth.signOut();
+
+        // Salva os dados no Firestore através da sessão do produtor que continua ativa e intacta
         await db.collection("alunos").doc(uid).set({
             nome: nome,
             telefone: telefone,
@@ -221,6 +206,14 @@ document.getElementById("cadastroForm").addEventListener("submit", async (e) => 
         }
         mensagemDiv.style.color = "#ff4444";
         setTimeout(() => mensagemDiv.remove(), 3000);
+    } finally {
+        if (secondaryApp) {
+            try {
+                await secondaryApp.delete();
+            } catch (delErr) {
+                console.warn("Erro ao limpar app secundário:", delErr);
+            }
+        }
     }
 });
 
@@ -279,7 +272,7 @@ function renderListaAlunos(alunos) {
 
         const senhaDiv = document.createElement("div");
         senhaDiv.className = "aluno-senha";
-        senhaDiv.textContent = `Senha: ${aluno.senha || "1585"}`;
+        senhaDiv.textContent = `Senha: ${aluno.senha || ""}`;
 
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "aluno-actions";
@@ -287,7 +280,7 @@ function renderListaAlunos(alunos) {
         const botaoCopiar = document.createElement("button");
         botaoCopiar.textContent = "Copiar";
         botaoCopiar.className = "copiar-btn";
-        botaoCopiar.onclick = () => copiarDadosAcesso(aluno.nome, aluno.telefone, aluno.senha || "1585", botaoCopiar);
+        botaoCopiar.onclick = () => copiarDadosAcesso(aluno.nome, aluno.telefone, aluno.senha || "", botaoCopiar);
 
         const botaoAcesso = document.createElement("button");
         botaoAcesso.textContent = aluno.acesso === "Liberado" ? "Bloquear" : "Liberar";
