@@ -156,7 +156,10 @@ initFirebase().then(() => {
                 const nome = user.displayName || "Aluno";
                 const foto = user.photoURL || "";
 
-                // Verifica se já existe cadastro deste aluno no Firestore
+                // Referência do documento do aluno no Firestore
+                const docRef = db.collection("alunos").doc(uid);
+                const docSnap = await docRef.get();
+
                 // Função para monitorar a aprovação em tempo real
                 const iniciarMonitoramentoAprovacao = () => {
                     if (window.unsubListenerAluno) {
