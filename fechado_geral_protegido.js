@@ -157,8 +157,41 @@ initFirebase().then(() => {
                 const foto = user.photoURL || "";
 
                 // Verifica se já existe cadastro deste aluno no Firestore
-                const docRef = db.collection("alunos").doc(uid);
-                const docSnap = await docRef.get();
+                // Função para monitorar a aprovação em tempo real
+                const iniciarMonitoramentoAprovacao = () => {
+                    if (window.unsubListenerAluno) {
+                        window.unsubListenerAluno();
+                    }
+
+                    window.unsubListenerAluno = docRef.onSnapshot((snapshot) => {
+                        if (snapshot.exists) {
+                            const dados = snapshot.data();
+                            const status = dados.acesso || dados.status;
+
+                            if (status === "Liberado") {
+                                if (avisoMsg) {
+                                    avisoMsg.style.backgroundColor = "rgba(76, 175, 80, 0.15)";
+                                    avisoMsg.style.color = "#81c784";
+                                    avisoMsg.style.border = "1px solid #81c784";
+                                    avisoMsg.innerHTML = "🎉 <strong>Acesso liberado pelo professor!</strong><br>Entrando no curso automaticamente...";
+                                    avisoMsg.style.display = "block";
+                                }
+                                setTimeout(() => {
+                                    const urlParams = new URLSearchParams(window.location.search);
+                                    const from = urlParams.get('from');
+                                    window.location.href = from === 'geral2' ? 'fechado_index.html?from=geral2' : 'fechado_geral_protegido_site.html';
+                                }, 1200);
+                            } else if (status === "Bloqueado") {
+                                if (erroMsg) {
+                                    erroMsg.textContent = "Acesso temporariamente bloqueado para este aluno.";
+                                    erroMsg.style.display = "block";
+                                }
+                                if (avisoMsg) avisoMsg.style.display = "none";
+                                auth.signOut();
+                            }
+                        }
+                    });
+                };
 
                 if (!docSnap.exists) {
                     // Novo aluno: cadastra no Firestore como Pendente
@@ -175,10 +208,12 @@ initFirebase().then(() => {
                         avisoMsg.style.backgroundColor = "rgba(255, 193, 7, 0.15)";
                         avisoMsg.style.color = "#ffc107";
                         avisoMsg.style.border = "1px solid #ffc107";
-                        avisoMsg.innerHTML = "⏳ <strong>Solicitação enviada com sucesso!</strong><br>Aguarde a liberação do professor Gabriel para acessar as aulas.";
+                        avisoMsg.innerHTML = "⏳ <strong>Solicitação enviada com sucesso!</strong><br>Aguarde a liberação do professor Gabriel (você entrará automaticamente assim que for aprovado).";
                         avisoMsg.style.display = "block";
                     }
-                    await auth.signOut();
+
+                    // Fica monitorando em tempo real a aprovação do produtor
+                    iniciarMonitoramentoAprovacao();
                     return;
                 }
 
@@ -195,10 +230,12 @@ initFirebase().then(() => {
                         avisoMsg.style.backgroundColor = "rgba(255, 193, 7, 0.15)";
                         avisoMsg.style.color = "#ffc107";
                         avisoMsg.style.border = "1px solid #ffc107";
-                        avisoMsg.innerHTML = "⏳ <strong>Sua solicitação está em análise.</strong><br>Aguarde a liberação do professor Gabriel para acessar as aulas.";
+                        avisoMsg.innerHTML = "⏳ <strong>Sua solicitação está em análise.</strong><br>Aguarde a liberação do professor Gabriel (você entrará automaticamente assim que for aprovado).";
                         avisoMsg.style.display = "block";
                     }
-                    await auth.signOut();
+
+                    // Fica monitorando em tempo real a aprovação do produtor
+                    iniciarMonitoramentoAprovacao();
                 } else {
                     erroMsg.textContent = "Acesso temporariamente bloqueado para este aluno.";
                     erroMsg.style.display = "block";
