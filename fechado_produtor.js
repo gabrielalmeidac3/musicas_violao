@@ -464,22 +464,31 @@ function atualizarTelas() {
     filtrarEApresentarAlunos(searchQuery, ativos);
 }
 
-// Carregar lista de alunos do Firestore
-async function carregarAlunos() {
+let unsubAlunosListener = null;
+
+// Carregar lista de alunos do Firestore em tempo real
+function carregarAlunos() {
+    if (unsubAlunosListener) {
+        unsubAlunosListener();
+    }
+
     try {
-        const snapshot = await db.collection("alunos").get();
-        alunosCarregados = [];
-        snapshot.forEach((doc) => {
-            alunosCarregados.push({
-                id: doc.id,
-                ...doc.data()
+        unsubAlunosListener = db.collection("alunos").onSnapshot((snapshot) => {
+            alunosCarregados = [];
+            snapshot.forEach((doc) => {
+                alunosCarregados.push({
+                    id: doc.id,
+                    ...doc.data()
+                });
             });
+            
+            // Ordena por nome de A-Z
+            alunosCarregados.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
+            
+            atualizarTelas();
+        }, (error) => {
+            console.error("Erro no listener em tempo real de alunos:", error);
         });
-        
-        // Ordena por nome de A-Z
-        alunosCarregados.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
-        
-        atualizarTelas();
     } catch (error) {
         console.error("Erro ao carregar alunos:", error);
     }
