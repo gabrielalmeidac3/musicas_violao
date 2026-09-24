@@ -25,8 +25,10 @@ initFirebase().then(() => {
         const telefone = document.getElementById("telefone").value;
         const senha = document.getElementById("senha").value;
         const erroMsg = document.getElementById("erro");
+        const avisoMsg = document.getElementById("aviso");
 
         erroMsg.style.display = "none"; // Reseta a mensagem de erro
+        if (avisoMsg) avisoMsg.style.display = "none";
 
         try {
             let cleanedTelefone = telefone.replace(/\D/g, '');
@@ -121,4 +123,102 @@ initFirebase().then(() => {
             }
         }
     });
+
+    // Listener do botão Entrar com Google
+    const btnGoogle = document.getElementById("btnGoogle");
+    if (btnGoogle) {
+        btnGoogle.addEventListener("click", async () => {
+            const erroMsg = document.getElementById("erro");
+            const avisoMsg = document.getElementById("aviso");
+
+            erroMsg.style.display = "none";
+            if (avisoMsg) avisoMsg.style.display = "none";
+
+            const htmlOriginal = btnGoogle.innerHTML;
+            btnGoogle.disabled = true;
+            btnGoogle.style.opacity = "0.7";
+
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                provider.setCustomParameters({ prompt: 'select_account' });
+
+                const userCredential = await auth.signInWithPopup(provider);
+                const user = userCredential.user;
+
+                if (!user) {
+                    btnGoogle.disabled = false;
+                    btnGoogle.style.opacity = "1";
+                    return;
+                }
+
+                const uid = user.uid;
+                const email = user.email || "";
+                const nome = user.displayName || "Aluno";
+                const foto = user.photoURL || "";
+
+                // Verifica se já existe cadastro deste aluno no Firestore
+                const docRef = db.collection("alunos").doc(uid);
+                const docSnap = await docRef.get();
+
+                if (!docSnap.exists) {
+                    // Novo aluno: cadastra no Firestore como Pendente
+                    await docRef.set({
+                        nome: nome,
+                        email: email,
+                        foto: foto,
+                        tipoLogin: "google",
+                        acesso: "Pendente",
+                        criadoEm: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    if (avisoMsg) {
+                        avisoMsg.style.backgroundColor = "rgba(255, 193, 7, 0.15)";
+                        avisoMsg.style.color = "#ffc107";
+                        avisoMsg.style.border = "1px solid #ffc107";
+                        avisoMsg.innerHTML = "⏳ <strong>Solicitação enviada com sucesso!</strong><br>Aguarde a liberação do professor Gabriel para acessar as aulas.";
+                        avisoMsg.style.display = "block";
+                    }
+                    await auth.signOut();
+                    return;
+                }
+
+                // Aluno já cadastrado no Firestore: verifica permissão de acesso
+                const aluno = docSnap.data();
+                const statusAcesso = aluno.acesso || aluno.status;
+
+                if (statusAcesso === "Liberado") {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const from = urlParams.get('from');
+                    window.location.href = from === 'geral2' ? 'fechado_index.html?from=geral2' : 'fechado_geral_protegido_site.html';
+                } else if (statusAcesso === "Pendente") {
+                    if (avisoMsg) {
+                        avisoMsg.style.backgroundColor = "rgba(255, 193, 7, 0.15)";
+                        avisoMsg.style.color = "#ffc107";
+                        avisoMsg.style.border = "1px solid #ffc107";
+                        avisoMsg.innerHTML = "⏳ <strong>Sua solicitação está em análise.</strong><br>Aguarde a liberação do professor Gabriel para acessar as aulas.";
+                        avisoMsg.style.display = "block";
+                    }
+                    await auth.signOut();
+                } else {
+                    erroMsg.textContent = "Acesso temporariamente bloqueado para este aluno.";
+                    erroMsg.style.display = "block";
+                    await auth.signOut();
+                }
+
+            } catch (error) {
+                console.error("Erro no login com Google:", error);
+                if (error.code !== "auth/popup-closed-by-user" && error.code !== "auth/cancelled-popup-request") {
+                    erroMsg.textContent = "Erro ao autenticar com Google. Tente novamente.";
+                    erroMsg.style.display = "block";
+                }
+                if (auth.currentUser) {
+                    await auth.signOut();
+                }
+            } finally {
+                btnGoogle.disabled = false;
+                btnGoogle.style.opacity = "1";
+                btnGoogle.innerHTML = htmlOriginal;
+            }
+        });
+    }
 });
