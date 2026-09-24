@@ -934,3 +934,132 @@ button {
 .nivel-5 .nivel-titulo {
     color: #d7801c;
 }
+
+/* ========================================================
+   ESTILOS DE APROVAÇÕES PENDENTES - PAINEL DO PRODUTOR
+   ======================================================== */
+.pendentes-section {
+    background: rgba(255, 193, 7, 0.05);
+    border: 1px solid rgba(255, 193, 7, 0.25);
+    border-radius: 14px;
+    padding: 16px 20px;
+    margin-bottom: 25px;
+}
+
+.pendentes-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+}
+
+.pendentes-header h2 {
+    color: #ffc107 !important;
+    font-size: 1.2em !important;
+    margin: 0 !important;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.badge-pendentes {
+    background: #ffc107;
+    color: #121212;
+    font-size: 0.75em;
+    padding: 2px 9px;
+    border-radius: 12px;
+    font-weight: 800;
+}
+
+.lista-pendentes {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.lista-pendentes li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.35);
+    border: 1px solid rgba(255, 193, 7, 0.2);
+    padding: 12px 16px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    gap: 12px;
+}
+
+.aluno-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+}
+
+.aluno-avatar {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid rgba(255, 193, 7, 0.4);
+    flex-shrink: 0;
+}
+
+.aluno-avatar-placeholder {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #2d3748;
+    color: #ffc107;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 16px;
+    border-radius: 50%;
+    border: 2px solid rgba(255, 193, 7, 0.3);
+    flex-shrink: 0;
+}
+
+.aluno-origem-badge {
+    display: inline-block;
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: 4px;
+    margin-left: 6px;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.badge-google {
+    background: rgba(66, 133, 244, 0.2);
+    color: #8ab4f8;
+    border: 1px solid rgba(66, 133, 244, 0.4);
+}
+
+.badge-telefone {
+    background: rgba(76, 175, 80, 0.2);
+    color: #81c784;
+    border: 1px solid rgba(76, 175, 80, 0.4);
+}
+
+.aprovar-btn {
+    background: #2e7d32;
+    box-shadow: 0 4px 10px rgba(46, 125, 50, 0.3);
+}
+
+.aprovar-btn:hover {
+    background: #1b5e20;
+    transform: translateY(-1px);
+}
+
+.recusar-btn {
+    background: #c62828;
+    box-shadow: 0 4px 10px rgba(198, 40, 40, 0.3);
+}
+
+.recusar-btn:hover {
+    background: #b71c1c;
+    transform: translateY(-1px);
+}

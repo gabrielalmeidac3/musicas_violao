@@ -246,7 +246,126 @@ ${senha}`;
     });
 }
 
-// Renderizar a lista de alunos
+// Renderizar a lista de solicitações pendentes (Google)
+function renderListaPendentes(pendentes) {
+    const lista = document.getElementById("listaPendentes");
+    const section = document.getElementById("pendentesSection");
+    const badge = document.getElementById("badgePendentes");
+    
+    if (!lista || !section) return;
+
+    if (pendentes.length === 0) {
+        section.style.display = "none";
+        lista.innerHTML = "";
+        return;
+    }
+
+    section.style.display = "block";
+    if (badge) badge.textContent = pendentes.length;
+    lista.innerHTML = "";
+
+    pendentes.forEach((aluno) => {
+        const li = document.createElement("li");
+        li.dataset.id = aluno.id;
+
+        // Lado esquerdo: Avatar e Informações
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "aluno-card-left";
+
+        if (aluno.foto) {
+            const img = document.createElement("img");
+            img.src = aluno.foto;
+            img.alt = aluno.nome || "Aluno";
+            img.className = "aluno-avatar";
+            leftDiv.appendChild(img);
+        } else {
+            const placeholder = document.createElement("div");
+            placeholder.className = "aluno-avatar-placeholder";
+            placeholder.textContent = (aluno.nome || "A").charAt(0).toUpperCase();
+            leftDiv.appendChild(placeholder);
+        }
+
+        const infoDiv = document.createElement("div");
+        infoDiv.className = "aluno-info";
+        infoDiv.innerHTML = `
+            <div class="aluno-nome">
+                ${aluno.nome || "Sem Nome"}
+                <span class="aluno-origem-badge badge-google">Google</span>
+            </div>
+            <div class="aluno-telefone">${aluno.email || aluno.telefone || "Sem e-mail"}</div>
+        `;
+        leftDiv.appendChild(infoDiv);
+
+        // Lado direito: Botões de Ação
+        const actionsDiv = document.createElement("div");
+        actionsDiv.className = "aluno-actions";
+
+        const btnAprovar = document.createElement("button");
+        btnAprovar.textContent = "Aprovar ✅";
+        btnAprovar.className = "aprovar-btn";
+        btnAprovar.onclick = () => aprovarAluno(aluno.id, btnAprovar);
+
+        const btnRecusar = document.createElement("button");
+        btnRecusar.textContent = "Recusar ❌";
+        btnRecusar.className = "recusar-btn";
+        btnRecusar.onclick = () => recusarAluno(aluno.id, aluno.nome);
+
+        actionsDiv.appendChild(btnAprovar);
+        actionsDiv.appendChild(btnRecusar);
+
+        li.appendChild(leftDiv);
+        li.appendChild(actionsDiv);
+        lista.appendChild(li);
+    });
+}
+
+// Aprovar aluno pendente
+async function aprovarAluno(id, botao) {
+    const originalText = botao.textContent;
+    botao.textContent = "Aprovando...";
+    botao.disabled = true;
+
+    try {
+        await db.collection("alunos").doc(id).update({
+            acesso: "Liberado",
+            aprovadoEm: firebase.firestore.FieldValue.serverTimestamp()
+        });
+
+        // Atualiza na lista em memória
+        const aluno = alunosCarregados.find(a => a.id === id);
+        if (aluno) {
+            aluno.acesso = "Liberado";
+        }
+
+        atualizarTelas();
+        console.log("Aluno aprovado com sucesso!");
+    } catch (error) {
+        console.error("Erro ao aprovar aluno:", error);
+        alert("Erro ao aprovar aluno. Verifique as permissões.");
+        botao.textContent = originalText;
+        botao.disabled = false;
+    }
+}
+
+// Recusar / Excluir solicitação de aluno pendente
+async function recusarAluno(id, nome) {
+    const confirmacao = confirm(`Deseja realmente recusar e remover a solicitação de ${nome || "este aluno"}?`);
+    if (!confirmacao) return;
+
+    try {
+        await db.collection("alunos").doc(id).delete();
+
+        // Remove da memória
+        alunosCarregados = alunosCarregados.filter(a => a.id !== id);
+        atualizarTelas();
+        console.log("Solicitação recusada e removida com sucesso!");
+    } catch (error) {
+        console.error("Erro ao recusar aluno:", error);
+        alert("Erro ao recusar solicitação.");
+    }
+}
+
+// Renderizar a lista geral de alunos cadastrados
 function renderListaAlunos(alunos) {
     const lista = document.getElementById("listaAlunos");
     lista.innerHTML = "";
@@ -263,24 +382,56 @@ function renderListaAlunos(alunos) {
         const li = document.createElement("li");
         li.dataset.id = aluno.id;
 
+        const leftDiv = document.createElement("div");
+        leftDiv.className = "aluno-card-left";
+
+        const isGoogle = aluno.tipoLogin === "google" || (!aluno.telefone && aluno.email);
+
+        if (aluno.foto) {
+            const img = document.createElement("img");
+            img.src = aluno.foto;
+            img.alt = aluno.nome || "Aluno";
+            img.className = "aluno-avatar";
+            leftDiv.appendChild(img);
+        } else {
+            const placeholder = document.createElement("div");
+            placeholder.className = "aluno-avatar-placeholder";
+            placeholder.textContent = (aluno.nome || "A").charAt(0).toUpperCase();
+            leftDiv.appendChild(placeholder);
+        }
+
         const infoDiv = document.createElement("div");
         infoDiv.className = "aluno-info";
-        infoDiv.innerHTML = `
-            <div class="aluno-nome">${aluno.nome}</div>
-            <div class="aluno-telefone">${aluno.telefone}</div>
-        `;
+        const badgeClass = isGoogle ? "badge-google" : "badge-telefone";
+        const badgeText = isGoogle ? "Google" : "Telefone";
+        const contato = aluno.telefone || aluno.email || "Sem contato";
 
+        infoDiv.innerHTML = `
+            <div class="aluno-nome">
+                ${aluno.nome || "Sem Nome"}
+                <span class="aluno-origem-badge ${badgeClass}">${badgeText}</span>
+            </div>
+            <div class="aluno-telefone">${contato}</div>
+        `;
+        leftDiv.appendChild(infoDiv);
+
+        // Bloco da senha (ou indicação de Google)
         const senhaDiv = document.createElement("div");
         senhaDiv.className = "aluno-senha";
-        senhaDiv.textContent = `Senha: ${aluno.senha || ""}`;
+        senhaDiv.textContent = isGoogle ? "Login Google" : `Senha: ${aluno.senha || ""}`;
 
+        // Ações
         const actionsDiv = document.createElement("div");
         actionsDiv.className = "aluno-actions";
 
-        const botaoCopiar = document.createElement("button");
-        botaoCopiar.textContent = "Copiar";
-        botaoCopiar.className = "copiar-btn";
-        botaoCopiar.onclick = () => copiarDadosAcesso(aluno.nome, aluno.telefone, aluno.senha || "", botaoCopiar);
+        // Botão de Copiar (apenas para quem tem senha/telefone)
+        if (!isGoogle && aluno.telefone && aluno.senha) {
+            const botaoCopiar = document.createElement("button");
+            botaoCopiar.textContent = "Copiar";
+            botaoCopiar.className = "copiar-btn";
+            botaoCopiar.onclick = () => copiarDadosAcesso(aluno.nome, aluno.telefone, aluno.senha || "", botaoCopiar);
+            actionsDiv.appendChild(botaoCopiar);
+        }
 
         const botaoAcesso = document.createElement("button");
         botaoAcesso.textContent = aluno.acesso === "Liberado" ? "Bloquear" : "Liberar";
@@ -290,17 +441,27 @@ function renderListaAlunos(alunos) {
         const botaoExcluir = document.createElement("button");
         botaoExcluir.textContent = "Excluir";
         botaoExcluir.className = "excluir-btn";
-        botaoExcluir.onclick = () => excluirAluno(aluno.id, aluno.telefone, li);
+        botaoExcluir.onclick = () => excluirAluno(aluno.id, aluno.telefone || aluno.nome, li);
 
-        actionsDiv.appendChild(botaoCopiar);
         actionsDiv.appendChild(botaoAcesso);
         actionsDiv.appendChild(botaoExcluir);
 
-        li.appendChild(infoDiv);
+        li.appendChild(leftDiv);
         li.appendChild(senhaDiv);
         li.appendChild(actionsDiv);
         lista.appendChild(li);
     });
+}
+
+// Atualizar e sincronizar as duas listas (Pendentes e Cadastrados)
+function atualizarTelas() {
+    const pendentes = alunosCarregados.filter(a => a.acesso === "Pendente");
+    const ativos = alunosCarregados.filter(a => a.acesso !== "Pendente");
+
+    renderListaPendentes(pendentes);
+
+    const searchQuery = document.getElementById("searchAlunos").value.toLowerCase().trim();
+    filtrarEApresentarAlunos(searchQuery, ativos);
 }
 
 // Carregar lista de alunos do Firestore
@@ -318,21 +479,22 @@ async function carregarAlunos() {
         // Ordena por nome de A-Z
         alunosCarregados.sort((a, b) => (a.nome || "").localeCompare(b.nome || ""));
         
-        const searchQuery = document.getElementById("searchAlunos").value.toLowerCase().trim();
-        filtrarEApresentarAlunos(searchQuery);
+        atualizarTelas();
     } catch (error) {
         console.error("Erro ao carregar alunos:", error);
     }
 }
 
-// Filtrar e renderizar os alunos com base na busca
-function filtrarEApresentarAlunos(query) {
+// Filtrar e renderizar os alunos cadastrados com base na busca
+function filtrarEApresentarAlunos(query, listaBase) {
+    const base = listaBase || alunosCarregados.filter(a => a.acesso !== "Pendente");
     if (!query) {
-        renderListaAlunos(alunosCarregados);
+        renderListaAlunos(base);
     } else {
-        const filtered = alunosCarregados.filter(aluno => 
+        const filtered = base.filter(aluno => 
             (aluno.nome || "").toLowerCase().includes(query) || 
-            (aluno.telefone || "").toLowerCase().includes(query)
+            (aluno.telefone || "").toLowerCase().includes(query) ||
+            (aluno.email || "").toLowerCase().includes(query)
         );
         renderListaAlunos(filtered);
     }
@@ -356,7 +518,7 @@ document.addEventListener("keydown", (e) => {
     }
 });
 
-// Toggle de acesso do aluno
+// Toggle de acesso do aluno (Liberar / Bloquear)
 async function toggleAcesso(id, liElement) {
     const botao = liElement.querySelector(".acesso-btn");
     const acessoAtual = botao.textContent === "Bloquear" ? "Liberado" : "Bloqueado";
@@ -382,8 +544,8 @@ async function toggleAcesso(id, liElement) {
 }
 
 // Função para excluir aluno
-async function excluirAluno(id, telefone, liElement) {
-    const confirmacao = confirm("Tem certeza que deseja excluir este aluno?");
+async function excluirAluno(id, identificador, liElement) {
+    const confirmacao = confirm(`Tem certeza que deseja excluir o aluno "${identificador || id}"?`);
     if (confirmacao) {
         try {
             await db.collection("alunos").doc(id).delete();
