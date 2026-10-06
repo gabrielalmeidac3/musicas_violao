@@ -586,16 +586,11 @@
         <!-- Seção de Apresentações de Colegas -->
         <div class="colaboradores-section">
             <h3 class="section-title">Apresentações dos Colegas</h3>
-            <div class="desafios-tabs">
-                <button class="tab-btn active">Desafio 1</button>
-                <button class="tab-btn disabled" title="Em breve">
-                    Desafio 2 e 3
-                    <span class="badge-em-breve">Em breve</span>
-                </button>
-                <button class="tab-btn disabled" title="Em breve">
-                    Desafio 4
-                    <span class="badge-em-breve">Em breve</span>
-                </button>
+            <div class="desafios-tabs" id="colegasTabs">
+                <button class="tab-btn active" onclick="trocarAbaColegas('1')">Desafio 1</button>
+                <button class="tab-btn" onclick="trocarAbaColegas('2')">Desafio 2</button>
+                <button class="tab-btn" onclick="trocarAbaColegas('3')">Desafio 3</button>
+                <button class="tab-btn" onclick="trocarAbaColegas('4')">Desafio 4</button>
             </div>
             
             <div class="carousel-wrapper">
@@ -651,16 +646,37 @@
             }
         ];
 
-        // Lista de alunos do Desafio 1 fornecida pelo produtor
-        const colegasDS1 = [
-            { nome: "Geni", local: "Goiás", videoId: "bo0EowNe4hU" },
-            { nome: "Carlos", local: "Foz do Iguaçu - Paraná", videoId: "lxX8IGwdQ4g" },
-            { nome: "Nina", local: "Araxá - Minas Gerais", videoId: "mE6sYgbEP2Y" },
-            { nome: "Gracie", local: "São Paulo", videoId: "bXnIngn6_V4" },
-            { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "J-x5eJylbc4" },
-            { nome: "Clerionise", local: "Monte Carmelo - MG", videoId: "rSEX_GAqN7U" }
-        ];
+        // Apresentações dos alunos organizadas por desafio
+        const colegasPorDesafio = {
+            "1": [
+                { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "W6_pm6q79bw" },
+                { nome: "Geni", local: "Goiás", videoId: "bo0EowNe4hU" },
+                { nome: "Carlos", local: "Foz do Iguaçu - Paraná", videoId: "lxX8IGwdQ4g" },
+                { nome: "Nina", local: "Araxá - Minas Gerais", videoId: "mE6sYgbEP2Y" },
+                { nome: "Gracie", local: "São Paulo", videoId: "bXnIngn6_V4" },
+                { nome: "Fátima (Versão 1)", local: "Camaragibe - Pernambuco", videoId: "J-x5eJylbc4" },
+                { nome: "Clerionise", local: "Monte Carmelo - MG", videoId: "rSEX_GAqN7U" }
+            ],
+            "2": [
+                { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "oBG-2805L-A" },
+                { nome: "Clerionise", local: "Monte Carmelo - MG", videoId: "ir4BnAdoeLE" },
+                { nome: "Geni", local: "Goiás", videoId: "ohgCAsEyfaU" },
+                { nome: "Sidnei", local: "São Paulo", videoId: "N0noatCDR08" }
+            ],
+            "3": [
+                { nome: "Carlos", local: "Foz do Iguaçu - Paraná", videoId: "R2z1_qUM37I" },
+                { nome: "Amélia", local: "São Paulo", videoId: "Fe2CUKkFbNM" },
+                { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "tHI-BKVFl30" },
+                { nome: "Geni", local: "Goiás", videoId: "YXB4XZ3NjKU" },
+                { nome: "Sidnei", local: "São Paulo", videoId: "2E9QvUL-Bs4" }
+            ],
+            "4": [
+                { nome: "Carlos", local: "Foz do Iguaçu - Paraná", videoId: "-b2bZYg8YI0" },
+                { nome: "Fátima", local: "Camaragibe - Pernambuco", videoId: "_cAlh8gZVho" }
+            ]
+        };
 
+        let abaColegasAtiva = "1";
         let slideAtual = 0;
         let desafioAtivoId = null;
 
@@ -744,6 +760,25 @@
             });
         }
 
+        // Alterna a aba de Desafio nos Colegas
+        function trocarAbaColegas(desafioId) {
+            pararVideosAtivos();
+            abaColegasAtiva = desafioId;
+            slideAtual = 0;
+
+            const tabs = document.querySelectorAll('#colegasTabs .tab-btn');
+            tabs.forEach(tab => {
+                const clickAttr = tab.getAttribute('onclick') || '';
+                tab.classList.toggle('active', clickAttr.includes(`'${desafioId}'`));
+            });
+
+            renderColegasCarousel();
+        }
+
+        function getColegasAtuais() {
+            return colegasPorDesafio[abaColegasAtiva] || [];
+        }
+
         // Funções do Carrossel de Colegas
         function renderColegasCarousel() {
             const track = document.getElementById('colegas-track');
@@ -751,7 +786,9 @@
             track.innerHTML = '';
             dotsContainer.innerHTML = '';
 
-            colegasDS1.forEach((aluno, index) => {
+            const alunos = getColegasAtuais();
+
+            alunos.forEach((aluno, index) => {
                 const slide = document.createElement('div');
                 slide.className = 'carousel-slide';
                 slide.innerHTML = `
@@ -782,15 +819,18 @@
                 dot.onclick = () => irParaSlide(index);
                 dotsContainer.appendChild(dot);
             });
+
+            track.style.transform = `translateX(0%)`;
         }
 
         function pararVideosAtivos() {
             const wrappers = document.querySelectorAll('#colegas-track .video-wrapper');
+            const alunos = getColegasAtuais();
             wrappers.forEach((wrapper, idx) => {
                 const iframe = wrapper.querySelector('iframe');
-                if (iframe) {
-                    const videoId = colegasDS1[idx].videoId;
-                    const nome = colegasDS1[idx].nome;
+                if (iframe && alunos[idx]) {
+                    const videoId = alunos[idx].videoId;
+                    const nome = alunos[idx].nome;
                     wrapper.innerHTML = `
                         <img alt="Apresentação de ${nome}" src="https://img.youtube.com/vi/${videoId}/hqdefault.jpg">
                         <div class="play-button"></div>
@@ -802,8 +842,9 @@
         function irParaSlide(index) {
             const track = document.getElementById('colegas-track');
             const dots = document.querySelectorAll('.carousel-dot');
-            const totalSlides = colegasDS1.length;
+            const totalSlides = getColegasAtuais().length;
             
+            if (totalSlides === 0) return;
             if (index < 0) index = totalSlides - 1;
             if (index >= totalSlides) index = 0;
             
