@@ -34,3 +34,12 @@ function toggleSection(element) {
     ? element.getAttribute('data-original-text')
     : element.getAttribute('data-close-text');
 }
+
+// Link do grupo de WhatsApp aberto para conversas
+const LINK_GRUPO_CONVERSAS_DEFAULT = 'https://chat.whatsapp.com/BPydwx8BUi1DxlSZeuQFZb';
+
+function abrirGrupo() {
+  const link = (typeof LINK_GRUPO_CONVERSAS !== 'undefined' && LINK_GRUPO_CONVERSAS) ? LINK_GRUPO_CONVERSAS : LINK_GRUPO_CONVERSAS_DEFAULT;
+  window.open(link, '_blank');
+}
+

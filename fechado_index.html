@@ -347,24 +347,7 @@
                                         window.closeModal = closeModal;
                                         
                                         function calcularRolagemTexto() {
-                                            const divs = document.querySelectorAll('.btn-scroll-text');
-                                            
-                                            divs.forEach(div => {
-                                                div.style.animation = 'none';
-                                                
-                                                setTimeout(() => {
-                                                    const parentWidth = div.parentElement.offsetWidth;
-                                                    const textWidth = div.scrollWidth;
-                                                    
-                                                    const marginTotal = 30;
-                                                    const distancia = -(textWidth - (parentWidth - marginTotal));
-                                                    
-                                                    if (textWidth > parentWidth) {
-                                                        div.style.setProperty('--scroll-distance', distancia + 'px');
-                                                        div.style.animation = 'rolarTexto 5s ease-in-out infinite';
-                                                    }
-                                                }, 10);
-                                            });
+                                            // Desativado para permitir quebra de linha natural em 2 linhas
                                         }
                                         
                                         window.addEventListener('load', calcularRolagemTexto);
@@ -454,23 +437,14 @@
         }
     </script>
     <style>
-     @keyframes rolarTexto {
-            0% {
-                transform: translateX(0);
-            }
-            85% {
-                transform: translateX(var(--scroll-distance, 0px));
-            }
-            100% {
-                transform: translateX(var(--scroll-distance, 0px));
-            }
-        }
-        
         .btn-scroll-text {
-            display: inline-block;
-            animation: rolarTexto 5s ease-in-out infinite;
-            margin: 0 15px;
-            box-sizing: content-box;
+            display: block;
+            width: 100%;
+            text-align: center;
+            white-space: normal;
+            margin: 0;
+            padding: 0;
+            line-height: 1.3;
         }
         #loading {
             text-align: center;

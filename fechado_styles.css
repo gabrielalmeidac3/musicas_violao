@@ -776,10 +776,53 @@ button {
     filter: brightness(90%);
 }
 
+.btn-grupo-conversas {
+    transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.btn-grupo-conversas:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+}
+
+.btn-grupo-conversas:active {
+    transform: scale(0.98);
+}
+
+.modal-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.modal-content::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 4px;
+}
+
+.modal-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.4);
+}
+
 @media (max-width: 600px) {
     .toggle-header {
         font-size: 16px;
         padding: 12px;
+    }
+    .btn-grupo-conversas {
+        padding: 8px 10px;
+        gap: 10px;
+    }
+    .btn-grupo-conversas img {
+        width: 46px !important;
+        height: 46px !important;
+        min-width: 46px;
+    }
+    .btn-grupo-conversas span {
+        font-size: 13.5px !important;
     }
     .modal-content {
         width: 95%;

@@ -8,9 +8,12 @@
 <link href="fechado_styles.css" rel="stylesheet"/>
 <style>
   .search-container {
-    margin: 10px 0;
+    width: 100%;
+    max-width: 100%;
+    margin: 15px auto;
     position: relative;
     z-index: 1000;
+    box-sizing: border-box;
     background: linear-gradient(135deg, #2594a3 0%, #1e7a87 100%);
     padding: 12px;
     border-radius: 15px;
@@ -223,7 +226,11 @@
 <div class="toggle-content">
   <div class="toggle-section">
     <div class="search-wrapper">
-      <input type="text" id="searchInput" placeholder="Pesquise pelo nome ou número da aula" />
+      <input type="text" id="searchInput" placeholder="Clique aqui para pesquisar pelo..." />
+      <svg class="search-icon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="position: absolute; right: 18px; top: 50%; transform: translateY(-50%); color: rgba(255, 255, 255, 0.7); pointer-events: none; z-index: 10;">
+        <circle cx="11" cy="11" r="8"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
       <div id="searchResults" class="search-results" style="margin-bottom:20px;"></div>
 
       <button id="toggleModulesBtn" class="toggle-modules-btn">Abrir pesquisa por módulos</button>
@@ -405,7 +412,7 @@
 </div>
 <div class="video-title">M1 Aula 9 Aprenda Todos os Acordes</div>
 <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
-<div class="video-description">Baixe o Dicionário de Acordes - Link Abaixo <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>  FAMÍLIAS DE ACORDES MAIS SIMPLES PRA VOCÊ JÁ COMEÇAR NO VIOLÃO  Família 1 - A, E, D Família 2 - D, A, G Família 3 - G, D, C Família 4 - E, B7, A</div>
+<div class="video-description">Baixe o Dicionário de Acordes - Link Abaixo <a href="https://drive.google.com/file/d/1X9yzzEFpetY_9sISRcHdfpEsT-KfTIox/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1X9yzzEFpetY_9sISRcHdfpEsT-KfTIox/view?usp=sharing</a>  FAMÍLIAS DE ACORDES MAIS SIMPLES PRA VOCÊ JÁ COMEÇAR NO VIOLÃO  Família 1 - A, E, D Família 2 - D, A, G Família 3 - G, D, C Família 4 - E, B7, A</div>
 </div>
 <div class="video-container" id="lesson-10">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/hJ3oQR9rtF4" onclick="loadVideo(this)">
@@ -432,7 +439,7 @@
 </div>
 <div class="video-title">M1 Aula 12 Acordes de pestana feitos sem pestana</div>
 <div class="description-toggle" onclick="toggleDescription(this)">Mostrar descrição</div>
-<div class="video-description">BAIXE O DICIONÁRIO DE ACORDES: <a href="https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1rvzlZsSPwxwYaqAPZWOghW8ouD441tdJ/view?usp=sharing</a>    - Existe a hora certa de colocar a voz em relação às batidas  Guarânia - 5 batidas - ↓↑↓↑↓  - Geralmente o ritmo começa na sílaba forte da palavra   - Faça pedaço por pedaço até ficar bom   - Dica de cantarolar a melodia   - Acertar o começo pra depois continuar  - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
+<div class="video-description">BAIXE O DICIONÁRIO DE ACORDES: <a href="https://drive.google.com/file/d/1X9yzzEFpetY_9sISRcHdfpEsT-KfTIox/view?usp=sharing" target="_blank">https://drive.google.com/file/d/1X9yzzEFpetY_9sISRcHdfpEsT-KfTIox/view?usp=sharing</a>    - Existe a hora certa de colocar a voz em relação às batidas  Guarânia - 5 batidas - ↓↑↓↑↓  - Geralmente o ritmo começa na sílaba forte da palavra   - Faça pedaço por pedaço até ficar bom   - Dica de cantarolar a melodia   - Acertar o começo pra depois continuar  - Ouvir bastante a música original ou alguém tocando e cantando - REFERÊNCIA (Ouvir e depois fazer sozinho ou deixar tocando e fazer junto)</div>
 </div>
 <div class="video-container" id="lesson-13">
 <div class="video-wrapper" data-src="https://www.youtube.com/embed/T_cLeLBc5wY" onclick="loadVideo(this)">
